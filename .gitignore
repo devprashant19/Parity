@@ -1,0 +1,15 @@
+# Personal learner profile
+/devpost/learner-profile.md
+
+# Local credential files
+.env
+.env.*
+!.env.example
+
+# Dependencies and build outputs
+node_modules/
+.next/
+out/
+test-results/
+.DS_Store
+*.log
