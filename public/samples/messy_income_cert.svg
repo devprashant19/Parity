@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 520" width="600" height="520">
+  <defs>
+    <linearGradient id="paperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="520" fill="#f1f5f9" />
+  <g transform="translate(15, 15)">
+    <rect width="570" height="490" rx="8" fill="url(#paperGrad)" stroke="#cbd5e1" stroke-width="2" />
+    <rect x="8" y="8" width="554" height="474" rx="4" fill="none" stroke="#d97706" stroke-width="1.5" stroke-dasharray="4 2" />
+    
+    <!-- Header -->
+    <text x="285" y="55" font-family="Georgia, serif" font-size="19" font-weight="bold" text-anchor="middle" fill="#0f172a">OFFICE OF THE REVENUE & TAX AUTHORITY</text>
+    <text x="285" y="80" font-family="Inter, sans-serif" font-size="12" text-anchor="middle" fill="#64748b">Annual Family Income Certificate (Form No. 16-B)</text>
+    <line x1="40" y1="100" x2="530" y2="100" stroke="#e2e8f0" stroke-width="1.5" />
+    
+    <text x="40" y="140" font-family="Inter, sans-serif" font-size="12" font-style="italic" fill="#64748b">Verified Official Record Excerpt • Higher Education Application Portal</text>
+    
+    <!-- Fields -->
+    
+    <g transform="translate(40, 180)">
+      <rect width="520" height="40" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" />
+      <text x="16" y="25" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#475569">Certified Applicant Name:</text>
+      <text x="220" y="25" font-family="JetBrains Mono, monospace" font-size="14" font-weight="700" fill="#0f172a">S. Sharma</text>
+    </g>
+    <g transform="translate(40, 228)">
+      <rect width="520" height="40" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" />
+      <text x="16" y="25" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#475569">Assessed Income:</text>
+      <text x="220" y="25" font-family="JetBrains Mono, monospace" font-size="14" font-weight="700" fill="#0f172a">₹15,000 per month</text>
+    </g>
+    <g transform="translate(40, 276)">
+      <rect width="520" height="40" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" />
+      <text x="16" y="25" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#475569">Certificate Issue Date:</text>
+      <text x="220" y="25" font-family="JetBrains Mono, monospace" font-size="14" font-weight="700" fill="#0f172a">12/08/2024</text>
+    </g>
+    <g transform="translate(40, 324)">
+      <rect width="520" height="40" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" />
+      <text x="16" y="25" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#475569">Validity Period:</text>
+      <text x="220" y="25" font-family="JetBrains Mono, monospace" font-size="14" font-weight="700" fill="#0f172a">1 Year (FY 2024-2025)</text>
+    </g>
+    
+    <!-- Official Stamp -->
+    <g transform="translate(380, 410)">
+      <circle cx="50" cy="30" r="34" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="3 2" />
+      <text x="50" y="27" font-family="Inter, sans-serif" font-size="9" font-weight="bold" text-anchor="middle" fill="#dc2626">REVENUE DEPT</text>
+      <text x="50" y="39" font-family="Inter, sans-serif" font-size="8" text-anchor="middle" fill="#dc2626">OFFICIAL VERIFIED</text>
+    </g>
+    <text x="40" y="450" font-family="Inter, sans-serif" font-size="10" fill="#94a3b8">Document Security ID: SYNTHETIC-PARITY-POC-TEST-ONLY</text>
+  </g>
+</svg>
