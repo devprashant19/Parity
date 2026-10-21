@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-canvas: #f9f9fb;
+    --bg-surface: #ffffff;
+    --border-subtle: #e2e2e8;
+    --text-ink: #1a1a1e;
+    --text-muted: #64748b;
+  }
+
+  .dark {
+    --bg-canvas: #121316;
+    --bg-surface: #1a1b20;
+    --border-subtle: #26282e;
+    --text-ink: #ececf1;
+    --text-muted: #94a3b8;
+  }
+
+  body {
+    background-color: var(--bg-canvas);
+    color: var(--text-ink);
+    font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+.font-serif-heading {
+  font-family: var(--font-newsreader), Georgia, serif;
+}
+
+.font-mono-val {
+  font-family: var(--font-mono), 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* Custom highlight styling */
+.evidence-highlight {
+  background-color: rgba(250, 204, 21, 0.28);
+  border-bottom: 2px solid #eab308;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-weight: 600;
+}
