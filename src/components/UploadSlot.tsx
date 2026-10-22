@@ -77,7 +77,7 @@ export function UploadSlot({
             )}
           </div>
           <div>
-            <h4 className="text-sm font-bold text-[#0F172A] dark:text-[#F1F5F9]">{label}</h4>
+            <h3 className="text-sm font-bold text-[#0F172A] dark:text-[#F1F5F9]">{label}</h3>
             <p className="text-[11px] text-[#475569] dark:text-[#94A3B8]">{expectedType}</p>
           </div>
         </div>
@@ -112,7 +112,7 @@ export function UploadSlot({
               >
                 {loadedDoc.fileName}
               </p>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+              <p className="text-[10px] text-slate-600 dark:text-slate-300 font-medium">
                 {loadedDoc.fileSize} {loadedDoc.isSample ? '• Pre-verified Sample' : '• Uploaded'}
               </p>
             </div>
@@ -139,7 +139,7 @@ export function UploadSlot({
           <p className="text-xs text-slate-600 dark:text-slate-300 font-medium">
             Drop file or <span className="text-blue-600 dark:text-blue-400 font-semibold underline underline-offset-2">browse</span>
           </p>
-          <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{description}</p>
+          <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium mt-0.5">{description}</p>
         </div>
       )}
     </div>

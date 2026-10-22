@@ -226,7 +226,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17] text-[#0F172A] dark:text-[#F1F5F9] flex flex-col transition-colors">
       <TopBar />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">
+      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">
         {/* Fallback Error Banner */}
         {apiErrorBanner && (
           <div className="p-4 bg-amber-50/90 border border-amber-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-amber-950 shadow-xs animate-fadeIn dark:bg-amber-950/40 dark:border-amber-900/60 dark:text-amber-200">

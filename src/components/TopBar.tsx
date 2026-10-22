@@ -23,9 +23,9 @@ export function TopBar() {
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <span className="font-serif-heading text-xl font-bold tracking-tight text-[#0F172A] dark:text-[#F1F5F9]">
+              <h1 className="font-serif-heading text-xl font-bold tracking-tight text-[#0F172A] dark:text-[#F1F5F9] inline-flex items-center">
                 Parity
-              </span>
+              </h1>
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200/60 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900/40">
                 PoC Verification
               </span>
@@ -38,7 +38,7 @@ export function TopBar() {
 
         <div className="flex items-center space-x-3.5">
           <div className="hidden sm:flex items-center space-x-2 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-200/70 text-xs font-medium text-slate-700 dark:bg-slate-900/60 dark:border-slate-800 dark:text-slate-300">
-            <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
             <span>Deterministic Engine Active</span>
           </div>
 
