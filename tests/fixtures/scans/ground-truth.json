@@ -1,0 +1,142 @@
+[
+  {
+    "scan_id": "scan_01_clean_form",
+    "file": "scan_01_clean_form.png",
+    "document_type": "application_form",
+    "document_label": "Application Form",
+    "difficulty": "clean",
+    "expected_fields": {
+      "name": { "value": "Suresh Sharma", "quote": "Applicant Name: Suresh Sharma" },
+      "academic_year": { "value": "2024-25", "quote": "Academic Year Applied: 2024-25" },
+      "marks": { "value": "92.4%", "quote": "Aggregate 12th Board Marks: 92.4%" },
+      "income": { "value": "₹2,40,000 per annum", "quote": "Declared Annual Family Income: ₹2,40,000 per annum" },
+      "issue_date": { "value": "15/07/2024", "quote": "Date of Submission: 15/07/2024" }
+    }
+  },
+  {
+    "scan_id": "scan_02_clean_marksheet",
+    "file": "scan_02_clean_marksheet.png",
+    "document_type": "marksheet",
+    "document_label": "Marksheet",
+    "difficulty": "clean",
+    "expected_fields": {
+      "name": { "value": "Suresh Sharma", "quote": "Name of Student: Suresh Sharma" },
+      "academic_year": { "value": "2024-25", "quote": "Academic Year: 2024-25" },
+      "marks": { "value": "89.4%", "quote": "Aggregate Percentage: 89.4%" },
+      "income": null,
+      "issue_date": null
+    }
+  },
+  {
+    "scan_id": "scan_03_clean_income_cert",
+    "file": "scan_03_clean_income_cert.png",
+    "document_type": "income_certificate",
+    "document_label": "Income Certificate",
+    "difficulty": "clean",
+    "expected_fields": {
+      "name": { "value": "Suresh Sharma", "quote": "This is to certify that Suresh Sharma" },
+      "academic_year": null,
+      "marks": null,
+      "income": { "value": "₹1,80,000", "quote": "Annual Family Income is ₹1,80,000" },
+      "issue_date": { "value": "12/08/2024", "quote": "Issued under my hand and seal on 12/08/2024" }
+    }
+  },
+  {
+    "scan_id": "scan_04_blurry_marksheet",
+    "file": "scan_04_blurry_marksheet.jpg",
+    "document_type": "marksheet",
+    "document_label": "Marksheet",
+    "difficulty": "blurry",
+    "expected_fields": {
+      "name": { "value": "Suresh Sharma", "quote": "Name of Student: Suresh Sharma" },
+      "academic_year": { "value": "2024-25", "quote": "Academic Year: 2024-25" },
+      "marks": { "value": "89.4%", "quote": "Aggregate Percentage: 89.4%" },
+      "income": null,
+      "issue_date": null
+    }
+  },
+  {
+    "scan_id": "scan_05_rotated_income_cert",
+    "file": "scan_05_rotated_income_cert.jpg",
+    "document_type": "income_certificate",
+    "document_label": "Income Certificate",
+    "difficulty": "rotated",
+    "expected_fields": {
+      "name": { "value": "Suresh Sharma", "quote": "This is to certify that Suresh Sharma" },
+      "academic_year": null,
+      "marks": null,
+      "income": { "value": "₹1,80,000 per year", "quote": "Annual Family Income is ₹1,80,000" },
+      "issue_date": { "value": "12/08/2024", "quote": "Issued under my hand and seal on 12/08/2024" }
+    }
+  },
+  {
+    "scan_id": "scan_06_messy_initials_marksheet",
+    "file": "scan_06_messy_initials_marksheet.png",
+    "document_type": "marksheet",
+    "document_label": "Marksheet",
+    "difficulty": "initials",
+    "expected_fields": {
+      "name": { "value": "S. Sharma", "quote": "Name of Student: S. Sharma" },
+      "academic_year": { "value": "2024-25", "quote": "Academic Year: 2024-25" },
+      "marks": { "value": "89.4%", "quote": "Aggregate Percentage: 89.4%" },
+      "income": null,
+      "issue_date": null
+    }
+  },
+  {
+    "scan_id": "scan_07_monthly_income_cert",
+    "file": "scan_07_monthly_income_cert.png",
+    "document_type": "income_certificate",
+    "document_label": "Income Certificate",
+    "difficulty": "monthly_period",
+    "expected_fields": {
+      "name": { "value": "Suresh Sharma", "quote": "This is to certify that Suresh Sharma" },
+      "academic_year": null,
+      "marks": null,
+      "income": { "value": "₹15,000 per month", "quote": "Monthly Family Income is ₹15,000 per month" },
+      "issue_date": { "value": "12/08/2024", "quote": "Issued under my hand and seal on 12/08/2024" }
+    }
+  },
+  {
+    "scan_id": "scan_08_honorific_form",
+    "file": "scan_08_honorific_form.png",
+    "document_type": "application_form",
+    "document_label": "Application Form",
+    "difficulty": "honorific",
+    "expected_fields": {
+      "name": { "value": "Shri Suresh Sharma", "quote": "Applicant Name: Shri Suresh Sharma" },
+      "academic_year": { "value": "2024-25", "quote": "Academic Year Applied: 2024-25" },
+      "marks": { "value": "92.4%", "quote": "Aggregate 12th Board Marks: 92.4%" },
+      "income": { "value": "₹2,40,000 per annum", "quote": "Declared Annual Family Income: ₹2,40,000 per annum" },
+      "issue_date": { "value": "15/07/2024", "quote": "Date of Submission: 15/07/2024" }
+    }
+  },
+  {
+    "scan_id": "scan_09_low_contrast_income",
+    "file": "scan_09_low_contrast_income.jpg",
+    "document_type": "income_certificate",
+    "document_label": "Income Certificate",
+    "difficulty": "faded_ink",
+    "expected_fields": {
+      "name": { "value": "Suresh Sharma", "quote": "This is to certify that Suresh Sharma" },
+      "academic_year": null,
+      "marks": null,
+      "income": { "value": "₹1,80,000 per annum", "quote": "Annual Family Income is ₹1,80,000" },
+      "issue_date": { "value": "12/08/2024", "quote": "Issued under my hand and seal on 12/08/2024" }
+    }
+  },
+  {
+    "scan_id": "scan_10_conflict_name_form",
+    "file": "scan_10_conflict_name_form.png",
+    "document_type": "application_form",
+    "document_label": "Application Form",
+    "difficulty": "conflicting_name",
+    "expected_fields": {
+      "name": { "value": "Suresh Verma", "quote": "Applicant Name: Suresh Verma" },
+      "academic_year": { "value": "2024-25", "quote": "Academic Year Applied: 2024-25" },
+      "marks": { "value": "92.4%", "quote": "Aggregate 12th Board Marks: 92.4%" },
+      "income": { "value": "₹2,40,000 per annum", "quote": "Declared Annual Family Income: ₹2,40,000 per annum" },
+      "issue_date": { "value": "15/07/2024", "quote": "Date of Submission: 15/07/2024" }
+    }
+  }
+]
