@@ -223,7 +223,7 @@ export default function HomePage() {
   const activeField = verificationResult?.fields.find((f) => f.field_id === selectedFieldId) || null;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17] text-[#0F172A] dark:text-[#F1F5F9] flex flex-col transition-colors">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#080A0F] text-[#0F172A] dark:text-[#F8FAFC] flex flex-col transition-colors">
       <TopBar />
 
       <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">

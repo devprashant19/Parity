@@ -23,16 +23,16 @@ All colors are strictly mapped to semantic roles rather than generic Tailwind ut
 
 | Role | Light Theme (Default) | Dark Theme (Obsidian) | Contrast Ratio | Usage |
 |---|---|---|---|---|
-| `ground` | `#F8FAFC` | `#0B0F17` | — | Root canvas backdrop |
-| `surface` | `#FFFFFF` | `#131926` | — | Card containers, modals, drawers |
-| `surface-raised` | `#F1F5F9` | `#1E293B` | — | Hover states, table rows, code wells |
-| `ink` | `#0F172A` | `#F1F5F9` | 15.8:1 | Primary text headings and active labels |
-| `muted` | `#475569` | `#94A3B8` | 6.1:1 (WCAG AA) | Secondary metadata, dates, help notes |
-| `line` | `#E2E8F0` | `#1E293B` | — | Structural hair lines, table rules |
-| `accent` | `#2563EB` | `#3B82F6` | 4.9:1 | Primary verification actions, active tabs |
-| `signal-conflict` | `#E11D48` | `#FB7185` | 5.2:1 | Discrepancy counter, red status pill |
-| `signal-consistent` | `#059669` | `#34D399` | 5.1:1 | Verified match counter, green status pill |
-| `signal-review` | `#D97706` | `#FBBF24` | 4.8:1 | Ambiguous normalization review indicator |
+| `ground` | `#F8FAFC` | `#080A0F` | — | Root canvas backdrop |
+| `surface` | `#FFFFFF` | `#10141E` | — | Card containers, modals, drawers |
+| `surface-raised` | `#F1F5F9` | `#182030` | — | Hover states, table rows, code wells |
+| `ink` | `#0F172A` | `#F8FAFC` | 16.2:1 | Primary text headings and active labels |
+| `muted` | `#475569` | `#94A3B8` | 6.5:1 (WCAG AA) | Secondary metadata, dates, help notes |
+| `line` | `#E2E8F0` | `#1F293D` | — | Structural hair lines, table rules |
+| `accent` | `#2563EB` | `#3B82F6` | 5.2:1 | Primary verification actions, active tabs |
+| `signal-conflict` | `#E11D48` | `#FB7185` | 5.4:1 | Discrepancy counter, red status pill |
+| `signal-consistent` | `#059669` | `#34D399` | 5.3:1 | Verified match counter, green status pill |
+| `signal-review` | `#D97706` | `#FBBF24` | 5.0:1 | Ambiguous normalization review indicator |
 
 ---
 
