@@ -36,10 +36,10 @@ export function IngestionZone({
     uploadedDocs.income_certificate !== null;
 
   return (
-    <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5 sm:p-6 shadow-xs dark:bg-[#131926] dark:border-[#1E293B] transition-all">
-      <div className="flex flex-col md:flex-row md:items-center justify-between pb-5 border-b border-[#E2E8F0] dark:border-[#1E293B] gap-4">
+    <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5 sm:p-6 shadow-xs dark:bg-[#10141E] dark:border-[#1F293D] transition-all duration-200 hover-card-lift">
+      <div className="flex flex-col md:flex-row md:items-center justify-between pb-5 border-b border-[#E2E8F0] dark:border-[#1F293D] gap-4">
         <div>
-          <h2 className="font-serif-heading text-lg sm:text-xl font-bold text-[#0F172A] dark:text-[#F1F5F9]">
+          <h2 className="font-serif-heading text-lg sm:text-xl font-bold text-[#0F172A] dark:text-[#F8FAFC]">
             Application Document Packet
           </h2>
           <p className="text-xs text-[#475569] dark:text-[#94A3B8] mt-0.5">
@@ -47,21 +47,21 @@ export function IngestionZone({
           </p>
         </div>
 
-        {/* Action Triggers */}
+        {/* Action Triggers with tactile hover & press feedback */}
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={onLoadCleanSample}
-            className="inline-flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-[#0F172A] text-white hover:bg-slate-800 transition-all duration-200 shadow-xs hover:-translate-y-0.5 cursor-pointer dark:bg-white dark:text-[#0F172A] dark:hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            className="inline-flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-[#0F172A] text-white hover:bg-slate-800 transition-all duration-200 shadow-xs hover:-translate-y-0.5 active-press cursor-pointer dark:bg-white dark:text-[#0F172A] dark:hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 group"
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-300 dark:text-amber-600" />
+            <Sparkles className="w-3.5 h-3.5 text-amber-300 dark:text-amber-600 group-hover:rotate-12 transition-transform duration-200" />
             <span>Load sample scholarship packet</span>
           </button>
 
           <button
             type="button"
             onClick={onLoadMessySample}
-            className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 transition-all duration-200 shadow-xs hover:-translate-y-0.5 cursor-pointer dark:border-slate-700 dark:text-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 transition-all duration-200 shadow-xs hover:-translate-y-0.5 active-press cursor-pointer dark:border-[#2A3854] dark:text-slate-200 dark:bg-[#182030] dark:hover:bg-[#202b40] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           >
             <span>Try a messy packet</span>
           </button>
@@ -70,9 +70,9 @@ export function IngestionZone({
             <button
               type="button"
               onClick={onReset}
-              className="inline-flex items-center space-x-1 px-2.5 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              className="inline-flex items-center space-x-1 px-2.5 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#182030] transition-colors cursor-pointer active-press focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 group"
             >
-              <RefreshCw className="w-3.5 h-3.5" />
+              <RefreshCw className="w-3.5 h-3.5 group-hover:rotate-180 transition-transform duration-300" />
               <span>Reset</span>
             </button>
           )}
@@ -113,7 +113,7 @@ export function IngestionZone({
       </div>
 
       {/* Primary Verification Action Bar */}
-      <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="mt-5 pt-4 border-t border-slate-100 dark:border-[#1F293D] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center space-x-2 text-xs text-slate-500 dark:text-slate-400">
           <Info className="w-4 h-4 text-blue-500 dark:text-blue-400 shrink-0" />
           <span>
@@ -129,8 +129,8 @@ export function IngestionZone({
           onClick={onRunCheck}
           className={`inline-flex items-center justify-center space-x-2 px-6 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 shadow-xs shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
             hasDocuments && !isAnalyzing
-              ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20 hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer'
-              : 'bg-slate-100 text-slate-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-600'
+              ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20 hover:-translate-y-0.5 active-press cursor-pointer hover:shadow-md hover:shadow-blue-500/25'
+              : 'bg-slate-100 text-slate-400 cursor-not-allowed dark:bg-[#182030] dark:text-slate-600'
           }`}
         >
           {isAnalyzing ? (
@@ -140,7 +140,7 @@ export function IngestionZone({
             </>
           ) : (
             <>
-              <Play className="w-3.5 h-3.5 fill-current" />
+              <Play className="w-3.5 h-3.5 fill-current transition-transform group-hover:scale-110" />
               <span>{hasRun ? 'Re-run check' : 'Run check'}</span>
             </>
           )}
@@ -148,7 +148,7 @@ export function IngestionZone({
       </div>
 
       {/* Privacy Notice on Live Ingestion */}
-      <div className="mt-4 p-3.5 bg-amber-50/80 border border-amber-200/80 rounded-xl flex items-start space-x-3 dark:bg-amber-950/20 dark:border-amber-900/40">
+      <div className="mt-4 p-3.5 bg-amber-50/80 border border-amber-200/80 rounded-xl flex items-start space-x-3 dark:bg-amber-950/20 dark:border-amber-900/40 transition-colors">
         <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-500 shrink-0 mt-0.5" />
         <p className="text-xs text-amber-900 dark:text-amber-300 leading-relaxed">
           <strong>Privacy Notice:</strong> Files you upload are sent to Google&apos;s Gemini API to read them. Don&apos;t

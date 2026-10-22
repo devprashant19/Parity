@@ -6,7 +6,9 @@
   :root {
     --bg-canvas: #f8fafc;
     --bg-surface: #ffffff;
+    --bg-surface-raised: #f1f5f9;
     --border-subtle: #e2e8f0;
+    --border-focus: #2563eb;
     --text-ink: #0f172a;
     --text-muted: #475569;
     --color-primary: #1e293b;
@@ -21,20 +23,34 @@
   }
 
   .dark {
-    --bg-canvas: #0b0f17;
-    --bg-surface: #131926;
-    --border-subtle: #1e293b;
-    --text-ink: #f1f5f9;
+    /* Awwwards-caliber Deep Obsidian with Midnight Tint */
+    --bg-canvas: #080a0f;
+    --bg-surface: #10141e;
+    --bg-surface-raised: #182030;
+    --border-subtle: #1f293d;
+    --border-focus: #3b82f6;
+    --text-ink: #f8fafc;
     --text-muted: #94a3b8;
     --color-primary: #f8fafc;
     --color-secondary: #cbd5e1;
     --color-accent: #3b82f6;
     --color-accent-hover: #60a5fa;
-    --color-border: #1e293b;
+    --color-border: #1f293d;
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
     --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Smooth cross-fade transition during theme switch */
+  html.theme-transition,
+  html.theme-transition *,
+  html.theme-transition *::before,
+  html.theme-transition *::after {
+    transition: background-color 250ms cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 250ms cubic-bezier(0.16, 1, 0.3, 1),
+                color 200ms cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 250ms cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
 
   body {
@@ -57,25 +73,48 @@
 
 /* Custom highlight styling for cited evidence quotes */
 .evidence-highlight {
-  background-color: rgba(254, 240, 138, 0.7);
+  background-color: rgba(254, 240, 138, 0.75);
   border-bottom: 2px solid #ca8a04;
   padding: 1px 4px;
-  border-radius: 3px;
+  border-radius: 4px;
   font-weight: 700;
   color: #713f12;
+  box-shadow: 0 0 8px rgba(250, 204, 21, 0.3);
 }
 
 .dark .evidence-highlight {
-  background-color: rgba(202, 138, 4, 0.35);
+  background-color: rgba(202, 138, 4, 0.4);
   border-bottom: 2px solid #facc15;
   color: #fef08a;
+  box-shadow: 0 0 10px rgba(234, 179, 8, 0.25);
+}
+
+/* Tactile Click & Hover Micro-Interactions (Awwwards Caliper Verb) */
+.active-press {
+  transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.active-press:active {
+  transform: scale(0.975);
+}
+
+.hover-card-lift {
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-card-lift:hover {
+  transform: translateY(-2px);
+}
+.hover-card-lift:active {
+  transform: translateY(0) scale(0.99);
 }
 
 /* Smooth keyframe animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -92,12 +131,46 @@
   }
 }
 
+@keyframes badgePop {
+  0% {
+    transform: scale(0.92);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes checkmarkPop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 .animate-fadeIn {
-  animation: fadeIn 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeIn 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-slideIn {
-  animation: slideInRight 260ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slideInRight 300ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-badgePop {
+  animation: badgePop 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-checkmarkPop {
+  animation: checkmarkPop 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -105,5 +178,6 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    transform: none !important;
   }
 }

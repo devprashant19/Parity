@@ -42,21 +42,21 @@ export function FieldChecklist({ fields, selectedFieldId, onSelectField }: Field
     switch (status) {
       case 'Conflict':
         return (
-          <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 dark:bg-red-950/70 dark:text-red-300 border border-red-200 dark:border-red-900">
+          <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 dark:bg-red-950/70 dark:text-red-300 border border-red-200 dark:border-red-900 shadow-xs">
             <AlertTriangle className="w-3.5 h-3.5 text-red-600 dark:text-red-400" />
             <span>Conflict</span>
           </span>
         );
       case 'Consistent':
         return (
-          <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900">
+          <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900 shadow-xs">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             <span>Consistent</span>
           </span>
         );
       case 'Needs Review':
         return (
-          <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300 border border-blue-200 dark:border-blue-900">
+          <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300 border border-blue-200 dark:border-blue-900 shadow-xs">
             <HelpCircle className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
             <span>Needs Review</span>
           </span>
@@ -65,10 +65,10 @@ export function FieldChecklist({ fields, selectedFieldId, onSelectField }: Field
   };
 
   return (
-    <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden shadow-xs dark:bg-[#131926] dark:border-[#1E293B]">
-      <div className="p-4 sm:p-5 border-b border-[#E2E8F0] dark:border-[#1E293B] flex items-center justify-between">
+    <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden shadow-xs dark:bg-[#10141E] dark:border-[#1F293D] transition-all duration-200 hover-card-lift">
+      <div className="p-4 sm:p-5 border-b border-[#E2E8F0] dark:border-[#1F293D] flex items-center justify-between">
         <div>
-          <h3 className="font-serif-heading text-base font-bold text-[#0F172A] dark:text-[#F1F5F9]">
+          <h3 className="font-serif-heading text-base font-bold text-[#0F172A] dark:text-[#F8FAFC]">
             Cross-Document Verification Checklist
           </h3>
           <p className="text-xs text-[#475569] dark:text-[#94A3B8] mt-0.5">
@@ -80,7 +80,7 @@ export function FieldChecklist({ fields, selectedFieldId, onSelectField }: Field
         </span>
       </div>
 
-      <div className="divide-y divide-[#E2E8F0] dark:divide-[#1E293B]">
+      <div className="divide-y divide-[#E2E8F0] dark:divide-[#1F293D]">
         {fields.map((field) => {
           const isSelected = selectedFieldId === field.field_id;
 
@@ -88,15 +88,15 @@ export function FieldChecklist({ fields, selectedFieldId, onSelectField }: Field
             <div
               key={field.field_id}
               onClick={() => onSelectField(field.field_id)}
-              className={`p-4 sm:p-5 flex items-center justify-between cursor-pointer transition-all duration-150 ${
+              className={`p-4 sm:p-5 flex items-center justify-between cursor-pointer transition-all duration-200 group active-press ${
                 isSelected
-                  ? 'bg-blue-50/70 border-l-4 border-blue-600 dark:bg-blue-950/30'
-                  : 'hover:bg-slate-50/80 dark:hover:bg-slate-900/40 border-l-4 border-transparent'
+                  ? 'bg-blue-50/80 border-l-4 border-blue-600 dark:bg-blue-950/40 dark:border-blue-500 shadow-xs'
+                  : 'hover:bg-slate-50/90 dark:hover:bg-[#182030] border-l-4 border-transparent hover:pl-5'
               }`}
             >
               <div className="flex items-start space-x-3.5 min-w-0 pr-4">
                 <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 border ${
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 border transition-transform duration-200 group-hover:scale-105 ${
                     field.status === 'Conflict'
                       ? 'bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-400 border-red-200/70 dark:border-red-900/60'
                       : field.status === 'Consistent'
@@ -109,11 +109,11 @@ export function FieldChecklist({ fields, selectedFieldId, onSelectField }: Field
 
                 <div className="min-w-0">
                   <div className="flex items-center space-x-2">
-                    <h4 className="text-sm font-bold text-[#0F172A] dark:text-[#F1F5F9] truncate">
+                    <h4 className="text-sm font-bold text-[#0F172A] dark:text-[#F8FAFC] truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                       {field.field_label}
                     </h4>
                     {field.resolution !== 'unresolved' && (
-                      <span className="text-[10px] font-bold text-purple-700 bg-purple-100 dark:bg-purple-950/70 dark:text-purple-300 border border-purple-200 dark:border-purple-900 px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] font-bold text-purple-700 bg-purple-100 dark:bg-purple-950/70 dark:text-purple-300 border border-purple-200 dark:border-purple-900 px-2 py-0.5 rounded-full animate-badgePop">
                         Decision recorded
                       </span>
                     )}
@@ -128,7 +128,7 @@ export function FieldChecklist({ fields, selectedFieldId, onSelectField }: Field
                     {field.documents.map((d, i) => (
                       <span
                         key={i}
-                        className="inline-flex items-center text-[11px] font-mono-val px-2.5 py-1 rounded-lg bg-slate-100/90 dark:bg-slate-900/80 text-slate-800 dark:text-slate-200 border border-slate-200/60 dark:border-slate-800"
+                        className="inline-flex items-center text-[11px] font-mono-val px-2.5 py-1 rounded-lg bg-slate-100/90 dark:bg-[#182030] text-slate-800 dark:text-slate-200 border border-slate-200/70 dark:border-[#2A3854] transition-colors"
                       >
                         <span className="text-slate-500 mr-1.5 font-sans font-medium">{d.doc_label.split(' ')[0]}:</span>
                         <strong className="font-bold text-slate-900 dark:text-white">
@@ -142,7 +142,7 @@ export function FieldChecklist({ fields, selectedFieldId, onSelectField }: Field
 
               <div className="flex items-center space-x-3 shrink-0">
                 {getStatusBadge(field.status)}
-                <ChevronRight className="w-4 h-4 text-slate-400" />
+                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-all duration-200" />
               </div>
             </div>
           );
