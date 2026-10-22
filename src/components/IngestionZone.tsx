@@ -127,9 +127,9 @@ export function IngestionZone({
           type="button"
           disabled={!hasDocuments || isAnalyzing}
           onClick={onRunCheck}
-          className={`inline-flex items-center justify-center space-x-2 px-6 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 shadow-xs shrink-0 cursor-pointer ${
+          className={`inline-flex items-center justify-center space-x-2 px-6 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 shadow-xs shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
             hasDocuments && !isAnalyzing
-              ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500'
+              ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20 hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer'
               : 'bg-slate-100 text-slate-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-600'
           }`}
         >

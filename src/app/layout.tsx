@@ -22,9 +22,40 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://parity.devprashant.com'),
   title: 'Parity — Evidence-First Application Packet Verification',
   description:
     'Catch subtle data mismatches across scholarship and college application documents with deterministic verification and inspectable cited evidence.',
+  alternates: {
+    canonical: '/',
+  },
+  icons: {
+    icon: '/favicon.svg',
+  },
+  openGraph: {
+    title: 'Parity — Evidence-First Application Packet Verification',
+    description:
+      'Catch subtle data mismatches across scholarship and college application documents with deterministic verification and inspectable cited evidence.',
+    url: 'https://parity.devprashant.com',
+    siteName: 'Parity',
+    images: [
+      {
+        url: '/samples/clean_form.png',
+        width: 1200,
+        height: 630,
+        alt: 'Parity Application Verification Preview',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Parity — Evidence-First Application Packet Verification',
+    description:
+      'Catch subtle data mismatches across scholarship and college application documents with deterministic verification and inspectable cited evidence.',
+    images: ['/samples/clean_form.png'],
+  },
 };
 
 export default function RootLayout({
@@ -35,8 +66,15 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${newsreader.variable} ${jetbrainsMono.variable}`}>
       <body className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17] text-[#0F172A] dark:text-[#F1F5F9] antialiased">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-xl focus:shadow-xl focus:outline-none focus:ring-2 focus:ring-white text-xs font-bold transition-all"
+        >
+          Skip to main content
+        </a>
         {children}
       </body>
     </html>
   );
 }
+
