@@ -25,12 +25,12 @@ export function DocumentModal({ isOpen, onClose, title, previewUrl, fileName }: 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-      <div className="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col dark:bg-[#1A1B20] border border-slate-200 dark:border-slate-800">
-        <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
+      <div className="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col dark:bg-[#131926] border border-slate-200 dark:border-slate-800">
+        <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800">
           <div>
-            <h3 className="font-serif-heading text-base font-bold text-slate-900 dark:text-slate-100">{title}</h3>
-            {fileName && <p className="text-xs text-slate-500 dark:text-slate-400">{fileName}</p>}
+            <h3 className="font-serif-heading text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">{title}</h3>
+            {fileName && <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-mono-val">{fileName}</p>}
           </div>
 
           <div className="flex items-center space-x-2">
@@ -39,7 +39,7 @@ export function DocumentModal({ isOpen, onClose, title, previewUrl, fileName }: 
                 href={previewUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="p-1.5 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="p-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 title="Open in new tab"
               >
                 <ExternalLink className="w-4 h-4" />
@@ -47,22 +47,23 @@ export function DocumentModal({ isOpen, onClose, title, previewUrl, fileName }: 
             )}
             <button
               onClick={onClose}
-              className="p-1.5 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+              aria-label="Close modal"
+              className="p-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-slate-100 dark:bg-slate-900">
+        <div className="flex-1 overflow-auto p-4 sm:p-6 flex items-center justify-center bg-slate-100/80 dark:bg-[#0B0F17]">
           {previewUrl ? (
             <img
               src={previewUrl}
               alt={title}
-              className="max-h-[75vh] w-auto object-contain rounded-lg shadow-md border border-slate-200 dark:border-slate-800"
+              className="max-h-[72vh] w-auto object-contain rounded-xl shadow-md border border-slate-200 dark:border-slate-800"
             />
           ) : (
-            <p className="text-sm text-slate-400">Document preview unavailable</p>
+            <p className="text-sm font-medium text-slate-400">Document preview unavailable</p>
           )}
         </div>
       </div>

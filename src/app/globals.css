@@ -4,19 +4,37 @@
 
 @layer base {
   :root {
-    --bg-canvas: #f9f9fb;
+    --bg-canvas: #f8fafc;
     --bg-surface: #ffffff;
-    --border-subtle: #e2e2e8;
-    --text-ink: #1a1a1e;
-    --text-muted: #64748b;
+    --border-subtle: #e2e8f0;
+    --text-ink: #0f172a;
+    --text-muted: #475569;
+    --color-primary: #1e293b;
+    --color-secondary: #334155;
+    --color-accent: #2563eb;
+    --color-accent-hover: #1d4ed8;
+    --color-border: #e2e8f0;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
   }
 
   .dark {
-    --bg-canvas: #121316;
-    --bg-surface: #1a1b20;
-    --border-subtle: #26282e;
-    --text-ink: #ececf1;
+    --bg-canvas: #0b0f17;
+    --bg-surface: #131926;
+    --border-subtle: #1e293b;
+    --text-ink: #f1f5f9;
     --text-muted: #94a3b8;
+    --color-primary: #f8fafc;
+    --color-secondary: #cbd5e1;
+    --color-accent: #3b82f6;
+    --color-accent-hover: #60a5fa;
+    --color-border: #1e293b;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
   }
 
   body {
@@ -24,6 +42,7 @@
     color: var(--text-ink);
     font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.011em;
   }
 }
 
@@ -33,13 +52,58 @@
 
 .font-mono-val {
   font-family: var(--font-mono), 'JetBrains Mono', 'Fira Code', monospace;
+  font-feature-settings: 'tnum' on, 'zero' on;
 }
 
-/* Custom highlight styling */
+/* Custom highlight styling for cited evidence quotes */
 .evidence-highlight {
-  background-color: rgba(250, 204, 21, 0.28);
-  border-bottom: 2px solid #eab308;
+  background-color: rgba(254, 240, 138, 0.7);
+  border-bottom: 2px solid #ca8a04;
   padding: 1px 4px;
-  border-radius: 2px;
-  font-weight: 600;
+  border-radius: 3px;
+  font-weight: 700;
+  color: #713f12;
+}
+
+.dark .evidence-highlight {
+  background-color: rgba(202, 138, 4, 0.35);
+  border-bottom: 2px solid #facc15;
+  color: #fef08a;
+}
+
+/* Smooth keyframe animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slideIn {
+  animation: slideInRight 260ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -223,18 +223,18 @@ export default function HomePage() {
   const activeField = verificationResult?.fields.find((f) => f.field_id === selectedFieldId) || null;
 
   return (
-    <div className="min-h-screen bg-[#F9F9FB] dark:bg-[#121316] text-[#1A1A1E] dark:text-[#ECECF1] flex flex-col">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17] text-[#0F172A] dark:text-[#F1F5F9] flex flex-col transition-colors">
       <TopBar />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">
         {/* Fallback Error Banner */}
         {apiErrorBanner && (
-          <div className="p-4 bg-amber-50/90 border border-amber-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-amber-900 shadow-sm animate-fadeIn dark:bg-amber-950/40 dark:border-amber-900/60 dark:text-amber-200">
+          <div className="p-4 bg-amber-50/90 border border-amber-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-amber-950 shadow-xs animate-fadeIn dark:bg-amber-950/40 dark:border-amber-900/60 dark:text-amber-200">
             <div className="flex items-start space-x-3">
               <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-semibold">Live check is unavailable right now</p>
-                <p className="text-xs text-amber-800 dark:text-amber-300 mt-0.5">{apiErrorBanner}</p>
+                <p className="text-sm font-bold">Live check is unavailable right now</p>
+                <p className="text-xs text-amber-900 dark:text-amber-300 mt-0.5">{apiErrorBanner}</p>
               </div>
             </div>
             <button
@@ -243,9 +243,9 @@ export default function HomePage() {
                 handleLoadCleanSample();
                 handleRunCheck();
               }}
-              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-700 text-white hover:bg-amber-800 transition-colors shadow-sm shrink-0 dark:bg-amber-600 dark:hover:bg-amber-500"
+              className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-700 text-white hover:bg-amber-800 transition-all duration-150 shadow-xs hover:-translate-y-0.5 cursor-pointer shrink-0 dark:bg-amber-600 dark:hover:bg-amber-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
             >
-              <Sparkles className="w-3.5 h-3.5" />
+              <Sparkles className="w-3.5 h-3.5 text-amber-200" />
               <span>Try instant sample packet instead</span>
             </button>
           </div>
@@ -311,20 +311,20 @@ export default function HomePage() {
         />
       )}
 
-      <footer className="border-t border-[#E2E2E8] py-8 text-center text-xs text-slate-500 dark:border-[#26282E] dark:text-slate-400">
+      <footer className="border-t border-[#E2E8F0] py-8 text-center text-xs text-slate-500 dark:border-[#1E293B] dark:text-slate-400">
         <div className="max-w-4xl mx-auto px-4 space-y-4">
-          <div className="font-medium text-slate-700 dark:text-slate-300">
+          <div className="font-semibold text-slate-800 dark:text-slate-200">
             Parity Proof-of-Concept • Build With AI: Basics Hackathon • Deterministic Inspection Engine
           </div>
 
           {/* Known Limitations Box */}
-          <div className="text-left bg-slate-100/80 border border-slate-200 rounded-xl p-4 space-y-2 text-[11px] text-slate-600 dark:bg-slate-900/60 dark:border-slate-800 dark:text-slate-400">
-            <span className="font-semibold text-slate-800 dark:text-slate-200 block text-xs">
-              Known Limitations & Verification Boundary:
+          <div className="text-left bg-slate-100/90 border border-slate-200/80 rounded-2xl p-5 space-y-2.5 text-xs text-slate-600 dark:bg-[#131926] dark:border-slate-800 dark:text-slate-300 leading-relaxed shadow-xs">
+            <span className="font-bold text-slate-900 dark:text-slate-100 block text-xs uppercase tracking-wider">
+              Known Limitations &amp; Verification Boundary
             </span>
-            <ul className="list-disc pl-4 space-y-1">
+            <ul className="list-disc pl-5 space-y-1.5 text-[11px]">
               <li>
-                <strong>Quote containment vs. scan fidelity:</strong> Parity verifies that each extracted value appears verbatim inside its cited quote excerpt ($\le 200$ chars). However, string containment confirms consistency between the value and the returned text quote—it does not independently prove the quote matches the scan pixels without human review of the source image in the Evidence Drawer.
+                <strong>Quote containment vs. scan fidelity:</strong> Parity verifies that each extracted value appears verbatim inside its cited quote excerpt (&le; 200 chars). However, string containment confirms consistency between the value and the returned text quote—it does not independently prove the quote matches the scan pixels without human review of the source image in the Evidence Drawer.
               </li>
               <li>
                 <strong>Human decision authority:</strong> Parity flags mismatches and normalizes formats, but never automatically alters official government certificates or decides which document is legally correct.

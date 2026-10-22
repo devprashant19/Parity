@@ -27,13 +27,13 @@ export function FixList({ fields, onSelectField }: FixListProps) {
   };
 
   return (
-    <div className="bg-white border border-[#E2E2E8] rounded-2xl p-5 shadow-sm space-y-5 dark:bg-[#1A1B20] dark:border-[#26282E]">
-      <div className="flex items-center justify-between pb-3 border-b border-[#E2E2E8] dark:border-[#26282E]">
+    <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5 sm:p-6 shadow-xs space-y-5 dark:bg-[#131926] dark:border-[#1E293B]">
+      <div className="flex items-center justify-between pb-3.5 border-b border-[#E2E8F0] dark:border-[#1E293B]">
         <div>
-          <h3 className="font-serif-heading text-base font-bold text-[#1A1A1E] dark:text-[#ECECF1]">
+          <h3 className="font-serif-heading text-base font-bold text-[#0F172A] dark:text-[#F1F5F9]">
             Prioritized Fix Plan
           </h3>
-          <p className="text-xs text-[#64748B] dark:text-[#94A3B8]">
+          <p className="text-xs text-[#475569] dark:text-[#94A3B8]">
             {fixPlan.totalActions > 0
               ? `${fixPlan.totalActions} action item(s) to verify before final submission`
               : 'All fields verified consistent across documents'}
@@ -43,7 +43,7 @@ export function FixList({ fields, onSelectField }: FixListProps) {
         <button
           type="button"
           onClick={handleExportCsv}
-          className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 text-white hover:bg-black transition-colors dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100"
+          className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#0F172A] text-white hover:bg-slate-800 transition-all duration-200 shadow-xs hover:-translate-y-0.5 cursor-pointer dark:bg-white dark:text-[#0F172A] dark:hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
         >
           <Download className="w-3.5 h-3.5" />
           <span>Export CSV</span>
@@ -58,7 +58,7 @@ export function FixList({ fields, onSelectField }: FixListProps) {
         </div>
 
         {fixPlan.fixBeforeSubmitting.length === 0 ? (
-          <p className="text-xs text-slate-400 italic bg-slate-50 dark:bg-slate-800/40 p-2.5 rounded-lg">
+          <p className="text-xs text-slate-500 italic bg-slate-50 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-200/60 dark:border-slate-800">
             No unresolved high-priority conflicts remaining.
           </p>
         ) : (
@@ -67,17 +67,17 @@ export function FixList({ fields, onSelectField }: FixListProps) {
               <div
                 key={item.field_id}
                 onClick={() => onSelectField?.(item.field_id)}
-                className="p-3 bg-red-50/70 border border-red-200/80 rounded-xl cursor-pointer hover:bg-red-50 transition-colors dark:bg-red-950/20 dark:border-red-900/50"
+                className="p-3.5 bg-red-50/70 border border-red-200/80 rounded-xl cursor-pointer hover:bg-red-100/70 hover:border-red-300 transition-all duration-150 dark:bg-red-950/20 dark:border-red-900/50 dark:hover:bg-red-950/40"
               >
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-red-900 dark:text-red-200">
+                  <h4 className="text-xs font-bold text-red-950 dark:text-red-200">
                     {item.instruction}
                   </h4>
-                  <span className="text-[10px] font-semibold text-red-700 bg-red-200/70 dark:bg-red-900/60 dark:text-red-300 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] font-bold text-red-800 bg-red-200/80 dark:bg-red-900/70 dark:text-red-300 border border-red-300 dark:border-red-800 px-2 py-0.5 rounded-full">
                     {item.field_label}
                   </span>
                 </div>
-                <p className="text-[11px] text-red-800/80 dark:text-red-300/80 mt-1 leading-relaxed">
+                <p className="text-[11px] text-red-900/80 dark:text-red-300/80 mt-1 leading-relaxed">
                   {item.detail}
                 </p>
               </div>
@@ -94,7 +94,7 @@ export function FixList({ fields, onSelectField }: FixListProps) {
         </div>
 
         {fixPlan.needsManualReview.length === 0 ? (
-          <p className="text-xs text-slate-400 italic bg-slate-50 dark:bg-slate-800/40 p-2.5 rounded-lg">
+          <p className="text-xs text-slate-500 italic bg-slate-50 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-200/60 dark:border-slate-800">
             No ambiguous extractions or review items.
           </p>
         ) : (
@@ -103,17 +103,17 @@ export function FixList({ fields, onSelectField }: FixListProps) {
               <div
                 key={item.field_id}
                 onClick={() => onSelectField?.(item.field_id)}
-                className="p-3 bg-blue-50/70 border border-blue-200/80 rounded-xl cursor-pointer hover:bg-blue-50 transition-colors dark:bg-blue-950/20 dark:border-blue-900/50"
+                className="p-3.5 bg-blue-50/70 border border-blue-200/80 rounded-xl cursor-pointer hover:bg-blue-100/70 hover:border-blue-300 transition-all duration-150 dark:bg-blue-950/20 dark:border-blue-900/50 dark:hover:bg-blue-950/40"
               >
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-blue-900 dark:text-blue-200">
+                  <h4 className="text-xs font-bold text-blue-950 dark:text-blue-200">
                     {item.instruction}
                   </h4>
-                  <span className="text-[10px] font-semibold text-blue-700 bg-blue-200/70 dark:bg-blue-900/60 dark:text-blue-300 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] font-bold text-blue-800 bg-blue-200/80 dark:bg-blue-900/70 dark:text-blue-300 border border-blue-300 dark:border-blue-800 px-2 py-0.5 rounded-full">
                     {item.field_label}
                   </span>
                 </div>
-                <p className="text-[11px] text-blue-800/80 dark:text-blue-300/80 mt-1 leading-relaxed">
+                <p className="text-[11px] text-blue-900/80 dark:text-blue-300/80 mt-1 leading-relaxed">
                   {item.detail}
                 </p>
               </div>
@@ -134,15 +134,15 @@ export function FixList({ fields, onSelectField }: FixListProps) {
             <div
               key={item.field_id}
               onClick={() => onSelectField?.(item.field_id)}
-              className="px-3 py-2 bg-emerald-50/50 border border-emerald-100 rounded-lg flex items-center justify-between cursor-pointer hover:bg-emerald-50 transition-colors dark:bg-emerald-950/15 dark:border-emerald-900/30"
+              className="px-3.5 py-2.5 bg-emerald-50/60 border border-emerald-200/60 rounded-xl flex items-center justify-between cursor-pointer hover:bg-emerald-100/60 transition-all duration-150 dark:bg-emerald-950/20 dark:border-emerald-900/40"
             >
               <div className="flex items-center space-x-2">
                 <FileText className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                <span className="text-xs font-medium text-emerald-900 dark:text-emerald-200">
+                <span className="text-xs font-semibold text-emerald-950 dark:text-emerald-200">
                   {item.field_label}
                 </span>
               </div>
-              <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold">
+              <span className="text-[10px] text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100 dark:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-full">
                 Match Verified
               </span>
             </div>
@@ -151,7 +151,7 @@ export function FixList({ fields, onSelectField }: FixListProps) {
       </div>
 
       {/* Honesty & Genuineness Disclaimer Footer */}
-      <div className="pt-3 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed italic">
+      <div className="pt-3.5 border-t border-slate-100 dark:border-slate-800/80 text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed italic">
         <strong>Important:</strong> Parity compares what it can read across submitted documents. It does not verify whether
         your documents are genuine or whether you are eligible for the scholarship.
       </div>
