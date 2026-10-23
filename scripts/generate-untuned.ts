@@ -6,8 +6,8 @@ async function createStateBoardDoc() {
   const outDir = path.resolve(process.cwd(), 'tests/fixtures/unseen');
   if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
-  // Remove legacy CBSE file if present
-  const oldPath = path.join(outDir, 'realworld_cbse_marksheet.jpg');
+  // Remove legacy regional file if present
+  const oldPath = path.join(outDir, 'realworld_legacy_marksheet.jpg');
   if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
 
   const outPath = path.join(outDir, 'state_board_marksheet.jpg');

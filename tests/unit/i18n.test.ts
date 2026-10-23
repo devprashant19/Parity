@@ -373,7 +373,7 @@ describe('Internationalization & Multi-Locale Verification Rules', () => {
   // Country 6: India (Preserving Backward Compatibility)
   // =========================================================================
   describe('Country 6: India (Backward Compatibility)', () => {
-    it('correctly parses Indian number grouping (lakh / ₹1,80,000)', () => {
+    it('correctly parses South Asian number grouping (₹1,80,000)', () => {
       const num = parseLocaleNumber('1,80,000');
       expect(num).toBe(180000);
 

@@ -140,7 +140,12 @@ export const IssuingOfficeModal: React.FC<IssuingOfficeModalProps> = ({
         </div>
 
         {/* Draft Message Preview Body */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-5">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3">
+          <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-xl text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2">
+            <span className="font-semibold text-amber-800 dark:text-amber-300">Notice:</span>
+            <span>This is an offline draft generated for your review. Parity never sends messages or contacts institutions on your behalf. Review and copy this text to send from your personal email or submit in person.</span>
+          </div>
+
           {drafted ? (
             <div className="space-y-3 font-mono text-xs">
               <div className="p-2.5 bg-neutral-100 dark:bg-neutral-800/70 rounded-lg text-neutral-800 dark:text-neutral-200 font-semibold border border-neutral-200 dark:border-neutral-700">

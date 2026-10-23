@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parity — Architecture & Application Map</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --text: #c9d1d9;
+      --text-muted: #8b949e;
+      --primary: #58a6ff;
+      --success: #3fb950;
+      --warning: #d29922;
+      --danger: #f85149;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      margin: 0;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+    h1, h2, h3 {
+      color: #fff;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-consistent { background: rgba(63, 185, 80, 0.2); color: var(--success); border: 1px solid var(--success); }
+    .badge-conflict { background: rgba(248, 81, 73, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+    .badge-review { background: rgba(210, 153, 34, 0.2); color: var(--warning); border: 1px solid var(--warning); }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin: 32px 0;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+    }
+    .card h3 {
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tag {
+      background: #21262d;
+      color: var(--primary);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: monospace;
+    }
+    .flow-arrow {
+      text-align: center;
+      font-size: 24px;
+      color: var(--text-muted);
+      margin: 16px 0;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    li {
+      margin-bottom: 8px;
+    }
+    .footer {
+      margin-top: 48px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Parity — Application Architecture & Route Map</h1>
+    <p>
+      An evidence-first, pre-submission packet verification system designed to eliminate silent disqualifications in academic and financial aid applications.
+    </p>
+
+    <div class="grid">
+      <div class="card">
+        <h3><span class="tag">LAYER 1</span> Perception (AI Extraction)</h3>
+        <p><strong>Strict Responsibility:</strong> Read document scans; extract values and verbatim quotes. Never decide matches.</p>
+        <ul>
+          <li><strong>Input:</strong> Multi-page PDF or JPEG/PNG document scans.</li>
+          <li><strong>Route:</strong> <code>POST /api/extract</code></li>
+          <li><strong>Models:</strong> Primary <code>gemini-3.1-flash-lite</code> with fallback to <code>gemini-2.5-flash</code>.</li>
+          <li><strong>Output:</strong> Field values, verbatim quotes (&le;200 chars), normalized bounding boxes, confidence scores.</li>
+          <li><strong>Double-Read Verification:</strong> Isolated full-width horizontal crop band (&plusmn;1 row) verified via secondary batched API call.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="tag">LAYER 2</span> Judgment (Deterministic Engine)</h3>
+        <p><strong>Strict Responsibility:</strong> Normalization, containment verification, and tri-state parity evaluation.</p>
+        <ul>
+          <li><strong>Quote Containment:</strong> Validates that extracted values literally occur within quoted snippets.</li>
+          <li><strong>Normalizers:</strong> Date formats (DMY/MDY/ISO), currency and frequency annualization (weekly &times;52, biweekly &times;26, monthly &times;12), cultural name tokenization and accent folding.</li>
+          <li><strong>Status Precedence:</strong> <span class="badge badge-conflict">Conflict</span> &gt; <span class="badge badge-review">Needs Review</span> &gt; <span class="badge badge-consistent">Consistent</span></li>
+          <li><strong>Zero Hallucination:</strong> Math and logic exclusively evaluate matches.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="tag">LAYER 3</span> Inspection & Human Authority</h3>
+        <p><strong>Strict Responsibility:</strong> Side-by-side evidence inspection, applicant authority, and remediation.</p>
+        <ul>
+          <li><strong>Inspection Drawer:</strong> Side-by-side verbatim quotes, diff callouts, visual bounding box overlays.</li>
+          <li><strong>Decision Controls:</strong> Applicant chooses authoritative document (&ldquo;Document A is correct&rdquo; / &ldquo;Document B is correct&rdquo;).</li>
+          <li><strong>Actionable Fix Plan:</strong> Prioritized remediation advice (edit application form vs request official certificate correction).</li>
+          <li><strong>Offline Artifacts:</strong> Downloadable PDF verification report and drafted correction request letter to registrar.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Application Data Flow</h2>
+    <div class="card">
+      <ol>
+        <li><strong>Document Ingestion:</strong> User selects a sample preset (e.g. USD Scholarship or EUR/GBP packet) or uploads custom files.</li>
+        <li><strong>Extraction:</strong> Fast client path runs offline from cached fixtures; live path calls <code>POST /api/extract</code> with multi-part images.</li>
+        <li><strong>Verification Engine:</strong> Deterministic engine (<code>src/lib/compare/engine.ts</code>) processes extracted records against schema definition.</li>
+        <li><strong>Double-Read Verification:</strong> For fields preliminarily marked Consistent, crops are generated and sent in one batched call per document. Visual overlays are displayed only if crops agree; otherwise marked &ldquo;Location not verified&rdquo;.</li>
+        <li><strong>Interactive Resolution:</strong> User inspects discrepancies in <code>EvidenceDrawer</code>, selects authoritative documents, and exports audit records.</li>
+      </ol>
+    </div>
+
+    <div class="footer">
+      Parity &bull; Built with Next.js 15, TypeScript, Tailwind CSS, and Google Gemini Multimodal APIs.
+    </div>
+  </div>
+</body>
+</html>
