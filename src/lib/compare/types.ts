@@ -6,9 +6,31 @@ export type ResolutionChoice =
   | 'not_sure'
   | 'unresolved';
 
-export type FieldId = 'name' | 'academic_year' | 'marks' | 'income' | 'issue_date';
+export type FieldId = 'name' | 'academic_year' | 'marks' | 'income' | 'issue_date' | string;
 
 export type DocumentType = 'application_form' | 'marksheet' | 'income_certificate';
+
+export type FieldDataType = 'name' | 'date' | 'amount' | 'id' | 'text';
+
+export interface CustomFieldDefinition {
+  id: string;
+  label: string;
+  type: FieldDataType;
+  target_documents: DocumentType[];
+}
+
+export type PacketPresetId = 'scholarship' | 'college_admission' | 'financial_aid';
+
+export interface PacketPreset {
+  id: PacketPresetId;
+  title: string;
+  description: string;
+  documents: {
+    type: DocumentType;
+    label: string;
+  }[];
+  fields: CustomFieldDefinition[];
+}
 
 export interface BoundingBox {
   x: number;
