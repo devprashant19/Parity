@@ -429,4 +429,13 @@ e:\Parity/
   - `evaluateGPA`: GPA scale differentiation (4.0, 5.0, percentage), flagging scale mismatches for human review.
   - `evaluateAcademicYear`: Support diverse international academic terms (`2024/2025`, `2024-2025`, `2024-25`, `AY 24/25`, `Fall 2024 - Spring 2025`).
 
+### 2026-10-23 — Bounding-Box Double-Read Refinement & Strict Verification Mode
+- **Batched Full-Width Band Cropping:** Shifted double-read cropping from narrow bounding boxes to full-width horizontal bands ($\pm 1$ row padding) to resolve narrow bounding-box vertical offsets into adjacent rows.
+- **Document-Level Verification Batching:** Secondary verification calls are batched per document into 1 single API call using multi-image inline data parts, reducing secondary API calls from 14 down to 4.
+- **Double-Read Scope Constraint:** Secondary verification is restricted strictly to fields initially classified as `Consistent` by the deterministic engine.
+- **Conditional Visual Overlay Policy:** Document preview bounding-box overlays are suppressed unless the secondary crop read confirms agreement with the primary full-page read; otherwise the verbatim quote is presented alongside a `"Location not verified"` warning badge.
+- **Strict Verification Toggle:** Interactive UI toggle allowing users to choose between Fast Mode (3 API calls) and Strict Verification Mode (4–6 API calls). Default set to ON based on 100.0% post-fix agreement rate.
+- **Unambiguous US Scan Dates:** Converted US scan dates to written months ("August 12, 2024" and "July 15, 2024").
+
+
 

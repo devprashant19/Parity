@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Sparkles, RefreshCw, ChevronRight, Info, AlertTriangle } from 'lucide-react';
+import { Sparkles, RefreshCw, ChevronRight, Info, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { UploadSlot } from './UploadSlot';
 import { SamplePacketMetadata } from '@/data/samples';
 
@@ -16,6 +16,8 @@ export interface IngestionZoneProps {
   uploadedDocs: Record<string, { fileName: string; fileSize: string; previewUrl?: string; isSample?: boolean } | null>;
   isAnalyzing: boolean;
   hasRun: boolean;
+  strictVerification?: boolean;
+  onToggleStrictVerification?: (val: boolean) => void;
 }
 
 export function IngestionZone({
@@ -29,6 +31,8 @@ export function IngestionZone({
   uploadedDocs,
   isAnalyzing,
   hasRun,
+  strictVerification = true,
+  onToggleStrictVerification,
 }: IngestionZoneProps) {
   const hasDocuments =
     uploadedDocs.application_form !== null &&
@@ -123,13 +127,46 @@ export function IngestionZone({
 
       {/* Action Bar */}
       <div className="mt-5 pt-4 border-t border-neutral-200/70 dark:border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-xs text-neutral-600 dark:text-neutral-400">
-          <Info className="w-4 h-4 text-[#ef4d23] shrink-0" />
-          <span>
-            {sampleMeta
-              ? sampleMeta.description
-              : 'Upload all 3 documents or click a sample preset above to run precomputed analysis in <2s.'}
-          </span>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+          <div className="flex items-center gap-2 text-xs text-neutral-600 dark:text-neutral-400">
+            <Info className="w-4 h-4 text-[#ef4d23] shrink-0" />
+            <span>
+              {sampleMeta
+                ? sampleMeta.description
+                : 'Upload all 3 documents or click a sample preset above to run precomputed analysis in <2s.'}
+            </span>
+          </div>
+
+          {/* Strict Verification Toggle Switch */}
+          <div className="inline-flex items-center gap-2 bg-white dark:bg-[#121620] px-3 py-1.5 rounded-full border border-neutral-200/80 dark:border-neutral-700/80 shadow-2xs">
+            <button
+              type="button"
+              role="switch"
+              aria-checked={strictVerification}
+              onClick={() => onToggleStrictVerification?.(!strictVerification)}
+              className={`relative inline-flex h-4.5 w-8 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out ${
+                strictVerification ? 'bg-[#ef4d23]' : 'bg-neutral-300 dark:bg-neutral-700'
+              }`}
+              title={
+                strictVerification
+                  ? 'Strict verification ON: Batches horizontal band crops (±1 row) per document for consistent fields and verifies with second pass.'
+                  : 'Fast mode: Single pass full-page multimodal extraction only.'
+              }
+            >
+              <span
+                className={`pointer-events-none inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow-xs ring-0 transition duration-200 ease-in-out mt-0.5 ml-0.5 ${
+                  strictVerification ? 'translate-x-3.5' : 'translate-x-0'
+                }`}
+              />
+            </button>
+            <div className="flex items-center gap-1.5 text-xs font-medium text-neutral-800 dark:text-neutral-200">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#ef4d23]" />
+              <span>Strict Verification</span>
+              <span className="text-[10px] text-neutral-500 font-mono">
+                {strictVerification ? '(Batched 2nd Pass)' : '(Fast 1-Pass)'}
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Dark Execution CTA Pill */}

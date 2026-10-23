@@ -105,6 +105,7 @@ export interface VerificationResult {
   consistent_count: number;
   needs_review_count: number;
   fields: FieldComparison[];
+  strict_verification?: boolean;
 }
 
 export const CONFIDENCE_THRESHOLD = 0.7;

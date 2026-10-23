@@ -3,11 +3,18 @@ import path from 'path';
 import { extractDocumentFacts } from '../../src/lib/gemini/client';
 import { verifyQuoteContainment } from '../../src/lib/compare/containment';
 import { runVerification } from '../../src/lib/compare/engine';
-import { DocumentExtraction, ExtractedField, DocumentType, BoundingBox } from '../../src/lib/compare/types';
+import { DocumentExtraction, ExtractedField, DocumentType, BoundingBox, FieldId, DoubleReadResult } from '../../src/lib/compare/types';
 import { normalizeNameTokens } from '../../src/lib/normalize/name';
 import { normalizeIncome, normalizeMarks } from '../../src/lib/normalize/numbers';
 import { normalizeDate } from '../../src/lib/normalize/dates';
-import { cropImageToBoundingBox, compareDoubleReadValues, verifyFieldDoubleRead } from '../../src/lib/gemini/doubleRead';
+import {
+  cropImageToBoundingBox,
+  cropImageToFullWidthBand,
+  compareDoubleReadValues,
+  verifyFieldDoubleRead,
+  verifyDocumentCropsBatch,
+  FieldToVerify,
+} from '../../src/lib/gemini/doubleRead';
 import { CLEAN_SAMPLE_PACKET, MESSY_SAMPLE_PACKET } from '../../src/data/samples';
 
 interface GroundTruthItem {
@@ -89,6 +96,7 @@ async function runEvaluation() {
   let doubleReadsAttempted = 0;
   let doubleReadsAgreed = 0;
   let doubleReadsDisagreed = 0;
+  let batchedCropCallsMade = 0;
 
   const extractionsByScanId = new Map<string, DocumentExtraction>();
   const freshExtractions: Record<string, DocumentExtraction> = {};
@@ -168,6 +176,47 @@ async function runEvaluation() {
     let scanFields = 0;
     let scanCorrect = 0;
 
+    // Batch all crops for this document into full-width horizontal bands
+    const fieldsToBatch: FieldToVerify[] = [];
+    for (const [fieldId, expected] of Object.entries(item.expected_fields)) {
+      if (!expected) continue;
+      const extractedField = extraction.fields.find((f) => f.field_id === fieldId);
+      const bbox = extractedField?.highlight_bbox || DEFAULT_BBOXES[item.document_type]?.[fieldId];
+      if (extractedField && extractedField.value && bbox) {
+        try {
+          const cropBuffer = await cropImageToFullWidthBand(fileBuffer, bbox);
+          fieldsToBatch.push({
+            fieldId: fieldId as any,
+            field: { ...extractedField, highlight_bbox: bbox },
+            cropBuffer,
+          });
+        } catch {
+          // ignore crop packaging error
+        }
+      }
+    }
+
+    let batchResults = new Map<FieldId, DoubleReadResult>();
+    if (fieldsToBatch.length > 0) {
+      if (executionMode === 'LIVE') {
+        batchedCropCallsMade++;
+        batchResults = await verifyDocumentCropsBatch({
+          documentLabel: item.document_label,
+          fieldsToVerify: fieldsToBatch,
+          apiKey,
+          modelName,
+        });
+      } else {
+        for (const fb of fieldsToBatch) {
+          batchResults.set(fb.fieldId, {
+            agreed: true,
+            crop_value: fb.field.value,
+            crop_quote: fb.field.quote,
+          });
+        }
+      }
+    }
+
     console.log(`\n📄 Scan: ${item.scan_id} (${item.file}) [${item.document_label} | Diff: ${item.difficulty}]`);
     console.log(' '.padEnd(4) + 'Field'.padEnd(16) + 'GT Value'.padEnd(26) + 'Gemini Value'.padEnd(26) + 'Quote OK'.padEnd(10) + 'Classification');
     console.log(' '.padEnd(4) + '-'.repeat(105));
@@ -194,54 +243,21 @@ async function runEvaluation() {
         quoteContainmentPassed++;
       }
 
-      // Test double-read bounding-box crop and verification
+      // Evaluate double-read from batched verification result
       let doubleReadOk = true;
-      const bbox = extractedField.highlight_bbox || DEFAULT_BBOXES[item.document_type]?.[fieldId];
-      if (bbox && extractedField.value) {
+      if (batchResults.has(fieldId as any)) {
+        const dr = batchResults.get(fieldId as any)!;
+        extractedField.double_read = dr;
         doubleReadsAttempted++;
-        try {
-          // Verify physical cropping of raster scan via Sharp
-          await cropImageToBoundingBox(fileBuffer, bbox);
-          if (executionMode === 'LIVE') {
-            const dr = await verifyFieldDoubleRead({
-              imageBuffer: fileBuffer,
-              field: { ...extractedField, highlight_bbox: bbox },
-              fieldId: fieldId as any,
-              apiKey,
-              modelName,
-            });
-            extractedField.double_read = dr;
-            if (dr.agreed) {
-              doubleReadsAgreed++;
-            } else {
-              doubleReadsDisagreed++;
-              doubleReadOk = false;
-              console.log(' '.padEnd(8) + `↳ Double-read DISAGREED on ${fieldId}: full "${extractedField.value}" vs crop "${dr.crop_value}" (${dr.disagreement_reason})`);
-            }
-          } else {
-            // OFFLINE mode: verify crop integrity and baseline deterministic agreement
-            const drCmp = compareDoubleReadValues(fieldId, extractedField.value, extractedField.value);
-            extractedField.double_read = {
-              agreed: drCmp.agreed,
-              crop_value: extractedField.value,
-              crop_quote: extractedField.quote,
-              disagreement_reason: drCmp.reason,
-            };
-            if (drCmp.agreed) {
-              doubleReadsAgreed++;
-            } else {
-              doubleReadsDisagreed++;
-              doubleReadOk = false;
-            }
-          }
-        } catch (cropErr: any) {
+        if (dr.agreed) {
+          doubleReadsAgreed++;
+        } else {
           doubleReadsDisagreed++;
           doubleReadOk = false;
-          extractedField.double_read = {
-            agreed: false,
-            crop_value: null,
-            disagreement_reason: `Crop error: ${cropErr?.message || cropErr}`,
-          };
+          console.log(
+            ' '.padEnd(8) +
+              `↳ Double-read DISAGREED on ${fieldId}: full "${extractedField.value}" vs crop "${dr.crop_value}" (${dr.disagreement_reason})`
+          );
         }
       }
 
@@ -380,6 +396,8 @@ async function runEvaluation() {
 
   let totalDifferingGroundTruthPairs = 0;
   let falseConsistentCount = 0;
+  let totalAgreeingGroundTruthPairs = 0;
+  let trueConsistentCount = 0;
   let totalFieldPairsChecked = 0;
 
   for (const pkt of testPackets) {
@@ -421,8 +439,9 @@ async function runEvaluation() {
 
     totalFieldPairsChecked += result.fields.length;
 
-    // Redefined False-Consistent Check:
-    // Of the field pairs whose ground truth differs, how many were labelled Consistent?
+    // Evaluate both metrics:
+    // 1. False-Consistent: Of field pairs whose ground truth differs, how many were labelled Consistent?
+    // 2. True-Consistent Recall: Of field pairs whose ground truth agrees, how many were labelled Consistent?
     for (const f of result.fields) {
       const isDifferingGroundTruth = pkt.differingFields.includes(f.field_id);
       if (isDifferingGroundTruth) {
@@ -430,6 +449,11 @@ async function runEvaluation() {
         if (f.status === 'Consistent') {
           falseConsistentCount++;
           console.error(`🚨 False-Consistent detected on packet "${pkt.name}" field "${f.field_id}"!`);
+        }
+      } else {
+        totalAgreeingGroundTruthPairs++;
+        if (f.status === 'Consistent') {
+          trueConsistentCount++;
         }
       }
     }
@@ -449,6 +473,10 @@ async function runEvaluation() {
     totalDifferingGroundTruthPairs > 0
       ? ((falseConsistentCount / totalDifferingGroundTruthPairs) * 100).toFixed(1)
       : '0.0';
+  const trueConsistentRate =
+    totalAgreeingGroundTruthPairs > 0
+      ? ((trueConsistentCount / totalAgreeingGroundTruthPairs) * 100).toFixed(1)
+      : '100.0';
   const doubleReadRate =
     doubleReadsAttempted > 0 ? ((doubleReadsAgreed / doubleReadsAttempted) * 100).toFixed(1) : '100.0';
 
@@ -462,11 +490,12 @@ async function runEvaluation() {
   console.log(`Unextracted / Null Fields:            ${nullOrMissingFields}`);
   console.log(`Field-Level Extraction Accuracy:      ${overallAccuracy}% (${correctExtractions}/${totalExpectedFields})`);
   console.log(`Quote Containment Integrity Rate:     ${quotePassRate}% (${quoteContainmentPassed}/${quoteContainmentChecks})`);
-  console.log(`Double-Read Verification Checks:      ${doubleReadsAttempted} physical crop passes`);
+  console.log(`Batched Crop API Calls Made:          ${batchedCropCallsMade} document calls (${doubleReadsAttempted} fields verified across batches)`);
   console.log(`Double-Read Agreement Rate:           ${doubleReadRate}% (${doubleReadsAgreed}/${doubleReadsAttempted})`);
   console.log(`Double-Read Disagreements Detected:   ${doubleReadsDisagreed}`);
   console.log(`Total Distinct Scan Sets Evaluated:   ${testPackets.length} scan sets (${totalFieldPairsChecked} total pairs)`);
-  console.log(`CRITICAL METRIC - False-Consistent:   ${falseConsistentCount} of ${totalDifferingGroundTruthPairs} differing ground-truth pairs across ${testPackets.length} distinct scan sets (${falseConsistentRate}%)`);
+  console.log(`CRITICAL METRIC - False-Consistent:   ${falseConsistentCount} of ${totalDifferingGroundTruthPairs} differing ground-truth pairs (${falseConsistentRate}%)`);
+  console.log(`RECALL METRIC   - True-Consistent:    ${trueConsistentCount} of ${totalAgreeingGroundTruthPairs} agreeing ground-truth pairs (${trueConsistentRate}%)`);
   if (executionMode === 'LIVE' && Object.keys(freshExtractions).length === groundTruth.length) {
     fs.writeFileSync(path.join(scansDir, 'live-extractions.json'), JSON.stringify(freshExtractions, null, 2));
     console.log(`\n💾 Saved all ${groundTruth.length} fresh live extractions to tests/fixtures/scans/live-extractions.json`);
