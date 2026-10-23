@@ -17,6 +17,13 @@ export interface BoundingBox {
   height: number;
 }
 
+export interface DoubleReadResult {
+  agreed: boolean;
+  crop_value: string | null;
+  crop_quote?: string | null;
+  disagreement_reason?: string;
+}
+
 export interface ExtractedField {
   field_id: FieldId;
   value: string | null;
@@ -25,6 +32,7 @@ export interface ExtractedField {
   confidence: number;
   source?: 'extracted' | 'manual';
   highlight_bbox?: BoundingBox;
+  double_read?: DoubleReadResult;
 }
 
 export interface DocumentExtraction {
@@ -44,6 +52,7 @@ export interface DocumentComparisonEntry {
   source: 'extracted' | 'manual';
   preview_url?: string;
   highlight_bbox?: BoundingBox;
+  double_read?: DoubleReadResult;
 }
 
 export interface PairwiseComparison {
