@@ -62,8 +62,21 @@ export function runVerification(
       confidence: raw?.confidence ?? 0,
       source: raw?.source || 'extracted',
       highlight_bbox: raw?.highlight_bbox,
+      double_read: raw?.double_read,
       preview_url: sampleUrls[packetType]?.[docType],
     };
+  };
+
+  const checkDoubleReadMismatch = (docs: DocumentComparisonEntry[]): string | null => {
+    for (const d of docs) {
+      if (d.double_read && !d.double_read.agreed) {
+        return (
+          d.double_read.disagreement_reason ||
+          `Double-read mismatch on ${d.doc_label}: full-page read disagrees with isolated bounding-box crop read.`
+        );
+      }
+    }
+    return null;
   };
 
   // 1. Name (Form, Marksheet, Income Certificate)
@@ -101,6 +114,12 @@ export function runVerification(
   } else if (!formNameConfOk || !marksNameConfOk || !incNameConfOk) {
     nameStatus = 'Needs Review';
     nameReason = 'Name extracted with low OCR confidence; requires manual review.';
+  }
+
+  const nameDoubleReadErr = checkDoubleReadMismatch(nameDocs);
+  if (nameDoubleReadErr) {
+    nameStatus = 'Needs Review';
+    nameReason = nameDoubleReadErr;
   }
 
   fields.push({
@@ -156,6 +175,12 @@ export function runVerification(
     yearReason = `Academic year mismatch: Application states "${formYear.value}" but Marksheet states "${marksYear.value}".`;
   }
 
+  const yearDoubleReadErr = checkDoubleReadMismatch(yearDocs);
+  if (yearDoubleReadErr) {
+    yearStatus = 'Needs Review';
+    yearReason = yearDoubleReadErr;
+  }
+
   fields.push({
     field_id: 'academic_year',
     field_label: 'Academic Year',
@@ -207,6 +232,12 @@ export function runVerification(
     marksStatus = 'Conflict';
     const delta = ((normMarksForm.value || 0) - (normMarksDoc.value || 0)).toFixed(1);
     marksReason = `Marks conflict: Application states ${normMarksForm.value}%, marksheet records ${normMarksDoc.value}% (difference of ${delta}%).`;
+  }
+
+  const marksDoubleReadErr = checkDoubleReadMismatch(marksDocs);
+  if (marksDoubleReadErr) {
+    marksStatus = 'Needs Review';
+    marksReason = marksDoubleReadErr;
   }
 
   fields.push({
@@ -265,6 +296,12 @@ export function runVerification(
     incomeReason = `Income conflict: Application reports ${formFormatted}/year, but Income Certificate verifies ${certFormatted}/year.`;
   }
 
+  const incomeDoubleReadErr = checkDoubleReadMismatch(incomeDocs);
+  if (incomeDoubleReadErr) {
+    incomeStatus = 'Needs Review';
+    incomeReason = incomeDoubleReadErr;
+  }
+
   fields.push({
     field_id: 'income',
     field_label: 'Annual Family Income',
@@ -315,6 +352,12 @@ export function runVerification(
   } else {
     dateStatus = 'Conflict';
     dateReason = `Date mismatch: Application states ${formDate.value} (parsed as ${normDateForm.iso}), but Income Certificate shows ${certDate.value} (parsed as ${normDateCert.iso}).`;
+  }
+
+  const dateDoubleReadErr = checkDoubleReadMismatch(dateDocs);
+  if (dateDoubleReadErr) {
+    dateStatus = 'Needs Review';
+    dateReason = dateDoubleReadErr;
   }
 
   fields.push({

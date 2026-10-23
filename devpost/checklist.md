@@ -107,7 +107,7 @@ Activity mode:
   - Precompute bounding boxes in sample packets (`samples.ts`).
   - Unit tests & commit.
 
-- [ ] **Slice B: Double-read verification**
+- [x] **Slice B: Double-read verification**
   - Crop image to box and re-extract value from crop only.
   - Mark `Needs Review` if reads disagree with explicit diff explanation.
   - Integrate into eval harness and report live figures honestly.

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit, extractDocumentFacts } from '@/lib/gemini/client';
+import { verifyFieldDoubleRead } from '@/lib/gemini/doubleRead';
 import { runVerification } from '@/lib/compare/engine';
 import { DocumentExtraction, DocumentType } from '@/lib/compare/types';
 
@@ -100,7 +101,28 @@ export async function POST(req: NextRequest) {
       })
     );
 
-    // 7. Deterministic comparison engine execution
+    // 7. Double-read secondary verification (crop & re-extract isolated value)
+    if (process.env.DOUBLE_READ_ENABLED !== 'false') {
+      await Promise.all(
+        extractions.map(async (doc, idx) => {
+          const file = docsToExtract[idx].file;
+          const imageBuffer = Buffer.from(await file.arrayBuffer());
+          await Promise.all(
+            doc.fields.map(async (field) => {
+              if (field.highlight_bbox && field.value) {
+                field.double_read = await verifyFieldDoubleRead({
+                  imageBuffer,
+                  field,
+                  fieldId: field.field_id,
+                });
+              }
+            })
+          );
+        })
+      );
+    }
+
+    // 8. Deterministic comparison engine execution
     const verificationResult = runVerification(extractions, 'live');
 
     return NextResponse.json(verificationResult);

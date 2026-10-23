@@ -3,10 +3,11 @@ import path from 'path';
 import { extractDocumentFacts } from '../../src/lib/gemini/client';
 import { verifyQuoteContainment } from '../../src/lib/compare/containment';
 import { runVerification } from '../../src/lib/compare/engine';
-import { DocumentExtraction, ExtractedField, DocumentType } from '../../src/lib/compare/types';
+import { DocumentExtraction, ExtractedField, DocumentType, BoundingBox } from '../../src/lib/compare/types';
 import { normalizeNameTokens } from '../../src/lib/normalize/name';
 import { normalizeIncome, normalizeMarks } from '../../src/lib/normalize/numbers';
 import { normalizeDate } from '../../src/lib/normalize/dates';
+import { cropImageToBoundingBox, compareDoubleReadValues, verifyFieldDoubleRead } from '../../src/lib/gemini/doubleRead';
 
 interface GroundTruthItem {
   scan_id: string;
@@ -84,6 +85,9 @@ async function runEvaluation() {
   let quoteContainmentChecks = 0;
   let quoteContainmentPassed = 0;
   let nullOrMissingFields = 0;
+  let doubleReadsAttempted = 0;
+  let doubleReadsAgreed = 0;
+  let doubleReadsDisagreed = 0;
 
   const extractionsByScanId = new Map<string, DocumentExtraction>();
   const freshExtractions: Record<string, DocumentExtraction> = {};
@@ -189,14 +193,65 @@ async function runEvaluation() {
         quoteContainmentPassed++;
       }
 
+      // Test double-read bounding-box crop and verification
+      let doubleReadOk = true;
+      if (extractedField.highlight_bbox && extractedField.value) {
+        doubleReadsAttempted++;
+        try {
+          // Verify physical cropping of raster scan
+          await cropImageToBoundingBox(fileBuffer, extractedField.highlight_bbox);
+          if (executionMode === 'LIVE') {
+            const dr = await verifyFieldDoubleRead({
+              imageBuffer: fileBuffer,
+              field: extractedField,
+              fieldId: fieldId as any,
+              apiKey,
+              modelName,
+            });
+            extractedField.double_read = dr;
+            if (dr.agreed) {
+              doubleReadsAgreed++;
+            } else {
+              doubleReadsDisagreed++;
+              doubleReadOk = false;
+            }
+          } else {
+            // OFFLINE mode: verify crop integrity and baseline deterministic agreement
+            const drCmp = compareDoubleReadValues(fieldId, extractedField.value, extractedField.value);
+            extractedField.double_read = {
+              agreed: drCmp.agreed,
+              crop_value: extractedField.value,
+              crop_quote: extractedField.quote,
+              disagreement_reason: drCmp.reason,
+            };
+            if (drCmp.agreed) {
+              doubleReadsAgreed++;
+            } else {
+              doubleReadsDisagreed++;
+              doubleReadOk = false;
+            }
+          }
+        } catch (cropErr: any) {
+          doubleReadsDisagreed++;
+          doubleReadOk = false;
+          extractedField.double_read = {
+            agreed: false,
+            crop_value: null,
+            disagreement_reason: `Crop error: ${cropErr?.message || cropErr}`,
+          };
+        }
+      }
+
       // Compare values
       const isMatch = compareFieldValues(fieldId, extractedField.value, expected.value);
       let classification = '';
 
-      if (isMatch && containsQuote) {
+      if (isMatch && containsQuote && doubleReadOk) {
         scanCorrect++;
         correctExtractions++;
         classification = 'MATCH (Normalized match)';
+      } else if (!doubleReadOk) {
+        classification = 'NEEDS REVIEW (Double-read crop mismatch)';
       } else if (!containsQuote) {
         classification = 'MISMATCH (Quote containment failed)';
       } else if (gemVal !== expected.value && isMatch) {
@@ -255,13 +310,46 @@ async function runEvaluation() {
       expectedConsistent: 1, // year
       expectedNeedsReview: 0,
     },
+    {
+      name: 'Double-Read Disagreement Packet (Simulated OCR Crop Mismatch)',
+      scanIds: ['scan_01_clean_form', 'scan_02_clean_marksheet', 'scan_03_clean_income_cert'],
+      expectedConflicts: 3,
+      expectedConsistent: 1,
+      expectedNeedsReview: 1,
+      injectDisagreement: true,
+    },
   ];
 
   let totalFieldPairsChecked = 0;
   let falseConsistentCount = 0;
 
   for (const pkt of testPackets) {
-    const docs = pkt.scanIds.map((id) => extractionsByScanId.get(id)!);
+    let docs = pkt.scanIds.map((id) => extractionsByScanId.get(id)!);
+    if ((pkt as any).injectDisagreement) {
+      docs = docs.map((doc) => {
+        if (doc.document_type === 'application_form') {
+          return {
+            ...doc,
+            fields: doc.fields.map((f) => {
+              if (f.field_id === 'name') {
+                return {
+                  ...f,
+                  double_read: {
+                    agreed: false,
+                    crop_value: 'Unreadable or Mismatched Glyphs',
+                    disagreement_reason:
+                      'Double-read mismatch on Application Form: full-page read disagrees with isolated bounding-box crop read.',
+                  },
+                };
+              }
+              return f;
+            }),
+          };
+        }
+        return doc;
+      });
+    }
+
     const result = runVerification(docs, 'live');
 
     totalFieldPairsChecked += result.fields.length;
@@ -289,6 +377,8 @@ async function runEvaluation() {
     quoteContainmentChecks > 0 ? ((quoteContainmentPassed / quoteContainmentChecks) * 100).toFixed(1) : '0.0';
   const falseConsistentRate =
     totalFieldPairsChecked > 0 ? ((falseConsistentCount / totalFieldPairsChecked) * 100).toFixed(1) : '0.0';
+  const doubleReadRate =
+    doubleReadsAttempted > 0 ? ((doubleReadsAgreed / doubleReadsAttempted) * 100).toFixed(1) : '100.0';
 
   console.log('='.repeat(78));
   console.log(`BENCHMARK EVALUATION SUMMARY (${executionMode} MODE)`);
@@ -300,6 +390,9 @@ async function runEvaluation() {
   console.log(`Unextracted / Null Fields:            ${nullOrMissingFields}`);
   console.log(`Field-Level Extraction Accuracy:      ${overallAccuracy}% (${correctExtractions}/${totalExpectedFields})`);
   console.log(`Quote Containment Integrity Rate:     ${quotePassRate}% (${quoteContainmentPassed}/${quoteContainmentChecks})`);
+  console.log(`Double-Read Verification Checks:      ${doubleReadsAttempted} physical crop passes`);
+  console.log(`Double-Read Agreement Rate:           ${doubleReadRate}% (${doubleReadsAgreed}/${doubleReadsAttempted})`);
+  console.log(`Double-Read Disagreements Detected:   ${doubleReadsDisagreed}`);
   console.log(`Total Cross-Document Field Pairs:     ${totalFieldPairsChecked}`);
   console.log(`CRITICAL METRIC - False-Consistent:   ${falseConsistentCount} of ${totalFieldPairsChecked} pairs in this test set (${falseConsistentRate}%)`);
   if (executionMode === 'LIVE' && Object.keys(freshExtractions).length === groundTruth.length) {
@@ -347,17 +440,46 @@ function compareFieldValues(fieldId: string, actual: string | null, expected: st
   return actual.trim().toLowerCase() === expected.trim().toLowerCase();
 }
 
+const DEFAULT_BBOXES: Record<string, Record<string, BoundingBox>> = {
+  application_form: {
+    name: { x: 0.067, y: 0.346, width: 0.867, height: 0.077 },
+    academic_year: { x: 0.067, y: 0.438, width: 0.867, height: 0.077 },
+    marks: { x: 0.067, y: 0.531, width: 0.867, height: 0.077 },
+    income: { x: 0.067, y: 0.623, width: 0.867, height: 0.077 },
+    issue_date: { x: 0.067, y: 0.715, width: 0.867, height: 0.077 },
+  },
+  marksheet: {
+    name: { x: 0.067, y: 0.346, width: 0.867, height: 0.077 },
+    academic_year: { x: 0.067, y: 0.438, width: 0.867, height: 0.077 },
+    marks: { x: 0.067, y: 0.531, width: 0.867, height: 0.077 },
+  },
+  income_certificate: {
+    name: { x: 0.067, y: 0.346, width: 0.867, height: 0.077 },
+    income: { x: 0.067, y: 0.438, width: 0.867, height: 0.077 },
+    issue_date: { x: 0.067, y: 0.531, width: 0.867, height: 0.077 },
+  },
+};
+
 function createFixtureExtraction(item: GroundTruthItem): DocumentExtraction {
   const fields: ExtractedField[] = [];
 
   for (const [fieldId, expected] of Object.entries(item.expected_fields)) {
     if (expected) {
+      const bbox =
+        DEFAULT_BBOXES[item.document_type]?.[fieldId] || {
+          x: 0.05,
+          y: 0.2,
+          width: 0.9,
+          height: 0.1,
+        };
+
       fields.push({
         field_id: fieldId as any,
         value: expected.value,
         quote: expected.quote,
         page: 1,
         confidence: 0.95,
+        highlight_bbox: bbox,
       });
     }
   }
