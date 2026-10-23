@@ -1,19 +1,24 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Download, AlertCircle, CheckCircle2, ShieldAlert, FileText, Check } from 'lucide-react';
-import { FieldComparison } from '@/lib/compare/types';
+import { Download, AlertCircle, CheckCircle2, ShieldAlert, FileText, Check, Mail, FileDown } from 'lucide-react';
+import { FieldComparison, VerificationResult } from '@/lib/compare/types';
 import { generateFixPlan } from '@/lib/fixplan/generator';
 import { exportToCsv } from '@/lib/fixplan/exporter';
+import { downloadPdfReport } from '@/lib/report/pdf';
 
 export interface FixListProps {
   fields: FieldComparison[];
   onSelectField?: (fieldId: string) => void;
+  onOpenOfficeModal?: (fieldId?: string) => void;
+  verificationResult?: VerificationResult | null;
+  presetTitle?: string;
 }
 
-export function FixList({ fields, onSelectField }: FixListProps) {
+export function FixList({ fields, onSelectField, onOpenOfficeModal, verificationResult, presetTitle }: FixListProps) {
   const fixPlan = generateFixPlan(fields);
   const [downloading, setDownloading] = useState(false);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
 
   const handleExportCsv = () => {
     setDownloading(true);
@@ -29,10 +34,17 @@ export function FixList({ fields, onSelectField }: FixListProps) {
     setTimeout(() => setDownloading(false), 800);
   };
 
+  const handleDownloadPdf = () => {
+    if (!verificationResult) return;
+    setDownloadingPdf(true);
+    downloadPdfReport(verificationResult, presetTitle);
+    setTimeout(() => setDownloadingPdf(false), 1000);
+  };
+
   return (
     <div className="bg-white dark:bg-[#121620] border border-neutral-200/80 dark:border-neutral-800 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between pb-3.5 border-b border-neutral-100 dark:border-neutral-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 border-b border-neutral-100 dark:border-neutral-800 gap-3">
         <div>
           <div className="flex items-center gap-2">
             <span className="text-[#ef4d23] font-medium text-xs">Step 3</span>
@@ -40,7 +52,7 @@ export function FixList({ fields, onSelectField }: FixListProps) {
             <span className="text-neutral-500 dark:text-neutral-400 text-xs font-medium">Action Items</span>
           </div>
           <h3 className="text-base font-semibold text-neutral-900 dark:text-white mt-0.5">
-            Prioritized Fix Plan
+            Prioritized Fix Plan &amp; Reports
           </h3>
           <p className="text-xs text-neutral-500 dark:text-neutral-400">
             {fixPlan.totalActions > 0
@@ -49,21 +61,41 @@ export function FixList({ fields, onSelectField }: FixListProps) {
           </p>
         </div>
 
-        {/* Orange Export Pill */}
-        <button
-          type="button"
-          onClick={handleExportCsv}
-          className="inline-flex items-center gap-2 bg-[#ef4d23] hover:bg-[#e03d13] text-white rounded-full pl-3.5 pr-1.5 py-1.5 text-xs font-medium transition-all shadow-xs cursor-pointer group shrink-0"
-        >
-          <span>{downloading ? 'Exported' : 'Export CSV'}</span>
-          <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0 group-hover:bg-white/30 transition-colors">
-            {downloading ? (
-              <Check className="w-3 h-3 text-white" />
-            ) : (
-              <Download className="w-3 h-3 text-white" />
-            )}
-          </span>
-        </button>
+        {/* Action Buttons */}
+        <div className="flex flex-wrap items-center gap-2">
+          {verificationResult && (
+            <button
+              type="button"
+              onClick={handleDownloadPdf}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-[#0b0f1a] hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-900 transition-colors shadow-xs cursor-pointer shrink-0"
+              title="Download formal PDF verification report"
+            >
+              <FileDown className="w-3.5 h-3.5" />
+              <span>{downloadingPdf ? 'Exporting...' : 'PDF Report'}</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={() => onOpenOfficeModal?.()}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 transition-colors cursor-pointer shrink-0"
+            title="Draft formal correction letter to issuing authority"
+          >
+            <Mail className="w-3.5 h-3.5" />
+            <span>Draft Office Request</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleExportCsv}
+            className="inline-flex items-center gap-2 bg-[#ef4d23] hover:bg-[#e03d13] text-white rounded-full pl-3 pr-1.5 py-1 text-xs font-medium transition-all shadow-xs cursor-pointer group shrink-0"
+          >
+            <span>{downloading ? 'Exported' : 'CSV'}</span>
+            <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0 group-hover:bg-white/30 transition-colors">
+              {downloading ? <Check className="w-3 h-3 text-white" /> : <Download className="w-3 h-3 text-white" />}
+            </span>
+          </button>
+        </div>
       </div>
 
       {/* 1. Fix Before Submitting */}

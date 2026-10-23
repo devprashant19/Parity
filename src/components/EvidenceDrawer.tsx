@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { X, AlertTriangle, CheckCircle2, HelpCircle, Eye, Check } from 'lucide-react';
+import { X, AlertTriangle, CheckCircle2, HelpCircle, Eye, Check, Mail } from 'lucide-react';
 import { FieldComparison, ResolutionChoice, BoundingBox } from '@/lib/compare/types';
 import { DocumentModal } from './DocumentModal';
 import { ManualEntry } from './ManualEntry';
@@ -11,6 +11,7 @@ export interface EvidenceDrawerProps {
   onClose: () => void;
   onDecision: (fieldId: string, choice: ResolutionChoice) => void;
   onManualOverride?: (fieldId: string, docType: string, newValue: string) => void;
+  onOpenOfficeModal?: (fieldId: string) => void;
 }
 
 export function EvidenceDrawer({
@@ -18,6 +19,7 @@ export function EvidenceDrawer({
   onClose,
   onDecision,
   onManualOverride,
+  onOpenOfficeModal,
 }: EvidenceDrawerProps) {
   const [modalDoc, setModalDoc] = useState<{
     title: string;
@@ -433,6 +435,20 @@ export function EvidenceDrawer({
                   </span>
                 )}
               </button>
+
+              {/* Action: Draft Letter to Issuing Office */}
+              {onOpenOfficeModal && (field.status === 'Conflict' || field.status === 'Needs Review') && (
+                <div className="pt-1">
+                  <button
+                    type="button"
+                    onClick={() => onOpenOfficeModal(field.field_id)}
+                    className="w-full py-2.5 px-3 rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50/70 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 text-xs font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                  >
+                    <Mail className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                    <span>Draft Formal Correction Letter to Issuing Office &rarr;</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
