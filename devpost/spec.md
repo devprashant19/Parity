@@ -42,6 +42,7 @@ Implements `prd.md > The Core Journey`.
 ## Field-to-Document Comparison Matrix
 The deterministic engine evaluates each field strictly across its designated source documents:
 
+### 1. Default Scholarship Packet Matrix
 | Field ID | Field Label | Compared Source Documents | Primary Extraction Target |
 | :--- | :--- | :--- | :--- |
 | `name` | Student Name | **Application Form**, **Marksheet**, **Income Certificate** (Pairwise: Form vs Marksheet, Form vs Income Cert) | Full legal name, tokens, initials |
@@ -49,6 +50,22 @@ The deterministic engine evaluates each field strictly across its designated sou
 | `marks` | Marks Percentage | **Application Form**, **Marksheet** | Overall percentage score (e.g. "89.4%") |
 | `income` | Annual Family Income | **Application Form**, **Income Certificate** | Gross annual income in INR (supports monthly $\times 12$) |
 | `issue_date` | Certificate Issue Date | **Application Form** (reported date), **Income Certificate** (official issue date) | Certificate issuance date (DD/MM/YYYY) |
+
+### 2. Preset Packets Matrix
+Parity includes pre-configured packet templates that adapt the comparison matrix across differing document sets:
+- **Scholarship Verification Packet (Default):** Application Form, Academic Marksheet, Income Certificate (evaluates `name`, `academic_year`, `marks`, `income`, `issue_date`).
+- **College Admission Packet:** Admission Application, High School Marksheet, Transfer Certificate / ID (evaluates `name`, `dob`, `id_number`, `marks`, `academic_year`).
+- **Financial Aid Packet:** Aid Application Form, Tax / Income Affidavit, Bank Statement / Certificate (evaluates `name`, `pan_or_tax_id`, `annual_income`, `issue_date`).
+
+### 3. Custom Field Deterministic Rules Matrix
+When defining custom fields in the packet editor, fields map to one of five deterministic comparison engines:
+| Field Type | Canonical Normalization | Matching & Comparison Logic | Classification Rules |
+| :--- | :--- | :--- | :--- |
+| `name` | Unicode normalization, title-casing, honorific stripping (Mr., Ms., Dr., Shri). | Pairwise token matching: full set equality, permutation invariance, single-initial compatibility. | Exact token match $\to$ `Consistent`; Initial mismatch or missing token $\to$ `Needs Review`; Disjoint token sets $\to$ `Conflict`. |
+| `date` | Parse DD/MM/YYYY, YYYY-MM-DD, MM/DD/YYYY, and textual dates (e.g., "15 July 2024"). | Calendar date comparison (year, month, day) independent of client timezone or formatting. | Identical date $\to$ `Consistent`; Ambiguous day/month (e.g. 05/06 vs 06/05) $\to$ `Needs Review`; Different calendar dates $\to$ `Conflict`. |
+| `amount` | Strip currency symbols (`$`, `₹`, `€`), commas; regional numeral conversion; detect per-month vs per-annum. | Exact numerical comparison in base currency units; automatic $12\times$ monthly-to-annual scaling. | Equal numerical value $\to$ `Consistent`; Unclear frequency/period $\to$ `Needs Review`; Unequal value $\to$ `Conflict`. |
+| `id` | Uppercase normalization, strip hyphens, spaces, and punctuation (e.g., Aadhaar, SSN, Roll No). | Exact alphanumeric string equality. | Identical sanitized string $\to$ `Consistent`; Missing characters or OCR noise $\to$ `Needs Review`; Mismatched alphanumeric string $\to$ `Conflict`. |
+| `text` | Trim whitespace, lowercase/uppercase canonicalization, punctuation collapsing. | Deterministic normalized string equality and quote containment verification. | Equal text $\to$ `Consistent`; Confidence $<0.7$ or containment failure $\to$ `Needs Review`; Disjoint non-empty values $\to$ `Conflict`. |
 
 ## Stack
 Implements `prd.md > Implementation Priorities`.
@@ -373,3 +390,27 @@ e:\Parity/
 
 ### Open Questions
 - **Student Demand Validation:** The user's field interviews with 4–5 students remain pending to validate problem frequency before final Devpost submission.
+
+## Revisions
+
+### 2026-10-23 — Pre-Submission Scope Expansion (Slices A–D)
+- **Slice A (Bounding-Box Evidence Architecture):**
+  - Updated extraction contract to request normalized bounding boxes `[ymin, xmin, ymax, xmax]` (or `{ x, y, width, height }` normalized to $0.0 \dots 1.0$) with each extracted fact.
+  - Implemented visual highlight bounding-box overlays across document previews in `EvidenceDrawer` and `DocumentModal`.
+  - Added precomputed normalized bounding boxes for all sample packet fields in `src/data/samples.ts`.
+  *Why:* Plain-text verbatim quotes prove the words exist, but students inspecting high-density multi-page forms need immediate visual localization directly overlaid on the scan.
+- **Slice B (Double-Read Verification & Eval Harness):**
+  - Added double-read verification pipeline: bounding-box crop isolation followed by independent value re-extraction restricted strictly to the crop.
+  - If the full-page extraction and isolated crop extraction disagree, the field is deterministically marked `Needs Review` with a specific mismatch explanation.
+  - Integrated double-read verification into `tests/eval/scan-eval.ts` and automated reporting to output true agreement and disagreement rates honestly without altering ground truth.
+  *Why:* Protects against full-page context contamination, OCR hallucination, or reading from adjacent tabular lines.
+- **Slice C (Packet Presets & Custom Field Editor):**
+  - Introduced configurable packet presets (`scholarship`, `college_admission`, `financial_aid`) and custom field schema editor supporting 5 data types: `name`, `date`, `amount`, `id`, `text`.
+  - Each field type reuses the strict deterministic comparison engine (token matching, date parsing, numeric/frequency scaling, alphanumeric sanitization).
+  - Updated the field-to-document matrix to specify source mappings and normalization rules across presets.
+  *Why:* Enables students and institutions to verify multi-variety document packets beyond the initial 5-field scholarship archetype while maintaining zero LLM judgment.
+- **Slice D (Downloadable PDF Report & Issuing Office Correction Draft):**
+  - Added formatted downloadable PDF verification summary capturing packet metadata, field statuses, source citations, and student resolutions.
+  - Built an automated letter generator drafting formal correction request messages addressed to the issuing registrar or authority for flagged official certificate discrepancies.
+  *Why:* Provides actionable, professional artifacts that students can physically print or email directly to college authorities to rectify certificate mismatches before deadlines.
+

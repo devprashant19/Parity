@@ -222,3 +222,16 @@ Source: `learner-profile.md > Collaboration and Communication Preferences`, `sco
 
 ## Open Questions
 - **Student Demand Validation:** The student-demand check (interviewing 4–5 students, requiring at least 3 to confirm document mismatch pain) is still pending execution.
+
+## Revisions
+
+### 2026-10-23 — Pre-Submission Scope Expansion (Slices A–D)
+- **Slice A (Bounding-Box Evidence):** Added normalized bounding box (`[ymin, xmin, ymax, xmax]` or `{x, y, width, height}`) extraction schema to Gemini calls, visual highlight bounding box overlays on document previews in the Evidence Drawer, and precomputed normalized bounding boxes for clean and messy sample packets.
+  *Why:* Plain text quote excerpts require manual scanning on dense multi-page forms; bounding box overlays provide instant visual grounding directly on the scanned certificate image.
+- **Slice B (Double-Read Verification):** Added secondary extraction pass on cropped bounding box images. If the initial full-page read and the isolated crop read disagree, or if either read fails/is ambiguous, the field is deterministically marked `Needs Review` (`Double-read mismatch`). Added double-read evaluation metrics to the eval harness to report live numbers honestly.
+  *Why:* Guards against hallucinated values or peripheral text interference, confirming that the extracted value genuinely resides inside the indicated bounding box.
+- **Slice C (Packet Presets & Custom Field Editor):** Added selectable packet presets (Scholarship Packet, College Admission Packet, Financial Aid Packet) and an interactive custom field editor supporting 5 standard field types (`name`, `date`, `amount`, `id`, `text`), reusing the deterministic comparison rules. Updated the field-to-document matrix in the spec.
+  *Why:* Expands Parity from a single fixed 5-field scholarship schema into a versatile packet verification tool for diverse admissions and financial aid workflows without compromising deterministic rules.
+- **Slice D (Downloadable PDF Report & Issuing Office Correction Draft):** Added downloadable PDF verification report and automated drafting of formal correction request letters to issuing registrars/offices for official document errors.
+  *Why:* Students need authoritative, offline-shareable documentation to present to college administrative desks and issuing authorities to dispute errors before deadlines.
+

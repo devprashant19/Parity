@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { X, ExternalLink } from 'lucide-react';
+import { BoundingBox } from '@/lib/compare/types';
 
 export interface DocumentModalProps {
   isOpen: boolean;
@@ -9,9 +10,19 @@ export interface DocumentModalProps {
   title: string;
   previewUrl?: string;
   fileName?: string;
+  highlightBbox?: BoundingBox | null;
+  highlightLabel?: string;
 }
 
-export function DocumentModal({ isOpen, onClose, title, previewUrl, fileName }: DocumentModalProps) {
+export function DocumentModal({
+  isOpen,
+  onClose,
+  title,
+  previewUrl,
+  fileName,
+  highlightBbox,
+  highlightLabel,
+}: DocumentModalProps) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -65,11 +76,30 @@ export function DocumentModal({ isOpen, onClose, title, previewUrl, fileName }: 
         {/* Scan Viewer */}
         <div className="flex-1 overflow-auto p-4 sm:p-6 flex items-center justify-center bg-neutral-100/70 dark:bg-[#0b0f1a]">
           {previewUrl ? (
-            <img
-              src={previewUrl}
-              alt={title}
-              className="max-h-[72vh] w-auto object-contain rounded-2xl shadow-md border border-neutral-200 dark:border-neutral-800"
-            />
+            <div className="relative inline-block max-h-[72vh] rounded-2xl shadow-md border border-neutral-200 dark:border-neutral-800 overflow-hidden bg-white">
+              <img
+                src={previewUrl}
+                alt={title}
+                className="max-h-[72vh] w-auto object-contain block"
+              />
+              {highlightBbox && (
+                <div
+                  className="absolute border-2 border-[#ef4d23] bg-[#ef4d23]/25 rounded-xs pointer-events-none shadow-[0_0_12px_rgba(239,77,35,0.4)] animate-pulse"
+                  style={{
+                    left: `${highlightBbox.x * 100}%`,
+                    top: `${highlightBbox.y * 100}%`,
+                    width: `${highlightBbox.width * 100}%`,
+                    height: `${highlightBbox.height * 100}%`,
+                  }}
+                >
+                  {highlightLabel && (
+                    <span className="absolute -top-5 left-0 text-[10px] font-mono font-semibold bg-[#ef4d23] text-white px-1.5 py-0.5 rounded shadow-xs whitespace-nowrap">
+                      {highlightLabel}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
           ) : (
             <p className="text-sm font-medium text-neutral-400">Document preview unavailable</p>
           )}

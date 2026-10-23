@@ -9,6 +9,7 @@ STRICT INSTRUCTIONS:
    - For income, the quote MUST include surrounding words indicating frequency or period (e.g., "per month", "p.m.", "per annum", "annual").
 4. Return a self-reported confidence score between 0.0 and 1.0 reflecting OCR clarity.
 5. Provide the 1-indexed page number where the fact was located.
+6. For every non-null field, provide normalized bounding box coordinates "highlight_bbox" as [ymin, xmin, ymax, xmax] scaled 0 to 1000 (or {x, y, width, height} scaled 0.0 to 1.0) marking the visual rectangle on the document image where the value is located. If not identifiable, return null.
 
 Target fields to extract:
 - name: The student's legal name (extract the single full name, omitting repeated stamp echoes).

@@ -10,6 +10,13 @@ export type FieldId = 'name' | 'academic_year' | 'marks' | 'income' | 'issue_dat
 
 export type DocumentType = 'application_form' | 'marksheet' | 'income_certificate';
 
+export interface BoundingBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export interface ExtractedField {
   field_id: FieldId;
   value: string | null;
@@ -17,12 +24,7 @@ export interface ExtractedField {
   page: number;
   confidence: number;
   source?: 'extracted' | 'manual';
-  highlight_bbox?: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  };
+  highlight_bbox?: BoundingBox;
 }
 
 export interface DocumentExtraction {
@@ -41,12 +43,7 @@ export interface DocumentComparisonEntry {
   confidence: number;
   source: 'extracted' | 'manual';
   preview_url?: string;
-  highlight_bbox?: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  };
+  highlight_bbox?: BoundingBox;
 }
 
 export interface PairwiseComparison {

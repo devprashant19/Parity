@@ -82,8 +82,46 @@ Activity mode:
 
 ## Revisions
 
+### Earlier Approved Revisions
 - **Unresolved conflict fix wording:** Prompted decision ("Choose which document is correct") instead of presuming an action fix before student selection.
 - **Persistent sample label:** Added permanent results banner `Sample Result — Synthetic Scholarship Packet` so judges never confuse offline demo samples with live AI extraction.
 - **Client downscaling for Vercel limits:** Capped each uploaded image at max 1600px JPEG and $\le 1.5$MB with total request $<4$MB, rejecting oversized PDFs client-side with actionable feedback.
 - **Live fallback error banner:** Implemented prominent top banner with a 1-click fallback button to load the instant sample packet whenever Gemini API quota, key, or network fails.
 - **Raster benchmark scans:** Generated 10 real raster PNG/JPEG scans (`tests/fixtures/scans/`) rendered via Playwright Chromium headless with subtle blur, rotation, and faded ink to test OCR vision without SVG shortcuts. Verified with `npm run eval:scans` achieving 0.0% False-Consistent rate.
+
+### 2026-10-23 — Pre-Submission Scope Expansion (Slices A–D)
+- **Slice A (Bounding-box evidence):** Request normalized bounding boxes with each extracted field (`ymin, xmin, ymax, xmax` or `{x, y, width, height}` normalized); render overlays on document previews in the evidence drawer and document preview modals; provide precomputed boxes for sample packets.
+  *Why:* Plain text quote excerpts require manual visual scanning; direct bounding-box highlight overlays localize the exact coordinate region on the document image instantly.
+- **Slice B (Double-read verification & eval harness):** Crop the image to the box, re-extract the value from the crop only, and mark `Needs Review` if the reads disagree. Add double-read metrics to the eval harness and report live numbers honestly (including any disagreements).
+  *Why:* Protects against hallucinated full-page values and ensures the extracted text exists within the cropped bounding box.
+- **Slice C (Packet presets and custom field editor):** Packet presets (Scholarship, College Admission, Financial Aid) and a custom field editor supporting 5 field types (`name`, `date`, `amount`, `id`, `text`), reusing the deterministic comparison rules. Updated the field-to-document matrix in the spec.
+  *Why:* Enables students to verify multi-variety document packets beyond the initial 5-field scholarship archetype while maintaining zero LLM judgment.
+- **Slice D (Downloadable PDF report & issuing office message):** Downloadable verification report (PDF) and drafted correction request message to the issuing office for corrected documents.
+  *Why:* Students need authoritative, offline-shareable documentation to present to college administrative desks and issuing authorities to dispute errors before deadlines.
+
+## Pre-Submission Expansion Slices
+
+- [x] **Slice A: Bounding-box evidence**
+  - Extract normalized bounding boxes with Gemini schema.
+  - Render overlays on document previews in evidence drawer and modal.
+  - Precompute bounding boxes in sample packets (`samples.ts`).
+  - Unit tests & commit.
+
+- [ ] **Slice B: Double-read verification**
+  - Crop image to box and re-extract value from crop only.
+  - Mark `Needs Review` if reads disagree with explicit diff explanation.
+  - Integrate into eval harness and report live figures honestly.
+  - Unit tests & commit.
+
+- [ ] **Slice C: Packet presets and custom field editor**
+  - Add preset selector (`scholarship`, `college_admission`, `financial_aid`).
+  - Build custom field editor supporting 5 field types (`name`, `date`, `amount`, `id`, `text`).
+  - Reuse deterministic comparison engine rules across all custom types.
+  - Update field-to-document matrix in spec.
+  - Unit tests & commit.
+
+- [ ] **Slice D: Downloadable report (PDF) & issuing office draft**
+  - Build downloadable PDF verification report.
+  - Draft polite, formal correction request message for issuing authority.
+  - Unit tests & commit.
+
