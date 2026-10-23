@@ -93,7 +93,7 @@ export function DocumentModal({
                   }}
                 >
                   {highlightLabel && (
-                    <span className="absolute -top-5 left-0 text-[10px] font-mono font-semibold bg-[#ef4d23] text-white px-1.5 py-0.5 rounded shadow-xs whitespace-nowrap">
+                    <span className="absolute top-1 right-2 text-[10px] font-mono font-semibold bg-[#ef4d23] text-white px-2 py-0.5 rounded shadow-xs whitespace-nowrap pointer-events-none">
                       {highlightLabel}
                     </span>
                   )}
