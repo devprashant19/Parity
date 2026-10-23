@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { AlertTriangle, CheckCircle2, HelpCircle } from 'lucide-react';
+import { Gauge } from '@/app/components/Gauge';
 
 export interface SummaryCountersProps {
   conflicts: number;
@@ -18,94 +19,133 @@ export function SummaryCounters({
   badgeText,
   isAnalyzing,
 }: SummaryCountersProps) {
+  const total = conflicts + consistent + needsReview;
+  const matchPercent = total > 0 ? Math.round((consistent / total) * 100) : 100;
+  const gaugeColor = conflicts > 0 ? '#ef4d23' : '#10b981';
+
   return (
-    <div className="space-y-3.5">
+    <div className="space-y-4">
+      {/* Sample Badge */}
       {badgeText && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl bg-amber-50/90 border border-amber-200 text-amber-950 dark:bg-amber-950/30 dark:border-amber-800/60 dark:text-amber-200 gap-2 shadow-xs transition-all duration-200 hover-card-lift">
-          <div className="flex items-center space-x-2.5">
-            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
-            <span className="text-xs font-bold uppercase tracking-wider">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-2xl bg-white dark:bg-[#121620] border border-neutral-200/80 dark:border-neutral-800 shadow-xs gap-2">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#ef4d23] animate-pulse shrink-0" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-neutral-900 dark:text-white">
               {badgeText}
             </span>
-            <span className="text-xs text-amber-800 dark:text-amber-300 hidden md:inline">
-              (Precomputed offline for instant demo • zero external API calls)
+            <span className="text-xs text-neutral-500 dark:text-neutral-400 hidden md:inline">
+              (Deterministic engine • zero hallucination guarantee)
             </span>
           </div>
-          <span className="text-xs text-amber-800 dark:text-amber-300 font-medium shrink-0">
-            5 cross-document checks evaluated
+          <span className="text-xs text-[#ef4d23] font-medium shrink-0">
+            5 cross-document field checks evaluated
           </span>
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-        {/* Conflicts Counter */}
+      {/* 3-Column / 4-Metric Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+        
+        {/* Card 1: Conflicts */}
         <div
           data-testid="counter-conflicts"
-          className="bg-white dark:bg-[#10141E] border border-red-200 dark:border-red-900/50 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-lg hover:shadow-red-500/10 hover:border-red-400 dark:hover:border-red-700 transition-all duration-200 relative overflow-hidden group hover-card-lift active-press cursor-default"
+          className="bg-white dark:bg-[#121620] rounded-2xl p-4 sm:p-5 shadow-xs border border-neutral-200/80 dark:border-neutral-800 flex flex-col justify-between"
         >
-          <div className="absolute top-0 left-0 right-0 h-1 bg-red-500 group-hover:h-1.5 transition-all duration-200" />
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-red-800 dark:text-red-300 flex items-center space-x-1.5">
-              <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0 group-hover:scale-110 transition-transform duration-200" />
-              <span>Conflicts</span>
-            </span>
-            <span className="text-[10px] uppercase tracking-wider font-bold text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-950/70 border border-red-200 dark:border-red-900 px-2 py-0.5 rounded-full">
-              High Risk
-            </span>
+          <div>
+            <div className="flex items-center justify-between text-[13px]">
+              <span className="text-[#ef4d23] font-medium">Discrepancies</span>
+              <span className="text-neutral-500 dark:text-neutral-400 font-normal">This Packet</span>
+            </div>
+            <div className="flex items-center gap-2.5 mt-2.5">
+              <span className="text-[28px] font-semibold text-neutral-900 dark:text-white leading-none tracking-tight">
+                {isAnalyzing ? '—' : conflicts}
+              </span>
+              <span className="inline-flex items-center gap-1 bg-red-50 text-red-600 dark:bg-red-950/60 dark:text-red-300 rounded-full px-2 py-0.5 text-[11px] font-medium">
+                <AlertTriangle className="w-3 h-3 stroke-[2.5]" />
+                {conflicts > 0 ? `${conflicts} Conflicts` : 'Zero'}
+              </span>
+            </div>
+            <p className="text-[11px] text-neutral-400 mt-1">Cross-check mismatches</p>
           </div>
-          <div className="mt-3 flex items-baseline space-x-2">
-            <span className="text-3xl font-extrabold font-mono-val text-red-700 dark:text-red-400 tracking-tight group-hover:scale-105 transition-transform duration-200 inline-block origin-left">
-              {isAnalyzing ? '—' : conflicts}
-            </span>
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">mismatches found</span>
+          <div className="mt-4 pt-3 border-t border-neutral-100 dark:border-neutral-800 text-[11px] text-neutral-500 font-medium">
+            Requires resolution before submit
           </div>
         </div>
 
-        {/* Consistent Counter */}
+        {/* Card 2: Consistency Match Gauge */}
+        <div className="bg-white dark:bg-[#121620] rounded-2xl p-4 sm:p-5 shadow-xs border border-neutral-200/80 dark:border-neutral-800 flex flex-col justify-between sm:col-span-2 lg:col-span-1">
+          <div>
+            <div className="flex items-center justify-between text-[13px]">
+              <span className="text-[#ef4d23] font-medium">Match Score</span>
+              <span className="text-neutral-500 dark:text-neutral-400 font-normal">Deterministic</span>
+            </div>
+            <div className="mt-1">
+              <Gauge
+                value={isAnalyzing ? 0 : matchPercent}
+                color={gaugeColor}
+                showLabels
+                min="0%"
+                max="100%"
+              />
+            </div>
+          </div>
+          <p className="text-center text-[11px] text-neutral-500 font-medium mt-1">
+            Packet Consistency Rate
+          </p>
+        </div>
+
+        {/* Card 3: Consistent */}
         <div
           data-testid="counter-consistent"
-          className="bg-white dark:bg-[#10141E] border border-emerald-200 dark:border-emerald-900/50 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-lg hover:shadow-emerald-500/10 hover:border-emerald-400 dark:hover:border-emerald-700 transition-all duration-200 relative overflow-hidden group hover-card-lift active-press cursor-default"
+          className="bg-white dark:bg-[#121620] rounded-2xl p-4 sm:p-5 shadow-xs border border-neutral-200/80 dark:border-neutral-800 flex flex-col justify-between"
         >
-          <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-500 group-hover:h-1.5 transition-all duration-200" />
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300 flex items-center space-x-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 group-hover:scale-110 transition-transform duration-200" />
-              <span>Consistent</span>
-            </span>
-            <span className="text-[10px] uppercase tracking-wider font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/70 border border-emerald-200 dark:border-emerald-900 px-2 py-0.5 rounded-full">
-              Verified
-            </span>
+          <div>
+            <div className="flex items-center justify-between text-[13px]">
+              <span className="text-[#10b981] font-medium">Verified</span>
+              <span className="text-neutral-500 dark:text-neutral-400 font-normal">Consistent</span>
+            </div>
+            <div className="flex items-center gap-2.5 mt-2.5">
+              <span className="text-[28px] font-semibold text-neutral-900 dark:text-white leading-none tracking-tight">
+                {isAnalyzing ? '—' : consistent}
+              </span>
+              <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 rounded-full px-2 py-0.5 text-[11px] font-medium">
+                <CheckCircle2 className="w-3 h-3 stroke-[2.5]" />
+                Values Match
+              </span>
+            </div>
+            <p className="text-[11px] text-neutral-400 mt-1">Identical claims cited</p>
           </div>
-          <div className="mt-3 flex items-baseline space-x-2">
-            <span className="text-3xl font-extrabold font-mono-val text-emerald-700 dark:text-emerald-400 tracking-tight group-hover:scale-105 transition-transform duration-200 inline-block origin-left">
-              {isAnalyzing ? '—' : consistent}
-            </span>
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">values match</span>
+          <div className="mt-4 pt-3 border-t border-neutral-100 dark:border-neutral-800 text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
+            Ready for institution intake
           </div>
         </div>
 
-        {/* Needs Review Counter */}
+        {/* Card 4: Needs Review */}
         <div
           data-testid="counter-needs-review"
-          className="bg-white dark:bg-[#10141E] border border-blue-200 dark:border-blue-900/50 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-lg hover:shadow-blue-500/10 hover:border-blue-400 dark:hover:border-blue-700 transition-all duration-200 relative overflow-hidden group hover-card-lift active-press cursor-default"
+          className="bg-white dark:bg-[#121620] rounded-2xl p-4 sm:p-5 shadow-xs border border-neutral-200/80 dark:border-neutral-800 flex flex-col justify-between"
         >
-          <div className="absolute top-0 left-0 right-0 h-1 bg-blue-500 group-hover:h-1.5 transition-all duration-200" />
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-blue-800 dark:text-blue-300 flex items-center space-x-1.5">
-              <HelpCircle className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 group-hover:scale-110 transition-transform duration-200" />
-              <span>Needs Review</span>
-            </span>
-            <span className="text-[10px] uppercase tracking-wider font-bold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-950/70 border border-blue-200 dark:border-blue-900 px-2 py-0.5 rounded-full">
-              Ambiguous
-            </span>
+          <div>
+            <div className="flex items-center justify-between text-[13px]">
+              <span className="text-amber-600 font-medium">Review Needed</span>
+              <span className="text-neutral-500 dark:text-neutral-400 font-normal">Pending</span>
+            </div>
+            <div className="flex items-center gap-2.5 mt-2.5">
+              <span className="text-[28px] font-semibold text-neutral-900 dark:text-white leading-none tracking-tight">
+                {isAnalyzing ? '—' : needsReview}
+              </span>
+              <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 rounded-full px-2 py-0.5 text-[11px] font-medium">
+                <HelpCircle className="w-3 h-3 stroke-[2.5]" />
+                Ambiguous
+              </span>
+            </div>
+            <p className="text-[11px] text-neutral-400 mt-1">Single citation or unclear</p>
           </div>
-          <div className="mt-3 flex items-baseline space-x-2">
-            <span className="text-3xl font-extrabold font-mono-val text-blue-700 dark:text-blue-400 tracking-tight group-hover:scale-105 transition-transform duration-200 inline-block origin-left">
-              {isAnalyzing ? '—' : needsReview}
-            </span>
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">needs checking</span>
+          <div className="mt-4 pt-3 border-t border-neutral-100 dark:border-neutral-800 text-[11px] text-neutral-500 font-medium">
+            Requires clerical inspection
           </div>
         </div>
+
       </div>
     </div>
   );

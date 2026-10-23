@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Edit3, Check, X } from 'lucide-react';
+import { Edit3, Check, X, ChevronDown } from 'lucide-react';
 import { DocumentComparisonEntry } from '@/lib/compare/types';
 
 export interface ManualEntryProps {
@@ -27,7 +27,7 @@ export function ManualEntry({ documents, onSaveManualValue }: ManualEntryProps) 
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="inline-flex items-center space-x-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline pt-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg active-press"
+        className="inline-flex items-center gap-1.5 text-xs font-medium text-[#ef4d23] hover:underline pt-2 cursor-pointer focus:outline-none"
       >
         <Edit3 className="w-3.5 h-3.5" />
         <span>Enter value manually / override OCR</span>
@@ -38,65 +38,74 @@ export function ManualEntry({ documents, onSaveManualValue }: ManualEntryProps) 
   return (
     <form
       onSubmit={handleSave}
-      className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3.5 dark:bg-[#10141E] dark:border-[#1F293D] animate-fadeIn hover-card-lift"
+      className="p-4 bg-white dark:bg-[#151a24] border border-neutral-200/90 dark:border-neutral-700 rounded-2xl space-y-3 shadow-xs"
     >
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-slate-900 dark:text-[#F8FAFC]">
-          Manual Value Entry &amp; OCR Override
+      <div className="flex items-center justify-between pb-1 border-b border-neutral-100 dark:border-neutral-800">
+        <span className="text-xs font-semibold text-neutral-900 dark:text-white">
+          Manual Value Entry &amp; Override
         </span>
         <button
           type="button"
           onClick={() => setIsOpen(false)}
-          className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer p-1 rounded-lg active-press group"
+          className="text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 cursor-pointer p-1"
         >
-          <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+          <X className="w-4 h-4" />
         </button>
       </div>
 
+      {/* Target Document Dropdown */}
       <div>
-        <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-          Select target document:
+        <label className="block text-[12px] font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+          Select target document
         </label>
-        <select
-          value={selectedDocType}
-          onChange={(e) => setSelectedDocType(e.target.value as any)}
-          className="w-full text-xs bg-white dark:bg-[#182030] border border-slate-300 dark:border-[#2A3854] rounded-xl p-2.5 text-slate-900 dark:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 cursor-pointer transition-colors"
+        <div className="relative">
+          <select
+            value={selectedDocType}
+            onChange={(e) => setSelectedDocType(e.target.value as any)}
+            className="w-full border border-neutral-200 dark:border-neutral-700 rounded-lg px-3 py-2 text-xs text-neutral-800 dark:text-neutral-200 bg-white dark:bg-[#121620] shadow-2xs appearance-none pr-8 focus:outline-none focus:border-neutral-400 cursor-pointer font-medium"
+          >
+            {documents.map((d) => (
+              <option key={d.doc_type} value={d.doc_type}>
+                {d.doc_label} (Current: {d.raw_value || 'Empty'})
+              </option>
+            ))}
+          </select>
+          <ChevronDown className="w-4 h-4 text-neutral-400 absolute right-2.5 top-2.5 pointer-events-none" />
+        </div>
+      </div>
+
+      {/* Value Input with # Prefix */}
+      <div>
+        <label className="block text-[12px] font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+          Type correct value as printed
+        </label>
+        <div className="flex items-center border border-neutral-200 dark:border-neutral-700 rounded-lg px-3 py-1.5 text-xs bg-white dark:bg-[#121620] text-neutral-800 dark:text-neutral-200 focus-within:border-neutral-400 transition-colors shadow-2xs">
+          <span className="text-neutral-400 mr-2 font-mono text-xs">#</span>
+          <input
+            type="text"
+            value={manualValue}
+            onChange={(e) => setManualValue(e.target.value)}
+            placeholder="e.g. 89.4% or $24,000"
+            className="w-full bg-transparent focus:outline-none text-xs font-medium"
+          />
+        </div>
+      </div>
+
+      {/* Footer Buttons Matching Convix Card 2 */}
+      <div className="flex items-center gap-3 pt-2 text-xs">
+        <button
+          type="submit"
+          className="bg-[#ef4d23] hover:bg-[#e03d13] text-white rounded-lg px-4 py-1.5 font-medium transition-colors shadow-2xs cursor-pointer inline-flex items-center gap-1.5"
         >
-          {documents.map((d) => (
-            <option key={d.doc_type} value={d.doc_type}>
-              {d.doc_label} (Current: {d.raw_value || 'Empty'})
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-          Type correct value as printed:
-        </label>
-        <input
-          type="text"
-          value={manualValue}
-          onChange={(e) => setManualValue(e.target.value)}
-          placeholder="e.g. 89.4% or $24,000"
-          className="w-full text-xs font-mono-val bg-white dark:bg-[#182030] border border-slate-300 dark:border-[#2A3854] rounded-xl p-2.5 text-slate-900 dark:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 transition-colors"
-        />
-      </div>
-
-      <div className="flex items-center justify-end space-x-2 pt-1">
+          <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+          <span>Save</span>
+        </button>
         <button
           type="button"
           onClick={() => setIsOpen(false)}
-          className="px-3 py-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white rounded-lg cursor-pointer active-press"
+          className="text-neutral-500 hover:text-neutral-800 underline underline-offset-2 transition-colors cursor-pointer"
         >
           Cancel
-        </button>
-        <button
-          type="submit"
-          className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs hover:-translate-y-0.5 active-press transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-        >
-          <Check className="w-3.5 h-3.5 stroke-[3]" />
-          <span>Save &amp; Re-evaluate</span>
         </button>
       </div>
     </form>

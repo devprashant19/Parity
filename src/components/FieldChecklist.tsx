@@ -42,22 +42,22 @@ export function FieldChecklist({ fields, selectedFieldId, onSelectField }: Field
     switch (status) {
       case 'Conflict':
         return (
-          <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 dark:bg-red-950/70 dark:text-red-300 border border-red-200 dark:border-red-900 shadow-xs">
-            <AlertTriangle className="w-3.5 h-3.5 text-red-600 dark:text-red-400" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-600 dark:bg-red-950/60 dark:text-red-300 border border-red-200/60 dark:border-red-900/60">
+            <AlertTriangle className="w-3.5 h-3.5 stroke-[2.5]" />
             <span>Conflict</span>
           </span>
         );
       case 'Consistent':
         return (
-          <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900 shadow-xs">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-900/60">
+            <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.5]" />
             <span>Consistent</span>
           </span>
         );
       case 'Needs Review':
         return (
-          <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300 border border-blue-200 dark:border-blue-900 shadow-xs">
-            <HelpCircle className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200/60 dark:border-amber-900/60">
+            <HelpCircle className="w-3.5 h-3.5 stroke-[2.5]" />
             <span>Needs Review</span>
           </span>
         );
@@ -65,22 +65,27 @@ export function FieldChecklist({ fields, selectedFieldId, onSelectField }: Field
   };
 
   return (
-    <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden shadow-xs dark:bg-[#10141E] dark:border-[#1F293D] transition-all duration-200 hover-card-lift">
-      <div className="p-4 sm:p-5 border-b border-[#E2E8F0] dark:border-[#1F293D] flex items-center justify-between">
+    <div className="bg-white dark:bg-[#121620] border border-neutral-200/80 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-xs transition-all">
+      <div className="p-4 sm:p-5 border-b border-neutral-100 dark:border-neutral-800 flex items-center justify-between">
         <div>
-          <h3 className="font-serif-heading text-base font-bold text-[#0F172A] dark:text-[#F8FAFC]">
+          <div className="flex items-center gap-2">
+            <span className="text-[#ef4d23] font-medium text-xs">Step 2</span>
+            <span className="text-neutral-400">•</span>
+            <span className="text-neutral-500 dark:text-neutral-400 text-xs font-medium">Field Analysis</span>
+          </div>
+          <h3 className="text-base font-semibold text-neutral-900 dark:text-white mt-0.5">
             Cross-Document Verification Checklist
           </h3>
-          <p className="text-xs text-[#475569] dark:text-[#94A3B8] mt-0.5">
-            Deterministic rule engine comparison across ingested application records
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+            Deterministic rule comparison across ingested application records
           </p>
         </div>
-        <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 hidden sm:inline">
-          Click any field to inspect cited evidence →
+        <span className="text-xs font-medium text-[#ef4d23] hidden sm:inline">
+          Click row to inspect cited evidence →
         </span>
       </div>
 
-      <div className="divide-y divide-[#E2E8F0] dark:divide-[#1F293D]">
+      <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
         {fields.map((field) => {
           const isSelected = selectedFieldId === field.field_id;
 
@@ -88,61 +93,59 @@ export function FieldChecklist({ fields, selectedFieldId, onSelectField }: Field
             <div
               key={field.field_id}
               onClick={() => onSelectField(field.field_id)}
-              className={`p-4 sm:p-5 flex items-center justify-between cursor-pointer transition-all duration-200 group active-press ${
+              className={`p-4 sm:p-5 flex items-center justify-between cursor-pointer transition-colors ${
                 isSelected
-                  ? 'bg-blue-50/80 border-l-4 border-blue-600 dark:bg-blue-950/40 dark:border-blue-500 shadow-xs'
-                  : 'hover:bg-slate-50/90 dark:hover:bg-[#182030] border-l-4 border-transparent hover:pl-5'
+                  ? 'bg-[#f5f2ee]/80 border-l-4 border-[#ef4d23] dark:bg-[#182030] dark:border-[#ef4d23]'
+                  : 'hover:bg-neutral-50/80 dark:hover:bg-[#182030] border-l-4 border-transparent'
               }`}
             >
-              <div className="flex items-start space-x-3.5 min-w-0 pr-4">
+              <div className="flex items-start gap-3.5 min-w-0 pr-4">
                 <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 border transition-transform duration-200 group-hover:scale-105 ${
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 border ${
                     field.status === 'Conflict'
-                      ? 'bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-400 border-red-200/70 dark:border-red-900/60'
+                      ? 'bg-red-50 text-red-600 border-red-200/70 dark:bg-red-950/40 dark:text-red-400 dark:border-red-900/60'
                       : field.status === 'Consistent'
-                      ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-200/70 dark:border-emerald-900/60'
-                      : 'bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 border-blue-200/70 dark:border-blue-900/60'
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200/70 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900/60'
+                      : 'bg-amber-50 text-amber-700 border-amber-200/70 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900/60'
                   }`}
                 >
                   {getFieldIcon(field.field_id)}
                 </div>
 
                 <div className="min-w-0">
-                  <div className="flex items-center space-x-2">
-                    <h4 className="text-sm font-bold text-[#0F172A] dark:text-[#F8FAFC] truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <h4 className="text-sm font-semibold text-neutral-900 dark:text-white truncate">
                       {field.field_label}
                     </h4>
                     {field.resolution !== 'unresolved' && (
-                      <span className="text-[10px] font-bold text-purple-700 bg-purple-100 dark:bg-purple-950/70 dark:text-purple-300 border border-purple-200 dark:border-purple-900 px-2 py-0.5 rounded-full animate-badgePop">
+                      <span className="text-[10px] font-medium text-[#ef4d23] bg-[#ef4d23]/10 px-2 py-0.5 rounded-full">
                         Decision recorded
                       </span>
                     )}
                   </div>
 
-                  <p className="text-xs text-[#475569] dark:text-[#94A3B8] mt-1 line-clamp-1">
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 line-clamp-1">
                     {field.diff_explanation}
                   </p>
 
                   {/* Documents compared pill list */}
-                  <div className="flex flex-wrap items-center gap-1.5 mt-2.5">
+                  <div className="flex flex-wrap items-center gap-1.5 mt-2">
                     {field.documents.map((d, i) => (
                       <span
                         key={i}
-                        className="inline-flex items-center text-[11px] font-mono-val px-2.5 py-1 rounded-lg bg-slate-100/90 dark:bg-[#182030] text-slate-800 dark:text-slate-200 border border-slate-200/70 dark:border-[#2A3854] transition-colors"
+                        className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-md bg-[#f5f2ee] dark:bg-[#182030] text-neutral-800 dark:text-neutral-200 border border-neutral-200/60 dark:border-neutral-700 font-medium"
                       >
-                        <span className="text-slate-500 mr-1.5 font-sans font-medium">{d.doc_label.split(' ')[0]}:</span>
-                        <strong className="font-bold text-slate-900 dark:text-white">
-                          {d.raw_value ?? 'null'}
-                        </strong>
+                        <span className="text-neutral-400 mr-1.5">{d.doc_label.split(' ')[0]}:</span>
+                        <strong>{d.raw_value ?? 'null'}</strong>
                       </span>
                     ))}
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center space-x-3 shrink-0">
+              <div className="flex items-center gap-3 shrink-0">
                 {getStatusBadge(field.status)}
-                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-all duration-200" />
+                <ChevronRight className="w-4 h-4 text-neutral-400" />
               </div>
             </div>
           );
