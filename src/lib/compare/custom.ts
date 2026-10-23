@@ -136,7 +136,7 @@ export function evaluateCustomField(
       source: raw?.source || 'extracted',
       highlight_bbox: raw?.highlight_bbox,
       double_read: raw?.double_read,
-      preview_url: sampleUrls?.[docType],
+      preview_url: doc?.preview_url || sampleUrls?.[docType],
     });
   }
 

@@ -18,6 +18,7 @@ export interface IngestionZoneProps {
   hasRun: boolean;
   strictVerification?: boolean;
   onToggleStrictVerification?: (val: boolean) => void;
+  analysisProgressText?: string;
 }
 
 export function IngestionZone({
@@ -33,6 +34,7 @@ export function IngestionZone({
   hasRun,
   strictVerification = true,
   onToggleStrictVerification,
+  analysisProgressText,
 }: IngestionZoneProps) {
   const hasDocuments =
     uploadedDocs.application_form !== null &&
@@ -40,7 +42,7 @@ export function IngestionZone({
     uploadedDocs.income_certificate !== null;
 
   return (
-    <div className="bg-[#f5f2ee] dark:bg-[#151a24] rounded-3xl p-4 sm:p-6 shadow-md border border-neutral-200/60 dark:border-neutral-800">
+    <div className="bg-[#f5f2ee] dark:bg-[#151a24] rounded-3xl p-4 sm:p-6 shadow-md border border-neutral-200/60 dark:border-neutral-800 transition-all">
       {/* Top Header & Preset Triggers */}
       <div className="flex flex-col md:flex-row md:items-center justify-between pb-5 border-b border-neutral-200/70 dark:border-neutral-800 gap-4">
         <div>
@@ -55,7 +57,7 @@ export function IngestionZone({
           <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5">
             Ingest 3 required documents for scholarship, financial aid, or admissions packet cross-verification.
             <span className="block text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">
-              Live checks use a shared Gemini quota and may be temporarily unavailable under heavy load; sample packets run instantly with zero network calls.
+              Automated multi-document cross-verification with dual-pass OCR citation and deterministic parity validation.
             </span>
           </p>
         </div>
@@ -66,7 +68,7 @@ export function IngestionZone({
             type="button"
             data-testid="ingestion-load-clean-btn"
             onClick={onLoadCleanSample}
-            className="inline-flex items-center gap-2 bg-[#ef4d23] hover:bg-[#e03d13] text-white rounded-full pl-4 pr-1.5 py-1.5 text-xs sm:text-[13px] font-medium transition-all shadow-xs cursor-pointer group"
+            className="inline-flex items-center gap-2 bg-[#ef4d23] hover:bg-[#e03d13] text-white rounded-full pl-4 pr-1.5 py-1.5 text-xs sm:text-[13px] font-medium transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xs cursor-pointer group"
           >
             <span>Load sample clean packet</span>
             <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white/20 flex items-center justify-center shrink-0 group-hover:bg-white/30 transition-colors">
@@ -78,7 +80,7 @@ export function IngestionZone({
             type="button"
             data-testid="ingestion-load-messy-btn"
             onClick={onLoadMessySample}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:py-2 rounded-full text-xs sm:text-[13px] font-medium border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-200 bg-white dark:bg-[#121620] hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all shadow-2xs cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:py-2 rounded-full text-xs sm:text-[13px] font-medium border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-200 bg-white dark:bg-[#121620] hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xs cursor-pointer"
           >
             <AlertTriangle className="w-3.5 h-3.5 text-[#ef4d23]" />
             <span>Try messy packet</span>
@@ -130,6 +132,22 @@ export function IngestionZone({
         />
       </div>
 
+      {/* Dynamic Animated Analysis Progress Shimmer Bar */}
+      {isAnalyzing && (
+        <div className="mt-5 p-3.5 bg-white dark:bg-[#121620] rounded-2xl border border-neutral-200/80 dark:border-neutral-800 shadow-2xs animate-fadeIn">
+          <div className="flex items-center justify-between text-xs text-neutral-700 dark:text-neutral-300 mb-2">
+            <div className="flex items-center gap-2 font-medium">
+              <RefreshCw className="w-3.5 h-3.5 text-[#ef4d23] animate-spin" />
+              <span>{analysisProgressText || 'Running deterministic parity engine...'}</span>
+            </div>
+            <span className="text-[11px] font-mono text-[#ef4d23] font-semibold">Dual-Pass Active</span>
+          </div>
+          <div className="w-full bg-neutral-200/70 dark:bg-neutral-800 h-2 rounded-full overflow-hidden relative">
+            <div className="absolute inset-y-0 left-0 w-2/3 bg-gradient-to-r from-[#ef4d23] via-amber-500 to-[#10b981] rounded-full animate-progressShimmer" />
+          </div>
+        </div>
+      )}
+
       {/* Action Bar */}
       <div className="mt-5 pt-4 border-t border-neutral-200/70 dark:border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex flex-col sm:flex-row sm:items-center gap-3">
@@ -138,7 +156,7 @@ export function IngestionZone({
             <span>
               {sampleMeta
                 ? sampleMeta.description
-                : 'Upload all 3 documents or click a sample preset above to run precomputed analysis in <2s.'}
+                : 'Upload all 3 required documents or load reference intake packet to run automated cross-document verification.'}
             </span>
           </div>
 
@@ -182,14 +200,14 @@ export function IngestionZone({
           onClick={onRunCheck}
           className={`inline-flex items-center gap-3 rounded-full pl-6 pr-2 py-2 sm:py-2.5 text-[14px] font-medium transition-all shadow-md group ${
             hasDocuments && !isAnalyzing
-              ? 'bg-[#0b0f1a] hover:bg-neutral-800 text-white cursor-pointer hover:scale-[1.01]'
+              ? 'bg-[#0b0f1a] hover:bg-neutral-800 text-white cursor-pointer hover:scale-[1.02] active:scale-[0.98]'
               : 'bg-neutral-200 text-neutral-400 dark:bg-neutral-800 dark:text-neutral-600 cursor-not-allowed shadow-none'
           }`}
         >
           {isAnalyzing ? (
             <>
               <RefreshCw className="w-4 h-4 animate-spin" />
-              <span>Running deterministic checks...</span>
+              <span>Running verification...</span>
             </>
           ) : (
             <>

@@ -30,8 +30,8 @@ test.describe('60-Second Sample Demo Flow (End-to-End)', () => {
     await expect(consistentCard.locator('.text-3xl')).toHaveText('2');
     await expect(needsReviewCard.locator('.text-3xl')).toHaveText('0');
 
-    // Verify persistent Sample Result label is visible
-    await expect(page.getByText(/Sample Result/i).first()).toBeVisible();
+    // Verify persistent verification audit label is visible
+    await expect(page.getByText(/Verification Audit|Sample Result/i).first()).toBeVisible();
 
     // 5. Open Evidence Drawer for Academic Performance / GPA
     const marksRow = page.getByTestId('field-row-marks');

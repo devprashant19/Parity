@@ -60,6 +60,7 @@ export interface ExtractedField {
 export interface DocumentExtraction {
   document_type: DocumentType;
   document_label: string;
+  preview_url?: string;
   fields: ExtractedField[];
 }
 

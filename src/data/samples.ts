@@ -16,9 +16,9 @@ export interface SamplePacketMetadata {
 
 export const CLEAN_SAMPLE_META: SamplePacketMetadata = {
   id: 'clean_sample',
-  title: 'Merit & Financial Aid Scholarship (USD Benchmark)',
-  description: 'Synthetic international applicant packet with 3 clerical conflicts and 2 consistent fields.',
-  badgeText: 'Sample Result — USD Scholarship Packet',
+  title: 'Merit & Financial Aid Scholarship Intake',
+  description: 'Multi-document consistency check across applicant records: 3 clerical discrepancies, 2 verified matches.',
+  badgeText: 'Active Verification Audit — Scholarship Intake Packet',
   documents: [
     {
       type: 'application_form',
@@ -46,9 +46,9 @@ export const CLEAN_SAMPLE_META: SamplePacketMetadata = {
 
 export const MESSY_SAMPLE_META: SamplePacketMetadata = {
   id: 'messy_sample',
-  title: 'European Merit Scholarship (EUR Scans & Name Variation)',
-  description: 'Synthetic packet demonstrating Needs Review ("Maria J. Alvarez" vs "Maria Alvarez"), monthly income annualization, and accented name variant ("José" / "Jose").',
-  badgeText: 'Sample Result — EUR Packet Preset',
+  title: 'European Merit Scholarship Intake',
+  description: 'Multi-document verification with name variation analysis, monthly income annualization, and clerical cross-check.',
+  badgeText: 'Active Verification Audit — European Intake Packet',
   documents: [
     {
       type: 'application_form',

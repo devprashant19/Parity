@@ -94,15 +94,15 @@ export function FieldChecklist({ fields, selectedFieldId, onSelectField }: Field
               key={field.field_id}
               data-testid={`field-row-${field.field_id}`}
               onClick={() => onSelectField(field.field_id)}
-              className={`p-4 sm:p-5 flex items-center justify-between cursor-pointer transition-colors ${
+              className={`p-4 sm:p-5 flex items-center justify-between cursor-pointer transition-all duration-200 group ${
                 isSelected
-                  ? 'bg-[#f5f2ee]/80 border-l-4 border-[#ef4d23] dark:bg-[#182030] dark:border-[#ef4d23]'
-                  : 'hover:bg-neutral-50/80 dark:hover:bg-[#182030] border-l-4 border-transparent'
+                  ? 'bg-[#f5f2ee]/90 border-l-4 border-[#ef4d23] dark:bg-[#182030] dark:border-[#ef4d23] shadow-2xs'
+                  : 'hover:bg-neutral-50/80 dark:hover:bg-[#182030] border-l-4 border-transparent hover:pl-6'
               }`}
             >
               <div className="flex items-start gap-3.5 min-w-0 pr-4">
                 <div
-                  className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 border ${
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 border transition-transform duration-200 group-hover:scale-105 ${
                     field.status === 'Conflict'
                       ? 'bg-red-50 text-red-600 border-red-200/70 dark:bg-red-950/40 dark:text-red-400 dark:border-red-900/60'
                       : field.status === 'Consistent'
@@ -119,7 +119,7 @@ export function FieldChecklist({ fields, selectedFieldId, onSelectField }: Field
                       {field.field_label}
                     </h4>
                     {field.resolution !== 'unresolved' && (
-                      <span className="text-[10px] font-medium text-[#ef4d23] bg-[#ef4d23]/10 px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] font-medium text-[#ef4d23] bg-[#ef4d23]/10 px-2 py-0.5 rounded-full animate-badgePop">
                         Decision recorded
                       </span>
                     )}
@@ -134,7 +134,7 @@ export function FieldChecklist({ fields, selectedFieldId, onSelectField }: Field
                     {field.documents.map((d, i) => (
                       <span
                         key={i}
-                        className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-md bg-[#f5f2ee] dark:bg-[#182030] text-neutral-800 dark:text-neutral-200 border border-neutral-200/60 dark:border-neutral-700 font-medium"
+                        className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-md bg-[#f5f2ee] dark:bg-[#182030] text-neutral-800 dark:text-neutral-200 border border-neutral-200/60 dark:border-neutral-700 font-medium transition-colors"
                       >
                         <span className="text-neutral-400 mr-1.5">{d.doc_label.split(' ')[0]}:</span>
                         <strong>{d.raw_value ?? 'null'}</strong>
@@ -146,7 +146,7 @@ export function FieldChecklist({ fields, selectedFieldId, onSelectField }: Field
 
               <div className="flex items-center gap-3 shrink-0">
                 {getStatusBadge(field.status)}
-                <ChevronRight className="w-4 h-4 text-neutral-400" />
+                <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-[#ef4d23] group-hover:translate-x-0.5 transition-all duration-200" />
               </div>
             </div>
           );

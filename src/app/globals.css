@@ -161,6 +161,18 @@
   }
 }
 
+@keyframes progressShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(10%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 .animate-fadeIn {
   animation: fadeIn 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -175,6 +187,10 @@
 
 .animate-checkmarkPop {
   animation: checkmarkPop 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-progressShimmer {
+  animation: progressShimmer 1.5s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
