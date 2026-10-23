@@ -17,19 +17,22 @@ export function verifyQuoteContainment(value: string | null, quote: string | nul
     return true;
   }
 
-  // Strip currency prefixes (e.g. ₹, Rs., INR) while keeping commas and digits (e.g. "2,40,000")
+  // Strip currency prefixes (e.g. ₹, Rs., INR, $, €, £) while keeping commas and digits (e.g. "2,40,000")
   const strippedCurrency = cleanVal
-    .replace(/^(₹|rs\.?|inr|\$|\€)\s*/i, '')
-    .replace(/\s*(per\s*year|per\s*annum|\/year|per\s*month|\/month)$/i, '')
+    .replace(/^(₹|rs\.?|inr|\$|\€|\£)\s*/i, '')
+    .replace(/\s*(per\s*year|per\s*annum|\/year|per\s*month|\/month|\/yr|\/mo)$/i, '')
     .trim();
 
   if (strippedCurrency.length >= 2 && cleanQuote.includes(strippedCurrency)) {
     return true;
   }
 
-  // Also check without currency symbols or % in case model formatted value
-  const digitsOnly = cleanVal.replace(/[₹\$\€\,%]/g, '').trim();
-  if (digitsOnly.length >= 2 && cleanQuote.includes(digitsOnly)) {
+  // Also check without currency symbols, %, or GPA suffixes in case model formatted value
+  const numOrCore = cleanVal
+    .replace(/[₹\$\€\£\,%]/g, '')
+    .replace(/\s*(gpa|\/4(\.0)?|\/5(\.0)?|\/10(\.0)?|out of 4(\.0)?|out of 5(\.0)?)$/i, '')
+    .trim();
+  if (numOrCore.length >= 2 && cleanQuote.includes(numOrCore)) {
     return true;
   }
 

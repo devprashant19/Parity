@@ -10,42 +10,42 @@ import {
   CONFIDENCE_THRESHOLD,
 } from './types';
 import { verifyQuoteContainment } from './containment';
-import { normalizeNameTokens } from '../normalize/name';
-import { normalizeDate } from '../normalize/dates';
+import { normalizeNameTokens, compareNames } from '../normalize/name';
+import { normalizeDate, normalizeAcademicYear } from '../normalize/dates';
 import { normalizeIncome, normalizeMarks } from '../normalize/numbers';
 
 export const PACKET_PRESETS: PacketPreset[] = [
   {
     id: 'scholarship',
     title: 'Scholarship Verification Packet',
-    description: 'Standard scholarship application cross-referenced with academic marksheet and official income certificate.',
+    description: 'Standard scholarship application cross-referenced with academic transcript and official income / tax statement.',
     documents: [
       { type: 'application_form', label: 'Application Form' },
-      { type: 'marksheet', label: 'Marksheet' },
-      { type: 'income_certificate', label: 'Income Certificate' },
+      { type: 'marksheet', label: 'Academic Transcript' },
+      { type: 'income_certificate', label: 'Proof of Income / Tax Statement' },
     ],
     fields: [
       { id: 'name', label: 'Student Name', type: 'name', target_documents: ['application_form', 'marksheet', 'income_certificate'] },
       { id: 'academic_year', label: 'Academic Year', type: 'text', target_documents: ['application_form', 'marksheet'] },
-      { id: 'marks', label: 'Marks Percentage', type: 'amount', target_documents: ['application_form', 'marksheet'] },
-      { id: 'income', label: 'Annual Family Income', type: 'amount', target_documents: ['application_form', 'income_certificate'] },
-      { id: 'issue_date', label: 'Certificate Issue Date', type: 'date', target_documents: ['application_form', 'income_certificate'] },
+      { id: 'marks', label: 'Academic Performance / GPA', type: 'amount', target_documents: ['application_form', 'marksheet'] },
+      { id: 'income', label: 'Annual Household Income', type: 'amount', target_documents: ['application_form', 'income_certificate'] },
+      { id: 'issue_date', label: 'Document Issue Date', type: 'date', target_documents: ['application_form', 'income_certificate'] },
     ],
   },
   {
     id: 'college_admission',
     title: 'College Admission Packet',
-    description: 'University admission portal verification cross-referencing identity, board marks, and application details.',
+    description: 'University admission portal verification cross-referencing identity, academic record, and application details.',
     documents: [
       { type: 'application_form', label: 'Admission Application' },
-      { type: 'marksheet', label: 'High School Marksheet' },
+      { type: 'marksheet', label: 'Academic Transcript' },
       { type: 'income_certificate', label: 'Identity / Transfer Certificate' },
     ],
     fields: [
       { id: 'name', label: 'Candidate Name', type: 'name', target_documents: ['application_form', 'marksheet', 'income_certificate'] },
       { id: 'dob', label: 'Date of Birth', type: 'date', target_documents: ['application_form', 'income_certificate'] },
-      { id: 'id_number', label: 'Application / Roll ID', type: 'id', target_documents: ['application_form', 'marksheet'] },
-      { id: 'marks', label: 'Qualifying Exam Marks', type: 'amount', target_documents: ['application_form', 'marksheet'] },
+      { id: 'id_number', label: 'Application / Student ID', type: 'id', target_documents: ['application_form', 'marksheet'] },
+      { id: 'marks', label: 'Qualifying GPA / Score', type: 'amount', target_documents: ['application_form', 'marksheet'] },
       { id: 'academic_year', label: 'Admission Academic Year', type: 'text', target_documents: ['application_form', 'marksheet'] },
     ],
   },
@@ -55,14 +55,14 @@ export const PACKET_PRESETS: PacketPreset[] = [
     description: 'Means-tested tuition assistance cross-referencing family income, tax identifier, and applicant details.',
     documents: [
       { type: 'application_form', label: 'Aid Application Form' },
-      { type: 'income_certificate', label: 'Income / Tax Certificate' },
+      { type: 'income_certificate', label: 'Official Tax / Income Statement' },
       { type: 'marksheet', label: 'Academic Record' },
     ],
     fields: [
       { id: 'name', label: 'Applicant Name', type: 'name', target_documents: ['application_form', 'income_certificate', 'marksheet'] },
-      { id: 'tax_id', label: 'Tax / PAN / SSN ID', type: 'id', target_documents: ['application_form', 'income_certificate'] },
+      { id: 'tax_id', label: 'Tax / Identity Number', type: 'id', target_documents: ['application_form', 'income_certificate'] },
       { id: 'income', label: 'Annual Gross Income', type: 'amount', target_documents: ['application_form', 'income_certificate'] },
-      { id: 'issue_date', label: 'Affidavit Issue Date', type: 'date', target_documents: ['application_form', 'income_certificate'] },
+      { id: 'issue_date', label: 'Statement Issue Date', type: 'date', target_documents: ['application_form', 'income_certificate'] },
       { id: 'category', label: 'Aid Category', type: 'text', target_documents: ['application_form', 'income_certificate'] },
     ],
   },
@@ -220,30 +220,20 @@ export function evaluateCustomField(
     const currentDoc = comparedDocs[i];
 
     if (fieldDef.type === 'name') {
-      const tokensA = normalizeNameTokens(firstDoc.raw_value || '');
-      const tokensB = normalizeNameTokens(currentDoc.raw_value || '');
+      const comp = compareNames(firstDoc.raw_value, currentDoc.raw_value);
 
-      const strA = tokensA.join(' ');
-      const strB = tokensB.join(' ');
-
-      if (strA === strB) {
+      if (comp.status === 'Consistent') {
         continue;
       }
 
-      // Check initial / abbreviation compatibility
-      const hasInitial =
-        tokensA.some((t) => t.length === 1) || tokensB.some((t) => t.length === 1);
-      const isSubset =
-        tokensA.every((t) => tokensB.includes(t)) || tokensB.every((t) => tokensA.includes(t));
-
-      if (hasInitial || isSubset) {
+      if (comp.status === 'Needs Review') {
         return {
           field_id: fieldDef.id,
           field_label: fieldDef.label,
           status: 'Needs Review',
-          status_reason: `Name abbreviation or initial variation between ${firstDoc.doc_label} ("${firstDoc.raw_value}") and ${currentDoc.doc_label} ("${currentDoc.raw_value}").`,
+          status_reason: comp.reason,
           documents: comparedDocs,
-          diff_explanation: `Name abbreviation/initial detected. Requires student confirmation.`,
+          diff_explanation: comp.reason,
           resolution: 'unresolved',
         };
       }
@@ -252,9 +242,9 @@ export function evaluateCustomField(
         field_id: fieldDef.id,
         field_label: fieldDef.label,
         status: 'Conflict',
-        status_reason: `Name conflict: ${firstDoc.doc_label} states "${firstDoc.raw_value}", but ${currentDoc.doc_label} states "${currentDoc.raw_value}".`,
+        status_reason: comp.reason,
         documents: comparedDocs,
-        diff_explanation: `Mismatched name across documents.`,
+        diff_explanation: comp.reason,
         resolution: 'unresolved',
       };
     }
@@ -268,9 +258,9 @@ export function evaluateCustomField(
           field_id: fieldDef.id,
           field_label: fieldDef.label,
           status: 'Needs Review',
-          status_reason: `Date format ambiguous on ${dateA.isAmbiguous ? firstDoc.doc_label : currentDoc.doc_label}.`,
+          status_reason: dateA.ambiguityReason || dateB.ambiguityReason || `Date format ambiguous on ${dateA.isAmbiguous ? firstDoc.doc_label : currentDoc.doc_label}.`,
           documents: comparedDocs,
-          diff_explanation: `Ambiguous date format (expected DD/MM/YYYY).`,
+          diff_explanation: `Ambiguous date format.`,
           resolution: 'unresolved',
         };
       }
@@ -294,20 +284,35 @@ export function evaluateCustomField(
       const incA = normalizeIncome(firstDoc.raw_value);
       const incB = normalizeIncome(currentDoc.raw_value);
 
-      if (incA.isAmbiguous || incB.isAmbiguous) {
-        return {
-          field_id: fieldDef.id,
-          field_label: fieldDef.label,
-          status: 'Needs Review',
-          status_reason: `Amount frequency or period ambiguous across documents.`,
-          documents: comparedDocs,
-          diff_explanation: `Ambiguous amount period.`,
-          resolution: 'unresolved',
-        };
-      }
-
       if (incA.value !== null && incB.value !== null) {
-        if (incA.value === incB.value) continue;
+        if (incA.isAmbiguous || incB.isAmbiguous) {
+          return {
+            field_id: fieldDef.id,
+            field_label: fieldDef.label,
+            status: 'Needs Review',
+            status_reason: `Amount frequency or period ambiguous across documents.`,
+            documents: comparedDocs,
+            diff_explanation: `Ambiguous amount period.`,
+            resolution: 'unresolved',
+          };
+        }
+
+        if (incA.currency !== 'UNKNOWN' && incB.currency !== 'UNKNOWN' && incA.currency !== incB.currency) {
+          return {
+            field_id: fieldDef.id,
+            field_label: fieldDef.label,
+            status: 'Needs Review',
+            status_reason: `Different currencies detected (${incA.currency} vs ${incB.currency}); requires manual exchange rate review.`,
+            documents: comparedDocs,
+            diff_explanation: `Currency mismatch (${incA.currency} vs ${incB.currency}).`,
+            resolution: 'unresolved',
+          };
+        }
+
+        if (incA.value === incB.value) {
+          continue;
+        }
+
         return {
           field_id: fieldDef.id,
           field_label: fieldDef.label,
@@ -322,27 +327,28 @@ export function evaluateCustomField(
       const markA = normalizeMarks(firstDoc.raw_value);
       const markB = normalizeMarks(currentDoc.raw_value);
 
-      if (markA.isCgpa || markB.isCgpa) {
-        return {
-          field_id: fieldDef.id,
-          field_label: fieldDef.label,
-          status: 'Needs Review',
-          status_reason: `Non-percentage or CGPA scale detected; requires manual verification.`,
-          documents: comparedDocs,
-          diff_explanation: `CGPA or non-percentage scale detected.`,
-          resolution: 'unresolved',
-        };
-      }
-
       if (markA.value !== null && markB.value !== null) {
+        if (markA.scale !== markB.scale) {
+          return {
+            field_id: fieldDef.id,
+            field_label: fieldDef.label,
+            status: 'Needs Review',
+            status_reason: `Different GPA / grading scales detected (${markA.scale} vs ${markB.scale}); requires manual verification.`,
+            documents: comparedDocs,
+            diff_explanation: `Grading scales differ (${markA.scale} vs ${markB.scale}).`,
+            resolution: 'unresolved',
+          };
+        }
+
         if (markA.value === markB.value) continue;
+
         return {
           field_id: fieldDef.id,
           field_label: fieldDef.label,
           status: 'Conflict',
-          status_reason: `Marks conflict: ${firstDoc.doc_label} states ${markA.value}%, but ${currentDoc.doc_label} states ${markB.value}%.`,
+          status_reason: `Academic score conflict: ${firstDoc.doc_label} states ${markA.value}, but ${currentDoc.doc_label} states ${markB.value}.`,
           documents: comparedDocs,
-          diff_explanation: `Numerical discrepancy of ${Math.abs(markA.value - markB.value).toFixed(1)}%.`,
+          diff_explanation: `Discrepancy of ${Math.abs(markA.value - markB.value).toFixed(2)}.`,
           resolution: 'unresolved',
         };
       }
@@ -365,7 +371,13 @@ export function evaluateCustomField(
       };
     }
 
-    // Default 'text' type comparison
+    // Default 'text' type comparison: check academic year compatibility first
+    const ayA = normalizeAcademicYear(firstDoc.raw_value);
+    const ayB = normalizeAcademicYear(currentDoc.raw_value);
+    if (ayA && ayB && ayA === ayB) {
+      continue;
+    }
+
     const textA = normalizeGenericText(firstDoc.raw_value)?.toLowerCase();
     const textB = normalizeGenericText(currentDoc.raw_value)?.toLowerCase();
 
