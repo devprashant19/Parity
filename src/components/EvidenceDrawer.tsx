@@ -120,13 +120,13 @@ export function EvidenceDrawer({
               highlightLabel: doc.raw_value ?? doc.doc_label,
             })
           }
-          className="relative rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900 group cursor-pointer aspect-16/10 flex items-center justify-center hover:border-[#ef4d23]/60 transition-colors shadow-2xs"
+          className="relative rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900 group cursor-pointer w-full aspect-[600/520] min-h-[220px] flex items-center justify-center hover:border-[#ef4d23]/60 transition-colors shadow-2xs"
           title={showOverlay ? 'Click to enlarge scan (verified bounding box)' : 'Click to enlarge scan (location unverified)'}
         >
           <img
             src={doc.preview_url}
             alt={doc.doc_label}
-            className="w-full h-full object-contain pointer-events-none"
+            className="w-full h-full object-contain pointer-events-none block"
           />
           {showOverlay && bbox && (
             <div
@@ -138,7 +138,7 @@ export function EvidenceDrawer({
                 height: `${bbox.height * 100}%`,
               }}
             >
-              <span className="absolute -top-4 left-0 text-[9px] font-mono font-semibold bg-[#ef4d23] text-white px-1 py-0.2 rounded shadow-2xs whitespace-nowrap">
+              <span className="absolute top-1 right-1.5 text-[9px] font-mono font-semibold bg-[#ef4d23] text-white px-1.5 py-0.5 rounded shadow-2xs whitespace-nowrap pointer-events-none">
                 {doc.raw_value ?? 'target region'}
               </span>
             </div>
