@@ -122,6 +122,7 @@ export default function HomePage() {
     });
     setVerificationResult(null);
     setSelectedFieldId(null);
+    setIsAnalyzing(false);
   };
 
   const handleRunCheck = async (overrideType?: 'clean_sample' | 'messy_sample') => {
@@ -163,7 +164,9 @@ export default function HomePage() {
       return;
     }
 
-    // Instant execution for sample packets
+    // Brief visual feedback so clicking "Run Verification Check" displays analyzing state
+    await new Promise((resolve) => setTimeout(resolve, 350));
+
     let result: VerificationResult;
     if (effectiveType === 'messy_sample') {
       result = runVerification(MESSY_SAMPLE_PACKET, 'messy_sample', customFields);
@@ -177,40 +180,70 @@ export default function HomePage() {
 
     setVerificationResult(result);
     setIsAnalyzing(false);
+    setTimeout(() => {
+      document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
   };
 
   const handleSelectPreset = (presetId: PacketPresetId) => {
     setActivePresetId(presetId);
     const preset = PACKET_PRESETS.find((p) => p.id === presetId) || PACKET_PRESETS[0];
     setCustomFields(preset.fields);
-    setActivePacketType('clean_sample');
     setApiErrorBanner(null);
 
-    let packet = CLEAN_SAMPLE_PACKET;
-    if (presetId === 'college_admission') {
-      packet = COLLEGE_ADMISSION_SAMPLE_PACKET;
-    } else if (presetId === 'financial_aid') {
-      packet = FINANCIAL_AID_SAMPLE_PACKET;
-    }
+    const hasDocs = Boolean(
+      uploadedDocs.application_form &&
+      uploadedDocs.marksheet &&
+      uploadedDocs.income_certificate
+    );
 
-    const res = runVerification(packet, 'clean_sample', preset.fields);
-    setVerificationResult(res);
+    // Only re-run verification if documents are already loaded & verified
+    if (hasDocs && verificationResult) {
+      let packet = CLEAN_SAMPLE_PACKET;
+      if (presetId === 'college_admission') {
+        packet = COLLEGE_ADMISSION_SAMPLE_PACKET;
+      } else if (presetId === 'financial_aid') {
+        packet = FINANCIAL_AID_SAMPLE_PACKET;
+      } else if (activePacketType === 'messy_sample') {
+        packet = MESSY_SAMPLE_PACKET;
+      }
+
+      if (activePacketType !== 'live') {
+        const res = runVerification(packet, activePacketType || 'clean_sample', preset.fields);
+        setVerificationResult(res);
+      }
+    } else {
+      setVerificationResult(null);
+    }
     setSelectedFieldId(null);
   };
 
   const handleSaveCustomFields = (newFields: CustomFieldDefinition[]) => {
     setCustomFields(newFields);
-    let packet = CLEAN_SAMPLE_PACKET;
-    if (activePresetId === 'college_admission') packet = COLLEGE_ADMISSION_SAMPLE_PACKET;
-    else if (activePresetId === 'financial_aid') packet = FINANCIAL_AID_SAMPLE_PACKET;
-    else if (activePacketType === 'messy_sample') packet = MESSY_SAMPLE_PACKET;
 
-    const res = runVerification(
-      packet,
-      activePacketType === 'messy_sample' ? 'messy_sample' : 'clean_sample',
-      newFields
+    const hasDocs = Boolean(
+      uploadedDocs.application_form &&
+      uploadedDocs.marksheet &&
+      uploadedDocs.income_certificate
     );
-    setVerificationResult(res);
+
+    if (hasDocs && verificationResult) {
+      let packet = CLEAN_SAMPLE_PACKET;
+      if (activePresetId === 'college_admission') packet = COLLEGE_ADMISSION_SAMPLE_PACKET;
+      else if (activePresetId === 'financial_aid') packet = FINANCIAL_AID_SAMPLE_PACKET;
+      else if (activePacketType === 'messy_sample') packet = MESSY_SAMPLE_PACKET;
+
+      if (activePacketType !== 'live') {
+        const res = runVerification(
+          packet,
+          activePacketType === 'messy_sample' ? 'messy_sample' : 'clean_sample',
+          newFields
+        );
+        setVerificationResult(res);
+      }
+    } else {
+      setVerificationResult(null);
+    }
     setSelectedFieldId(null);
   };
 
@@ -339,12 +372,12 @@ export default function HomePage() {
               id="hero-clean-btn"
               onClick={() => {
                 handleLoadCleanSample();
-                handleRunCheck('clean_sample');
+                document.getElementById('documents')?.scrollIntoView({ behavior: 'smooth' });
               }}
               className="inline-flex items-center gap-3 bg-[#0b0f1a] hover:bg-neutral-800 text-white rounded-full pl-5 pr-2 py-2 text-xs sm:text-[13px] font-medium shadow-md transition-all hover:scale-[1.01] cursor-pointer group"
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              <span>Load Benchmark Packet (Instant Demo)</span>
+              <span>Load Benchmark Packet</span>
               <span className="w-6 h-6 rounded-full bg-white/15 flex items-center justify-center shrink-0 group-hover:bg-white/25 transition-colors">
                 <ChevronRight className="w-3.5 h-3.5 text-white stroke-[2.5]" />
               </span>
@@ -355,12 +388,12 @@ export default function HomePage() {
               id="hero-messy-btn"
               onClick={() => {
                 handleLoadMessySample();
-                handleRunCheck('messy_sample');
+                document.getElementById('documents')?.scrollIntoView({ behavior: 'smooth' });
               }}
               className="inline-flex items-center gap-3 bg-[#ef4d23] hover:bg-[#e03d13] text-white rounded-full pl-5 pr-2 py-2 text-xs sm:text-[13px] font-medium shadow-md transition-all hover:scale-[1.01] cursor-pointer group"
             >
               <AlertTriangle className="w-3.5 h-3.5 text-white" />
-              <span>Try Messy Packet (3 Conflicts)</span>
+              <span>Try Messy Packet</span>
               <span className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center shrink-0 group-hover:bg-white/30 transition-colors">
                 <ChevronRight className="w-3.5 h-3.5 text-white stroke-[2.5]" />
               </span>
@@ -405,14 +438,8 @@ export default function HomePage() {
         {/* Step 1: Ingestion Zone in #f5f2ee Tray */}
         <section id="documents">
           <IngestionZone
-            onLoadCleanSample={() => {
-              handleLoadCleanSample();
-              handleRunCheck('clean_sample');
-            }}
-            onLoadMessySample={() => {
-              handleLoadMessySample();
-              handleRunCheck('messy_sample');
-            }}
+            onLoadCleanSample={handleLoadCleanSample}
+            onLoadMessySample={handleLoadMessySample}
             onReset={handleReset}
             onRunCheck={() => handleRunCheck()}
             onFileSelect={handleFileSelect}
