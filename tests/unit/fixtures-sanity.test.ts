@@ -94,7 +94,8 @@ describe('Fixture Sanity - Generator & Samples Duplication Checks', () => {
     const groundTruth = JSON.parse(fs.readFileSync(gtPath, 'utf8'));
 
     for (const item of groundTruth) {
-      for (const [fieldId, expected] of Object.entries(item.expected_fields)) {
+      for (const [fieldId, rawExpected] of Object.entries(item.expected_fields)) {
+        const expected = rawExpected as { value?: string | null; quote?: string | null };
         if (!expected || !expected.value || !expected.quote) continue;
 
         const val = expected.value.trim();
