@@ -16,9 +16,9 @@ describe('Slice D: Downloadable Report (PDF) & Issuing Office Draft', () => {
           {
             doc_type: 'application_form',
             doc_label: 'Application Form',
-            raw_value: 'SURESH SHARMA',
-            normalized_value: 'SURESH SHARMA',
-            quote: 'SURESH SHARMA',
+            raw_value: 'Alex Morgan',
+            normalized_value: 'Alex Morgan',
+            quote: 'Applicant: Alex Morgan',
             page: 1,
             confidence: 0.98,
             source: 'extracted',
@@ -26,10 +26,10 @@ describe('Slice D: Downloadable Report (PDF) & Issuing Office Draft', () => {
           },
           {
             doc_type: 'marksheet',
-            doc_label: 'Marksheet',
-            raw_value: 'SURESH SHARMA',
-            normalized_value: 'SURESH SHARMA',
-            quote: 'SURESH SHARMA',
+            doc_label: 'Academic Transcript',
+            raw_value: 'Alex Morgan',
+            normalized_value: 'Alex Morgan',
+            quote: 'Student Name: Alex Morgan',
             page: 1,
             confidence: 0.98,
             source: 'extracted',
@@ -41,15 +41,15 @@ describe('Slice D: Downloadable Report (PDF) & Issuing Office Draft', () => {
         field_id: 'income',
         field_label: 'Annual Family Income',
         status: 'Conflict',
-        status_reason: 'Values differ by ₹60,000 (exceeds tolerance of ₹0)',
-        diff_explanation: 'Application states ₹2,40,000, income certificate records ₹1,80,000.',
+        status_reason: 'Values differ by $17,000 (exceeds tolerance of $0)',
+        diff_explanation: 'Application states $65,000, Proof of Income records $48,000.',
         documents: [
           {
             doc_type: 'application_form',
             doc_label: 'Application Form',
-            raw_value: '₹2,40,000',
-            normalized_value: '240000',
-            quote: 'Annual Family Income: Rs. 2,40,000',
+            raw_value: '$65,000',
+            normalized_value: '65000',
+            quote: 'Annual Family Income: $65,000',
             page: 1,
             confidence: 0.95,
             source: 'extracted',
@@ -57,10 +57,10 @@ describe('Slice D: Downloadable Report (PDF) & Issuing Office Draft', () => {
           },
           {
             doc_type: 'income_certificate',
-            doc_label: 'Income Certificate',
-            raw_value: '₹1,80,000',
-            normalized_value: '180000',
-            quote: 'Gross annual income certified as Rs 1,80,000/- only',
+            doc_label: 'Proof of Income',
+            raw_value: '$48,000',
+            normalized_value: '48000',
+            quote: 'Gross annual income certified as $48,000',
             page: 1,
             confidence: 0.92,
             source: 'extracted',
@@ -87,7 +87,7 @@ describe('Slice D: Downloadable Report (PDF) & Issuing Office Draft', () => {
           },
           {
             doc_type: 'marksheet',
-            doc_label: 'Marksheet',
+            doc_label: 'Academic Transcript',
             raw_value: '89.4%',
             normalized_value: '89.4%',
             quote: 'TOTAL PERCENTAGE: 89.4%',
@@ -172,17 +172,17 @@ describe('Slice D: Downloadable Report (PDF) & Issuing Office Draft', () => {
       const incomeField = mockResult.fields.find((f) => f.field_id === 'income')!;
       const letter = draftIssuingOfficeMessage({
         field: incomeField,
-        studentName: 'Aarav Patel',
+        studentName: 'Alex Morgan',
         referenceId: 'INC-2024-9912',
       });
 
       expect(letter.subject).toContain('Urgent: Request for Clerical Correction in Annual Family Income');
       expect(letter.subject).toContain('[Ref / Roll No: INC-2024-9912]');
       expect(letter.recipient).toContain('Revenue Office');
-      expect(letter.body).toContain('Aarav Patel');
-      expect(letter.body).toContain('Primary Application Record (Application Form): "₹2,40,000"');
-      expect(letter.body).toContain('Issued Certificate Record (Income Certificate): "₹1,80,000"');
-      expect(letter.body).toContain('Gross annual income certified as Rs 1,80,000/- only');
+      expect(letter.body).toContain('Alex Morgan');
+      expect(letter.body).toContain('Primary Application Record (Application Form): "$65,000"');
+      expect(letter.body).toContain('Issued Certificate Record (Proof of Income): "$48,000"');
+      expect(letter.body).toContain('Gross annual income certified as $48,000');
       expect(letter.enclosures.length).toBe(3);
     });
 
@@ -190,21 +190,21 @@ describe('Slice D: Downloadable Report (PDF) & Issuing Office Draft', () => {
       const marksField = mockResult.fields.find((f) => f.field_id === 'marks')!;
       const letter = draftIssuingOfficeMessage({
         field: marksField,
-        studentName: 'Priya Nair',
-        studentEmail: 'priya@example.com',
-        studentPhone: '+91 98765 43210',
+        studentName: 'Maria Alvarez',
+        studentEmail: 'maria.alvarez@example.com',
+        studentPhone: '+1 (555) 019-2834',
       });
 
       expect(letter.recipient).toContain('Examination Board');
-      expect(letter.body).toContain('Priya Nair');
-      expect(letter.body).toContain('Email: priya@example.com');
-      expect(letter.body).toContain('Phone: +91 98765 43210');
+      expect(letter.body).toContain('Maria Alvarez');
+      expect(letter.body).toContain('Email: maria.alvarez@example.com');
+      expect(letter.body).toContain('Phone: +1 (555) 019-2834');
       expect(letter.body).toContain('TOTAL PERCENTAGE: 89.4%');
     });
 
     it('honors explicitly specified issuing authority override', () => {
       const field = mockResult.fields[0];
-      const customOffice = 'Office of the District Collector, Pune District';
+      const customOffice = 'Office of the Registrar, Central University';
       const letter = draftIssuingOfficeMessage({
         field,
         issuingAuthority: customOffice,

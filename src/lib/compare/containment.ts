@@ -3,7 +3,7 @@ import { CONFIDENCE_THRESHOLD, MAX_QUOTE_LENGTH } from './types';
 /**
  * Checks if raw value literally appears within the quoted snippet.
  * Enforces quote length <= 200 chars.
- * Handles whitespace, case, and currency symbol prefixes (₹, Rs., INR).
+ * Handles whitespace, case, and currency symbol prefixes ($, €, £, ¥, ₹, etc.).
  */
 export function verifyQuoteContainment(value: string | null, quote: string | null): boolean {
   if (!value || !quote) return false;

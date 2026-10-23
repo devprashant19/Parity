@@ -25,7 +25,7 @@ describe('generateFixPlan', () => {
         },
         {
           doc_type: 'marksheet',
-          doc_label: 'Marksheet',
+          doc_label: 'Academic Transcript',
           raw_value: '89.4%',
           normalized_value: '89.4%',
           quote: '89.4%',

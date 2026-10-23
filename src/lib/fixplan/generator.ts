@@ -80,7 +80,7 @@ export function generateFixPlan(fields: FieldComparison[]): FixPlan {
         field_label: field.field_label,
         category: 'fix_before_submitting',
         instruction: `Update the application form to ${correctVal}`,
-        detail: `You confirmed that your official ${officialDoc?.doc_label || 'document'} is correct (${correctVal}). Correct the entry on your scholarship application form before final submission.`,
+        detail: `You confirmed that your official ${officialDoc?.doc_label || 'document'} is correct (${correctVal}). Correct the entry on your application form before final submission.`,
         status: field.status,
       });
     } else if (field.resolution === 'document_a_correct') {

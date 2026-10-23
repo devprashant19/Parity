@@ -13,14 +13,14 @@ STRICT INSTRUCTIONS:
 
 Target fields to extract:
 - name: The student's legal name (extract the single full name, omitting repeated stamp echoes).
-- academic_year: The academic year (e.g., "2024-25").
-- marks: The aggregate percentage or marks scored (e.g., "89.4%").
-- income: The family or guardian annual or monthly income. Quote the number and the words that follow it defining period/frequency (e.g., "₹1,80,000 per annum", "₹15,000 per month", "₹1,80,000").
-- issue_date: The certificate issue date formatted as a single date (e.g., "12/08/2024").
+- academic_year: The academic year (e.g., "2024-25" or "2024-2025").
+- marks: The aggregate GPA, grades, or percentage scored (e.g., "3.80 GPA", "89.4%").
+- income: The family or guardian annual or monthly income. Quote the number, currency, and the words that follow it defining period/frequency (e.g., "$65,000 per year", "€4,500 per month", "£30,000", "₹1,80,000 per annum").
+- issue_date: The certificate or document issue date formatted as printed (e.g., "12 Aug 2024", "12/08/2024").
 
 You MUST return valid JSON in this exact structure:
 {
-  "document_type": "application_form", // or "marksheet" or "income_certificate"
+  "document_type": "application_form", // or "marksheet" (transcript) or "income_certificate" (proof of income)
   "fields": [
     {
       "field_id": "name",
