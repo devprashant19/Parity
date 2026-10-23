@@ -81,10 +81,10 @@ describe('Internationalization & Multi-Locale Verification Rules', () => {
   // Country 3: Spain & Latin America (ES / MX / CO)
   // =========================================================================
   describe('Country 3: Spain & Latin America (ES / MX / CO)', () => {
-    it('folds accents between variants ("José" vs "Jose") and marks Needs Review', () => {
+    it('folds accents between variants ("José" vs "Jose") and treats as Consistent with note', () => {
       const nameCmp = compareNames('José María Álvarez', 'Jose Maria Alvarez');
-      expect(nameCmp.status).toBe('Needs Review');
-      expect(nameCmp.reason).toContain('Accent');
+      expect(nameCmp.status).toBe('Consistent');
+      expect(nameCmp.reason).toContain('accent folding');
     });
 
     it('evaluates compound Spanish maternal/paternal surnames as Needs Review', () => {

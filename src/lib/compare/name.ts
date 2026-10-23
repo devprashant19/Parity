@@ -57,7 +57,12 @@ export function evaluateNamePairwise(
 
   let status_reason = '';
   if (overallStatus === 'Consistent') {
-    status_reason = 'Name matches identically across Application Form, Academic Transcript, and Proof of Income.';
+    if (pair1.reason.includes('accent folding') || pair2.reason.includes('accent folding')) {
+      const note = pair1.reason.includes('accent folding') ? pair1.reason : pair2.reason;
+      status_reason = `Name matches across documents (${note}).`;
+    } else {
+      status_reason = 'Name matches identically across Application Form, Academic Transcript, and Proof of Income.';
+    }
   } else if (overallStatus === 'Conflict') {
     if (pair1.status === 'Conflict' && pair2.status === 'Conflict') {
       status_reason = `Name conflict with both Academic Transcript (${pair1.reason}) and Proof of Income (${pair2.reason}).`;

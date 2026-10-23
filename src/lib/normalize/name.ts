@@ -102,7 +102,7 @@ export interface NameComparisonResult {
  * Evaluates two names according to international and locale-aware rules:
  * - Exact match -> Consistent
  * - Honorific detected -> Needs Review
- * - Accent folding variation ("José" vs "Jose") -> Needs Review
+ * - Accent folding variation ("José" vs "Jose") -> Consistent (with note in explanation)
  * - Middle initial or omission ("Maria J. Alvarez" vs "Maria Alvarez") -> Needs Review
  * - Hyphenated / double surname variation -> Needs Review
  * - Particles ("van", "de", "von") -> Needs Review
@@ -153,8 +153,8 @@ export function compareNames(nameA: string | null, nameB: string | null): NameCo
 
   if (foldedA === foldedB) {
     return {
-      status: 'Needs Review',
-      reason: `Accent variant detected ("${nameA.trim()}" vs "${nameB.trim()}") - requires review.`,
+      status: 'Consistent',
+      reason: `Exact name match after accent folding ("${nameA.trim()}" and "${nameB.trim()}" folded to "${foldedA}").`,
     };
   }
 

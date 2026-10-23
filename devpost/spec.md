@@ -61,7 +61,7 @@ Parity includes pre-configured packet templates that adapt the comparison matrix
 When defining custom fields in the packet editor, fields map to one of five deterministic comparison engines:
 | Field Type | Canonical Normalization | Matching & Comparison Logic | Classification Rules |
 | :--- | :--- | :--- | :--- |
-| `name` | Unicode normalization, accent folding, title-casing, cultural name parsing (Mr., Ms., Dr., Prof.). | Pairwise token matching: full set equality, permutation invariance, single-initial compatibility. | Exact token match $\to$ `Consistent`; Initial mismatch, accent variant, compound surname, or particle $\to$ `Needs Review`; Disjoint token sets $\to$ `Conflict`. |
+| `name` | Unicode normalization, accent folding, title-casing, cultural name parsing (Mr., Ms., Dr., Prof.). | Pairwise token matching: full set equality after accent folding, permutation invariance, single-initial compatibility. | Exact token match or accent-folded match (e.g. "José" / "Jose") $\to$ `Consistent` (with note in explanation); Initial mismatch, compound surname, or particle $\to$ `Needs Review`; Disjoint token sets $\to$ `Conflict`. |
 | `date` | Parse DD/MM/YYYY, YYYY-MM-DD, MM/DD/YYYY, and textual dates (e.g., "12 Aug 2024"). | Calendar date comparison (year, month, day) independent of client timezone or formatting. | Identical date $\to$ `Consistent`; Ambiguous day/month (e.g. 05/06 vs 06/05) $\to$ `Needs Review`; Different calendar dates $\to$ `Conflict`. |
 | `amount` | Strip currency symbols (`$`, `€`, `£`, `₹`), locale grouping; regional numeral conversion; detect per-month vs per-annum. | Exact numerical comparison in base currency units; automatic monthly/weekly/biweekly scaling. | Equal numerical value $\to$ `Consistent`; Currency or scale mismatch $\to$ `Needs Review`; Unequal value $\to$ `Conflict`. |
 | `id` | Uppercase normalization, strip hyphens, spaces, and punctuation (e.g., SSN, National ID, Student ID, Tax ID). | Exact alphanumeric string equality. | Identical sanitized string $\to$ `Consistent`; Missing characters or OCR noise $\to$ `Needs Review`; Mismatched alphanumeric string $\to$ `Conflict`. |
@@ -251,6 +251,7 @@ $$\mathbf{Conflict} > \mathbf{Needs\ Review} > \mathbf{Consistent}$$
 | Case | Document A | Document B | Normalized Comparison | Pair Status | Precedence Reason |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | Exact Match | Suresh Sharma | Suresh Sharma | `["suresh", "sharma"]` == `["suresh", "sharma"]` | `Consistent` | Identical tokens |
+| Accent Folding | José Alvarez | Jose Alvarez | Fold accents $\to$ `["jose", "alvarez"]` == `["jose", "alvarez"]` | `Consistent` | Exact name match after accent folding (note in explanation) |
 | Title/Honorific | Shri Suresh Sharma | Suresh Sharma | Strips "Shri" $\rightarrow$ Identical | `Consistent` | Honorific ignored |
 | Reordered | Sharma Suresh | Suresh Sharma | Identical set, different order | `Needs Review` | Possible match, reordered |
 | Initials | S. Sharma | Suresh Sharma | Initial token "s" matches prefix "suresh" | `Needs Review` | Possible match, initials |
