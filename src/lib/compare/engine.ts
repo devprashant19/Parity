@@ -11,7 +11,7 @@ import {
 import { verifyQuoteContainment } from './containment';
 import { evaluateNamePairwise } from './name';
 import { normalizeIncome, normalizeMarks } from '../normalize/numbers';
-import { normalizeDate } from '../normalize/dates';
+import { normalizeDate, normalizeAcademicYear } from '../normalize/dates';
 import { evaluateCustomField } from './custom';
 
 export function runVerification(
@@ -108,15 +108,15 @@ export function runVerification(
     return null;
   };
 
-  // 1. Name (Form, Marksheet, Income Certificate)
+  // 1. Name (Form, Transcript/Marksheet, Proof of Income)
   const formNameField = getField(form, 'name');
   const marksheetNameField = getField(marksheet, 'name');
   const incomeNameField = getField(incomeCert, 'name');
 
   const nameDocs: DocumentComparisonEntry[] = [
     toDocEntry('application_form', 'Application Form', 'name', formNameField?.value || null),
-    toDocEntry('marksheet', 'Marksheet', 'name', marksheetNameField?.value || null),
-    toDocEntry('income_certificate', 'Income Certificate', 'name', incomeNameField?.value || null),
+    toDocEntry('marksheet', 'Academic Transcript', 'name', marksheetNameField?.value || null),
+    toDocEntry('income_certificate', 'Proof of Income', 'name', incomeNameField?.value || null),
   ];
 
   // Check containment and confidence for each
@@ -165,16 +165,16 @@ export function runVerification(
     resolution: 'unresolved',
   });
 
-  // 2. Academic Year (Form, Marksheet)
+  // 2. Academic Year (Form, Transcript)
   const formYear = getField(form, 'academic_year');
   const marksYear = getField(marksheet, 'academic_year');
 
-  const normYearForm = formYear?.value?.trim().toLowerCase().replace(/\s+/g, '') || null;
-  const normYearMarks = marksYear?.value?.trim().toLowerCase().replace(/\s+/g, '') || null;
+  const normYearForm = normalizeAcademicYear(formYear?.value || null);
+  const normYearMarks = normalizeAcademicYear(marksYear?.value || null);
 
   const yearDocs: DocumentComparisonEntry[] = [
     toDocEntry('application_form', 'Application Form', 'academic_year', normYearForm),
-    toDocEntry('marksheet', 'Marksheet', 'academic_year', normYearMarks),
+    toDocEntry('marksheet', 'Academic Transcript', 'academic_year', normYearMarks),
   ];
 
   const yearQuoteOk =
@@ -198,10 +198,10 @@ export function runVerification(
     yearReason = 'Academic year extracted with low confidence.';
   } else if (normYearForm === normYearMarks) {
     yearStatus = 'Consistent';
-    yearReason = `Academic year "${formYear.value}" matches between Application and Marksheet.`;
+    yearReason = `Academic year "${formYear.value}" matches between Application and Academic Transcript.`;
   } else {
     yearStatus = 'Conflict';
-    yearReason = `Academic year mismatch: Application states "${formYear.value}" but Marksheet states "${marksYear.value}".`;
+    yearReason = `Academic year mismatch: Application states "${formYear.value}" but Transcript states "${marksYear.value}".`;
   }
 
   const yearDoubleReadErr = checkDoubleReadMismatch(yearDocs);
@@ -220,16 +220,22 @@ export function runVerification(
     resolution: 'unresolved',
   });
 
-  // 3. Marks Percentage (Form, Marksheet)
+  // 3. Academic Performance / GPA (Form, Transcript)
   const formMarks = getField(form, 'marks');
   const marksMarks = getField(marksheet, 'marks');
 
   const normMarksForm = normalizeMarks(formMarks?.value || null);
   const normMarksDoc = normalizeMarks(marksMarks?.value || null);
 
+  const formatMarksDisplay = (m: typeof normMarksForm) => {
+    if (m.value === null) return null;
+    if (m.scale === 'percentage') return `${m.value}%`;
+    return `${m.value} GPA (${m.scale} scale)`;
+  };
+
   const marksDocs: DocumentComparisonEntry[] = [
-    toDocEntry('application_form', 'Application Form', 'marks', normMarksForm.value ? `${normMarksForm.value}%` : null),
-    toDocEntry('marksheet', 'Marksheet', 'marks', normMarksDoc.value ? `${normMarksDoc.value}%` : null),
+    toDocEntry('application_form', 'Application Form', 'marks', formatMarksDisplay(normMarksForm)),
+    toDocEntry('marksheet', 'Academic Transcript', 'marks', formatMarksDisplay(normMarksDoc)),
   ];
 
   const marksQuoteOk =
@@ -244,23 +250,25 @@ export function runVerification(
 
   if (!formMarks?.value || !marksMarks?.value) {
     marksStatus = 'Needs Review';
-    marksReason = 'Marks percentage missing or unreadable on one document.';
-  } else if (normMarksForm.isCgpa || normMarksDoc.isCgpa) {
-    marksStatus = 'Needs Review';
-    marksReason = 'Marks appear in CGPA or non-percentage scale; requires manual verification.';
+    marksReason = 'Academic score missing or unreadable on one document.';
   } else if (!marksQuoteOk) {
     marksStatus = 'Needs Review';
-    marksReason = 'Extracted marks could not be confirmed in document quote text.';
+    marksReason = 'Extracted academic score could not be confirmed in document quote text.';
   } else if (!marksConfOk) {
     marksStatus = 'Needs Review';
-    marksReason = 'Marks extracted with low OCR confidence.';
+    marksReason = 'Academic score extracted with low OCR confidence.';
+  } else if (normMarksForm.scale !== normMarksDoc.scale) {
+    marksStatus = 'Needs Review';
+    marksReason = `GPA scales differ across documents (${normMarksForm.scale} vs ${normMarksDoc.scale}); requires manual verification.`;
   } else if (normMarksForm.value === normMarksDoc.value) {
     marksStatus = 'Consistent';
-    marksReason = `Marks percentage ${normMarksForm.value}% matches across Application and Marksheet.`;
+    const scaleLabel = normMarksForm.scale === 'percentage' ? '%' : ` GPA (${normMarksForm.scale} scale)`;
+    marksReason = `Academic performance ${normMarksForm.value}${scaleLabel} matches across Application and Academic Transcript.`;
   } else {
     marksStatus = 'Conflict';
-    const delta = ((normMarksForm.value || 0) - (normMarksDoc.value || 0)).toFixed(1);
-    marksReason = `Marks conflict: Application states ${normMarksForm.value}%, marksheet records ${normMarksDoc.value}% (difference of ${delta}%).`;
+    const scaleLabel = normMarksForm.scale === 'percentage' ? '%' : ` GPA`;
+    const delta = Math.abs((normMarksForm.value || 0) - (normMarksDoc.value || 0)).toFixed(2);
+    marksReason = `Academic performance conflict: Application states ${normMarksForm.value}${scaleLabel}, transcript records ${normMarksDoc.value}${scaleLabel} (difference of ${delta}).`;
   }
 
   const marksDoubleReadErr = checkDoubleReadMismatch(marksDocs);
@@ -271,7 +279,7 @@ export function runVerification(
 
   fields.push({
     field_id: 'marks',
-    field_label: 'Marks Percentage',
+    field_label: 'Academic Performance / GPA',
     status: marksStatus,
     status_reason: marksReason,
     documents: marksDocs,
@@ -279,18 +287,22 @@ export function runVerification(
     resolution: 'unresolved',
   });
 
-  // 4. Annual Income (Form, Income Certificate)
+  // 4. Annual Household Income (Form, Proof of Income)
   const formIncome = getField(form, 'income');
   const certIncome = getField(incomeCert, 'income');
 
   const normIncomeForm = normalizeIncome(formIncome?.value || null);
   const normIncomeCert = normalizeIncome(certIncome?.value || null);
 
-  const formatRupees = (val: number | null) => (val !== null ? `₹${val.toLocaleString('en-IN')}/year` : null);
+  const formatIncomeDisplay = (inc: typeof normIncomeForm) => {
+    if (inc.value === null) return null;
+    const sym = inc.currencySymbol || '$';
+    return `${sym}${inc.value.toLocaleString()}/year`;
+  };
 
   const incomeDocs: DocumentComparisonEntry[] = [
-    toDocEntry('application_form', 'Application Form', 'income', formatRupees(normIncomeForm.value)),
-    toDocEntry('income_certificate', 'Income Certificate', 'income', formatRupees(normIncomeCert.value)),
+    toDocEntry('application_form', 'Application Form', 'income', formatIncomeDisplay(normIncomeForm)),
+    toDocEntry('income_certificate', 'Proof of Income', 'income', formatIncomeDisplay(normIncomeCert)),
   ];
 
   const incomeQuoteOk =
@@ -309,6 +321,13 @@ export function runVerification(
   } else if (normIncomeForm.isAmbiguous || normIncomeCert.isAmbiguous) {
     incomeStatus = 'Needs Review';
     incomeReason = 'Income period (monthly vs annual) could not be unambiguously confirmed.';
+  } else if (
+    normIncomeForm.currency !== 'UNKNOWN' &&
+    normIncomeCert.currency !== 'UNKNOWN' &&
+    normIncomeForm.currency !== normIncomeCert.currency
+  ) {
+    incomeStatus = 'Needs Review';
+    incomeReason = `Different currencies detected across documents (${normIncomeForm.currency} vs ${normIncomeCert.currency}); requires manual exchange rate review.`;
   } else if (!incomeQuoteOk) {
     incomeStatus = 'Needs Review';
     incomeReason = 'Extracted income could not be verified in quoted document excerpt.';
@@ -317,12 +336,21 @@ export function runVerification(
     incomeReason = 'Income figure extracted with low OCR confidence.';
   } else if (normIncomeForm.value === normIncomeCert.value) {
     incomeStatus = 'Consistent';
-    incomeReason = `Annual income normalized to ₹${normIncomeForm.value?.toLocaleString('en-IN')} matches across both documents.`;
+    const sym = normIncomeForm.currencySymbol || normIncomeCert.currencySymbol || '$';
+    let freqNote = '';
+    if (normIncomeCert.frequencyFactor > 1) {
+      freqNote = ` (annualized from ${certIncome?.value} via x${normIncomeCert.frequencyFactor} factor)`;
+    } else if (normIncomeForm.frequencyFactor > 1) {
+      freqNote = ` (annualized from ${formIncome?.value} via x${normIncomeForm.frequencyFactor} factor)`;
+    }
+    incomeReason = `Annual income matches across documents (${sym}${normIncomeForm.value?.toLocaleString()}/year${freqNote}).`;
   } else {
     incomeStatus = 'Conflict';
-    const formFormatted = `₹${normIncomeForm.value?.toLocaleString('en-IN')}`;
-    const certFormatted = `₹${normIncomeCert.value?.toLocaleString('en-IN')}`;
-    incomeReason = `Income conflict: Application reports ${formFormatted}/year, but Income Certificate verifies ${certFormatted}/year.`;
+    const symForm = normIncomeForm.currencySymbol || '$';
+    const symCert = normIncomeCert.currencySymbol || '$';
+    const formFormatted = `${symForm}${normIncomeForm.value?.toLocaleString()}`;
+    const certFormatted = `${symCert}${normIncomeCert.value?.toLocaleString()}`;
+    incomeReason = `Income conflict: Application reports ${formFormatted}/year, but Proof of Income verifies ${certFormatted}/year.`;
   }
 
   const incomeDoubleReadErr = checkDoubleReadMismatch(incomeDocs);
@@ -333,7 +361,7 @@ export function runVerification(
 
   fields.push({
     field_id: 'income',
-    field_label: 'Annual Family Income',
+    field_label: 'Annual Household Income',
     status: incomeStatus,
     status_reason: incomeReason,
     documents: incomeDocs,
@@ -341,7 +369,7 @@ export function runVerification(
     resolution: 'unresolved',
   });
 
-  // 5. Certificate Issue Date (Form, Income Certificate)
+  // 5. Document Issue Date (Form, Proof of Income)
   const formDate = getField(form, 'issue_date');
   const certDate = getField(incomeCert, 'issue_date');
 
@@ -350,7 +378,7 @@ export function runVerification(
 
   const dateDocs: DocumentComparisonEntry[] = [
     toDocEntry('application_form', 'Application Form', 'issue_date', normDateForm.iso),
-    toDocEntry('income_certificate', 'Income Certificate', 'issue_date', normDateCert.iso),
+    toDocEntry('income_certificate', 'Proof of Income', 'issue_date', normDateCert.iso),
   ];
 
   const dateQuoteOk =
@@ -368,7 +396,7 @@ export function runVerification(
     dateReason = 'Issue date missing on one document.';
   } else if (normDateForm.isAmbiguous || normDateCert.isAmbiguous) {
     dateStatus = 'Needs Review';
-    dateReason = 'Date format could not be unambiguously parsed (expected DD/MM/YYYY).';
+    dateReason = normDateForm.ambiguityReason || normDateCert.ambiguityReason || 'Ambiguous numeric date format (e.g. DD/MM vs MM/DD); requires manual review.';
   } else if (!dateQuoteOk) {
     dateStatus = 'Needs Review';
     dateReason = 'Extracted issue date could not be confirmed in document quote.';
@@ -377,10 +405,10 @@ export function runVerification(
     dateReason = 'Issue date extracted with low confidence.';
   } else if (normDateForm.iso === normDateCert.iso) {
     dateStatus = 'Consistent';
-    dateReason = `Certificate issue date (${normDateForm.iso}) matches across Application and Certificate.`;
+    dateReason = `Document issue date (${normDateForm.iso}) matches across Application and Proof of Income.`;
   } else {
     dateStatus = 'Conflict';
-    dateReason = `Date mismatch: Application states ${formDate.value} (parsed as ${normDateForm.iso}), but Income Certificate shows ${certDate.value} (parsed as ${normDateCert.iso}).`;
+    dateReason = `Date mismatch: Application states ${formDate.value} (parsed as ${normDateForm.iso}), but Proof of Income shows ${certDate.value} (parsed as ${normDateCert.iso}).`;
   }
 
   const dateDoubleReadErr = checkDoubleReadMismatch(dateDocs);
@@ -391,7 +419,7 @@ export function runVerification(
 
   fields.push({
     field_id: 'issue_date',
-    field_label: 'Certificate Issue Date',
+    field_label: 'Document Issue Date',
     status: dateStatus,
     status_reason: dateReason,
     documents: dateDocs,

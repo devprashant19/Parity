@@ -88,9 +88,10 @@ describe('compareNames - Spec Table Verification', () => {
     expect(res.status).toBe('Consistent');
   });
 
-  it('Title/Honorific ignored -> Consistent', () => {
-    const res = compareNames('Shri Suresh Sharma', 'Suresh Sharma');
-    expect(res.status).toBe('Consistent');
+  it('Title/Honorific detected -> Needs Review', () => {
+    const res = compareNames('Dr. Suresh Sharma', 'Suresh Sharma');
+    expect(res.status).toBe('Needs Review');
+    expect(res.reason).toContain('Honorific detected');
   });
 
   it('Reordered tokens -> Needs Review', () => {

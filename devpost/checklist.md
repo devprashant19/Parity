@@ -146,7 +146,7 @@ Activity mode:
   - Ensure clean packet produces 3 Conflicts / 2 Consistent and messy packet produces Needs Review via real engine.
   - Unit tests & commit.
 
-- [ ] **3. Locale-Aware Verification Engine Rules**
+- [x] **3. Locale-Aware Verification Engine Rules**
   - Ambiguous numeric dates $\rightarrow$ Needs Review (unless day > 12, written month, or explicit format setting).
   - EU/US/Indian/space number grouping normalization.
   - Different currencies $\rightarrow$ Needs Review.
