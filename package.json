@@ -3,6 +3,23 @@
   "version": "0.1.0",
   "private": true,
   "description": "Evidence-first pre-submission document packet consistency checker",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devprashant19/Parity.git"
+  },
+  "keywords": [
+    "document-verification",
+    "gemini-api",
+    "gemini-vision",
+    "multimodal",
+    "devpost",
+    "admissions",
+    "scholarships",
+    "zero-hallucination",
+    "typescript",
+    "nextjs"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",

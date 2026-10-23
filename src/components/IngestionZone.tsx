@@ -54,6 +54,9 @@ export function IngestionZone({
           </h2>
           <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5">
             Ingest 3 required documents for scholarship, financial aid, or admissions packet cross-verification.
+            <span className="block text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">
+              Live checks use a shared Gemini quota and may be temporarily unavailable under heavy load; sample packets run instantly with zero network calls.
+            </span>
           </p>
         </div>
 

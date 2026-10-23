@@ -9,7 +9,12 @@
         "quote": "Applicant Name: Suresh Sharma",
         "page": 1,
         "confidence": 1,
-        "source": "extracted"
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "Suresh Sharma",
+          "crop_quote": "Applicant Name: Suresh Sharma"
+        }
       },
       {
         "field_id": "academic_year",
@@ -17,7 +22,12 @@
         "quote": "Academic Year Applied: 2024-25",
         "page": 1,
         "confidence": 1,
-        "source": "extracted"
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "2024-25",
+          "crop_quote": "Academic Year Applied: 2024-25"
+        }
       },
       {
         "field_id": "marks",
@@ -25,7 +35,12 @@
         "quote": "Aggregate 12th Board Marks: 92.4%",
         "page": 1,
         "confidence": 1,
-        "source": "extracted"
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "92.4%",
+          "crop_quote": "Aggregate 12th Board Marks: 92.4%"
+        }
       },
       {
         "field_id": "income",
@@ -33,12 +48,800 @@
         "quote": "Declared Annual Family Income: ₹2,40,000 per annum",
         "page": 1,
         "confidence": 1,
-        "source": "extracted"
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "₹2,40,000 per annum",
+          "crop_quote": "Declared Annual Family Income: ₹2,40,000 per annum"
+        }
       },
       {
         "field_id": "issue_date",
         "value": "15/07/2024",
         "quote": "Date of Submission: 15/07/2024",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "15/07/2024",
+          "crop_quote": "Date of Submission: 15/07/2024"
+        }
+      }
+    ]
+  },
+  "scan_02_clean_marksheet": {
+    "document_type": "marksheet",
+    "document_label": "Marksheet",
+    "fields": [
+      {
+        "field_id": "name",
+        "value": "Suresh Sharma",
+        "quote": "Name of Student: Suresh Sharma",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "Suresh Sharma",
+          "crop_quote": "Suresh Sharma"
+        }
+      },
+      {
+        "field_id": "academic_year",
+        "value": "2024-25",
+        "quote": "Academic Year: 2024-25",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "2024-25",
+          "crop_quote": "2024-25"
+        }
+      },
+      {
+        "field_id": "marks",
+        "value": "89.4%",
+        "quote": "Aggregate Percentage: 89.4%",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "89.4%",
+          "crop_quote": "89.4%"
+        }
+      },
+      {
+        "field_id": "income",
+        "value": null,
+        "quote": null,
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted"
+      },
+      {
+        "field_id": "issue_date",
+        "value": null,
+        "quote": null,
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted"
+      }
+    ]
+  },
+  "scan_03_clean_income_cert": {
+    "document_type": "income_certificate",
+    "document_label": "Income Certificate",
+    "fields": [
+      {
+        "field_id": "name",
+        "value": "Suresh Sharma",
+        "quote": "This is to certify that Suresh Sharma",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "Suresh Sharma",
+          "crop_quote": "This is to certify that Suresh Sharma"
+        }
+      },
+      {
+        "field_id": "academic_year",
+        "value": null,
+        "quote": null,
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted"
+      },
+      {
+        "field_id": "marks",
+        "value": null,
+        "quote": null,
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted"
+      },
+      {
+        "field_id": "income",
+        "value": "₹1,80,000",
+        "quote": "Annual Family Income is ₹1,80,000",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "₹1,80,000",
+          "crop_quote": "Annual Family Income is ₹1,80,000"
+        }
+      },
+      {
+        "field_id": "issue_date",
+        "value": "12/08/2024",
+        "quote": "Issued under my hand and seal on 12/08/2024",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "12/08/2024",
+          "crop_quote": "Issued under my hand and seal on 12/08/2024"
+        }
+      }
+    ]
+  },
+  "scan_04_blurry_marksheet": {
+    "document_type": "marksheet",
+    "document_label": "Marksheet",
+    "fields": [
+      {
+        "field_id": "name",
+        "value": "Suresh Sharma",
+        "quote": "Name of Student: Suresh Sharma",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "Suresh Sharma",
+          "crop_quote": "Suresh Sharma"
+        }
+      },
+      {
+        "field_id": "academic_year",
+        "value": "2024-25",
+        "quote": "Academic Year: 2024-25",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "2024-25",
+          "crop_quote": "2024-25"
+        }
+      },
+      {
+        "field_id": "marks",
+        "value": "89.4%",
+        "quote": "Aggregate Percentage: 89.4%",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "89.4%",
+          "crop_quote": "89.4%"
+        }
+      },
+      {
+        "field_id": "income",
+        "value": null,
+        "quote": null,
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted"
+      },
+      {
+        "field_id": "issue_date",
+        "value": null,
+        "quote": null,
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted"
+      }
+    ]
+  },
+  "scan_05_rotated_income_cert": {
+    "document_type": "income_certificate",
+    "document_label": "Income Certificate",
+    "fields": [
+      {
+        "field_id": "name",
+        "value": "Suresh Sharma",
+        "quote": "This is to certify that Suresh Sharma",
+        "page": 1,
+        "confidence": 0.98,
+        "source": "extracted",
+        "highlight_bbox": {
+          "x": 0.642,
+          "y": 0.45,
+          "width": 0.196,
+          "height": 0.017
+        },
+        "double_read": {
+          "agreed": false,
+          "crop_value": null,
+          "disagreement_reason": "Batch double-read secondary pass encountered an error: {\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}"
+        }
+      },
+      {
+        "field_id": "academic_year",
+        "value": null,
+        "quote": null,
+        "page": 1,
+        "confidence": 0,
+        "source": "extracted"
+      },
+      {
+        "field_id": "marks",
+        "value": null,
+        "quote": null,
+        "page": 1,
+        "confidence": 0,
+        "source": "extracted"
+      },
+      {
+        "field_id": "income",
+        "value": "₹1,80,000 per year",
+        "quote": "Annual Family Income is ₹1,80,000 per year",
+        "page": 1,
+        "confidence": 0.99,
+        "source": "extracted",
+        "highlight_bbox": {
+          "x": 0.61,
+          "y": 0.521,
+          "width": 0.287,
+          "height": 0.017
+        },
+        "double_read": {
+          "agreed": false,
+          "crop_value": null,
+          "disagreement_reason": "Batch double-read secondary pass encountered an error: {\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}"
+        }
+      },
+      {
+        "field_id": "issue_date",
+        "value": "12/08/2024",
+        "quote": "Issued under my hand and seal on 12/08/2024",
+        "page": 1,
+        "confidence": 0.99,
+        "source": "extracted",
+        "highlight_bbox": {
+          "x": 0.715,
+          "y": 0.591,
+          "width": 0.182,
+          "height": 0.017
+        },
+        "double_read": {
+          "agreed": false,
+          "crop_value": null,
+          "disagreement_reason": "Batch double-read secondary pass encountered an error: {\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}"
+        }
+      }
+    ]
+  },
+  "scan_07_monthly_income_cert": {
+    "document_type": "income_certificate",
+    "document_label": "Income Certificate",
+    "fields": [
+      {
+        "field_id": "name",
+        "value": "Suresh Sharma",
+        "quote": "This is to certify that Suresh Sharma",
+        "page": 1,
+        "confidence": 0.99,
+        "source": "extracted",
+        "highlight_bbox": {
+          "x": 0.644,
+          "y": 0.436,
+          "width": 0.118,
+          "height": 0.016
+        },
+        "double_read": {
+          "agreed": true,
+          "crop_value": "Suresh Sharma",
+          "crop_quote": "This is to certify that Suresh Sharma"
+        }
+      },
+      {
+        "field_id": "academic_year",
+        "value": null,
+        "quote": null,
+        "page": 1,
+        "confidence": 0,
+        "source": "extracted"
+      },
+      {
+        "field_id": "marks",
+        "value": null,
+        "quote": null,
+        "page": 1,
+        "confidence": 0,
+        "source": "extracted"
+      },
+      {
+        "field_id": "income",
+        "value": "₹15,000 per month",
+        "quote": "Monthly Family Income is ₹15,000 per month",
+        "page": 1,
+        "confidence": 0.99,
+        "source": "extracted",
+        "highlight_bbox": {
+          "x": 0.657,
+          "y": 0.508,
+          "width": 0.182,
+          "height": 0.016
+        },
+        "double_read": {
+          "agreed": true,
+          "crop_value": "₹15,000 per month",
+          "crop_quote": "Monthly Family Income is ₹15,000 per month"
+        }
+      },
+      {
+        "field_id": "issue_date",
+        "value": "12/08/2024",
+        "quote": "Issued under my hand and seal on 12/08/2024",
+        "page": 1,
+        "confidence": 0.99,
+        "source": "extracted",
+        "highlight_bbox": {
+          "x": 0.747,
+          "y": 0.579,
+          "width": 0.092,
+          "height": 0.016
+        },
+        "double_read": {
+          "agreed": true,
+          "crop_value": "12/08/2024",
+          "crop_quote": "12/08/2024"
+        }
+      }
+    ]
+  },
+  "scan_08_honorific_form": {
+    "document_type": "application_form",
+    "document_label": "Application Form",
+    "fields": [
+      {
+        "field_id": "name",
+        "value": "Shri Suresh Sharma",
+        "quote": "Applicant Name: Shri Suresh Sharma",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "Shri Suresh Sharma",
+          "crop_quote": "Applicant Name: Shri Suresh Sharma"
+        }
+      },
+      {
+        "field_id": "academic_year",
+        "value": "2024-25",
+        "quote": "Academic Year Applied: 2024-25",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "2024-25",
+          "crop_quote": "Academic Year Applied: 2024-25"
+        }
+      },
+      {
+        "field_id": "marks",
+        "value": "92.4%",
+        "quote": "Aggregate 12th Board Marks: 92.4%",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "92.4%",
+          "crop_quote": "Aggregate 12th Board Marks: 92.4%"
+        }
+      },
+      {
+        "field_id": "income",
+        "value": "₹2,40,000 per annum",
+        "quote": "Declared Annual Family Income: ₹2,40,000 per annum",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "₹2,40,000 per annum",
+          "crop_quote": "Declared Annual Family Income: ₹2,40,000 per annum"
+        }
+      },
+      {
+        "field_id": "issue_date",
+        "value": "15/07/2024",
+        "quote": "Date of Submission: 15/07/2024",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "15/07/2024",
+          "crop_quote": "Date of Submission: 15/07/2024"
+        }
+      }
+    ]
+  },
+  "scan_09_low_contrast_income": {
+    "document_type": "income_certificate",
+    "document_label": "Income Certificate",
+    "fields": [
+      {
+        "field_id": "name",
+        "value": "Suresh Sharma",
+        "quote": "This is to certify that Suresh Sharma",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "Suresh Sharma",
+          "crop_quote": "This is to certify that Suresh Sharma"
+        }
+      },
+      {
+        "field_id": "academic_year",
+        "value": null,
+        "quote": null,
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted"
+      },
+      {
+        "field_id": "marks",
+        "value": null,
+        "quote": null,
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted"
+      },
+      {
+        "field_id": "income",
+        "value": "₹1,80,000 per annum",
+        "quote": "Annual Family Income is ₹1,80,000 per annum",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "₹1,80,000 per annum",
+          "crop_quote": "Annual Family Income is ₹1,80,000 per annum"
+        }
+      },
+      {
+        "field_id": "issue_date",
+        "value": "12/08/2024",
+        "quote": "Issued under my hand and seal on 12/08/2024",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "12/08/2024",
+          "crop_quote": "Issued under my hand and seal on 12/08/2024"
+        }
+      }
+    ]
+  },
+  "scan_10_conflict_name_form": {
+    "document_type": "application_form",
+    "document_label": "Application Form",
+    "fields": [
+      {
+        "field_id": "name",
+        "value": "Suresh Verma",
+        "quote": "Applicant Name: Suresh Verma",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "Suresh Verma",
+          "crop_quote": "Applicant Name: Suresh Verma"
+        }
+      },
+      {
+        "field_id": "academic_year",
+        "value": "2024-25",
+        "quote": "Academic Year Applied: 2024-25",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "2024-25",
+          "crop_quote": "Academic Year Applied: 2024-25"
+        }
+      },
+      {
+        "field_id": "marks",
+        "value": "92.4%",
+        "quote": "Aggregate 12th Board Marks: 92.4%",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "92.4%",
+          "crop_quote": "Aggregate 12th Board Marks: 92.4%"
+        }
+      },
+      {
+        "field_id": "income",
+        "value": "₹2,40,000 per annum",
+        "quote": "Declared Annual Family Income: ₹2,40,000 per\nannum",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "₹2,40,000 per annum",
+          "crop_quote": "Declared Annual Family Income: ₹2,40,000 per annum"
+        }
+      },
+      {
+        "field_id": "issue_date",
+        "value": "15/07/2024",
+        "quote": "Date of Submission: 15/07/2024",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "15/07/2024",
+          "crop_quote": "Date of Submission: 15/07/2024"
+        }
+      }
+    ]
+  },
+  "scan_11_us_transcript": {
+    "document_type": "marksheet",
+    "document_label": "Marksheet",
+    "fields": [
+      {
+        "field_id": "name",
+        "value": "Alex Morgan",
+        "quote": "Student Name: Alex Morgan",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "Alex Morgan",
+          "crop_quote": "Alex Morgan"
+        }
+      },
+      {
+        "field_id": "academic_year",
+        "value": "2024-25",
+        "quote": "Academic Year: 2024-25",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "2024-25",
+          "crop_quote": "2024-25"
+        }
+      },
+      {
+        "field_id": "marks",
+        "value": "3.82 GPA",
+        "quote": "Cumulative GPA: 3.82 GPA",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "3.82 GPA",
+          "crop_quote": "3.82 GPA"
+        }
+      },
+      {
+        "field_id": "income",
+        "value": null,
+        "quote": null,
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted"
+      },
+      {
+        "field_id": "issue_date",
+        "value": null,
+        "quote": null,
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted"
+      }
+    ]
+  },
+  "scan_12_us_payslip": {
+    "document_type": "income_certificate",
+    "document_label": "Income Certificate",
+    "fields": [
+      {
+        "field_id": "name",
+        "value": "Alex Morgan",
+        "quote": "Employee Name: Alex Morgan",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "Alex Morgan",
+          "crop_quote": "Employee Name: Alex Morgan"
+        }
+      },
+      {
+        "field_id": "academic_year",
+        "value": null,
+        "quote": null,
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted"
+      },
+      {
+        "field_id": "marks",
+        "value": null,
+        "quote": null,
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted"
+      },
+      {
+        "field_id": "income",
+        "value": "$2,500 every two weeks",
+        "quote": "Net Pay: $2,500 every two weeks",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "$2,500 every two weeks",
+          "crop_quote": "Net Pay: $2,500 every two weeks"
+        }
+      },
+      {
+        "field_id": "issue_date",
+        "value": "August 12, 2024",
+        "quote": "Pay Date: August 12, 2024",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "August 12, 2024",
+          "crop_quote": "Pay Date: August 12, 2024"
+        }
+      }
+    ]
+  },
+  "scan_13_tax_statement": {
+    "document_type": "income_certificate",
+    "document_label": "Income Certificate",
+    "fields": [
+      {
+        "field_id": "name",
+        "value": "Alex Morgan",
+        "quote": "Taxpayer: Alex Morgan",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "Alex Morgan",
+          "crop_quote": "Taxpayer: Alex Morgan"
+        }
+      },
+      {
+        "field_id": "academic_year",
+        "value": "2024-25",
+        "quote": "Session: 2024-25",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "2024-25",
+          "crop_quote": "Session: 2024-25"
+        }
+      },
+      {
+        "field_id": "marks",
+        "value": null,
+        "quote": null,
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted"
+      },
+      {
+        "field_id": "income",
+        "value": "$65,000 per year",
+        "quote": "Total Compensation: $65,000 per year",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "$65,000 per year",
+          "crop_quote": "Total Compensation: $65,000 per year"
+        }
+      },
+      {
+        "field_id": "issue_date",
+        "value": "July 15, 2024",
+        "quote": "Date Filed: July 15, 2024",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted",
+        "double_read": {
+          "agreed": true,
+          "crop_value": "July 15, 2024",
+          "crop_quote": "Date Filed: July 15, 2024"
+        }
+      }
+    ]
+  },
+  "scan_14_eur_income": {
+    "document_type": "income_certificate",
+    "document_label": "Income Certificate",
+    "fields": [
+      {
+        "field_id": "name",
+        "value": "José Alvarez",
+        "quote": "Bénéficiaire: José Alvarez",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted"
+      },
+      {
+        "field_id": "academic_year",
+        "value": "2024-25",
+        "quote": "Période: 2024-25",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted"
+      },
+      {
+        "field_id": "marks",
+        "value": null,
+        "quote": null,
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted"
+      },
+      {
+        "field_id": "income",
+        "value": "€3,500 per month",
+        "quote": "Revenu Mensuel Net: €3,500 per month",
+        "page": 1,
+        "confidence": 1,
+        "source": "extracted"
+      },
+      {
+        "field_id": "issue_date",
+        "value": "12 Aug 2024",
+        "quote": "Fait le: 12 Aug 2024",
         "page": 1,
         "confidence": 1,
         "source": "extracted"
