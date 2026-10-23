@@ -26,22 +26,25 @@ describe('Sample Packets Ground Truth Verification', () => {
     expect(year?.status).toBe('Consistent');
   });
 
-  it('Messy Sample packet demonstrates Needs Review ("S. Sharma") and Monthly Income Normalization', () => {
+  it('Messy Sample packet demonstrates Needs Review ("Maria J. Alvarez" vs "Maria Alvarez") and Monthly Income Normalization', () => {
     const result = runVerification(MESSY_SAMPLE_PACKET, 'messy_sample');
 
     const name = result.fields.find((f) => f.field_id === 'name');
     expect(name?.status).toBe('Needs Review');
-    expect(name?.status_reason).toContain('initials');
+    expect(name?.status_reason).toContain('omitted');
 
     const income = result.fields.find((f) => f.field_id === 'income');
     expect(income?.status).toBe('Consistent');
-    expect(income?.status_reason).toContain('1,80,000');
+    expect(income?.status_reason).toContain('36,000');
 
     const marks = result.fields.find((f) => f.field_id === 'marks');
     expect(marks?.status).toBe('Conflict');
 
     const issueDate = result.fields.find((f) => f.field_id === 'issue_date');
     expect(issueDate?.status).toBe('Conflict');
+
+    const year = result.fields.find((f) => f.field_id === 'academic_year');
+    expect(year?.status).toBe('Consistent');
 
     expect(result.needs_review_count).toBe(1);
     expect(result.conflicts_count).toBe(2);

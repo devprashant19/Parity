@@ -11,8 +11,8 @@
     <rect x="8" y="8" width="554" height="474" rx="4" fill="none" stroke="#059669" stroke-width="1.5" stroke-dasharray="4 2" />
     
     <!-- Header -->
-    <text x="285" y="55" font-family="Georgia, serif" font-size="19" font-weight="bold" text-anchor="middle" fill="#0f172a">BOARD OF HIGHER SECONDARY EDUCATION</text>
-    <text x="285" y="80" font-family="Inter, sans-serif" font-size="12" text-anchor="middle" fill="#64748b">Senior Secondary Certificate Examination Marksheet</text>
+    <text x="285" y="55" font-family="Georgia, serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#0f172a">FACULTY ACADEMIC REGISTRY</text>
+    <text x="285" y="80" font-family="Inter, sans-serif" font-size="12" text-anchor="middle" fill="#64748b">Official Academic Transcript of Records</text>
     <line x1="40" y1="100" x2="530" y2="100" stroke="#e2e8f0" stroke-width="1.5" />
     
     <text x="40" y="140" font-family="Inter, sans-serif" font-size="12" font-style="italic" fill="#64748b">Verified Official Record Excerpt • Higher Education Application Portal</text>
@@ -22,28 +22,28 @@
     <g transform="translate(40, 180)">
       <rect width="520" height="40" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" />
       <text x="16" y="25" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#475569">Student Name:</text>
-      <text x="220" y="25" font-family="JetBrains Mono, monospace" font-size="14" font-weight="700" fill="#0f172a">Suresh Sharma</text>
+      <text x="230" y="25" font-family="JetBrains Mono, monospace" font-size="14" font-weight="700" fill="#0f172a">Maria Alvarez</text>
     </g>
     <g transform="translate(40, 228)">
       <rect width="520" height="40" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" />
-      <text x="16" y="25" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#475569">Session / Academic Year:</text>
-      <text x="220" y="25" font-family="JetBrains Mono, monospace" font-size="14" font-weight="700" fill="#0f172a">2024-25</text>
+      <text x="16" y="25" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#475569">Academic Session:</text>
+      <text x="230" y="25" font-family="JetBrains Mono, monospace" font-size="14" font-weight="700" fill="#0f172a">2024-25</text>
     </g>
     <g transform="translate(40, 276)">
       <rect width="520" height="40" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" />
-      <text x="16" y="25" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#475569">Aggregate Marks Obtained:</text>
-      <text x="220" y="25" font-family="JetBrains Mono, monospace" font-size="14" font-weight="700" fill="#0f172a">89.4%</text>
+      <text x="16" y="25" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#475569">Cumulative GPA:</text>
+      <text x="230" y="25" font-family="JetBrains Mono, monospace" font-size="14" font-weight="700" fill="#0f172a">3.65 / 4.0 GPA</text>
     </g>
     <g transform="translate(40, 324)">
       <rect width="520" height="40" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" />
-      <text x="16" y="25" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#475569">Result Status:</text>
-      <text x="220" y="25" font-family="JetBrains Mono, monospace" font-size="14" font-weight="700" fill="#0f172a">PASS (First Division)</text>
+      <text x="16" y="25" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#475569">Evaluation Status:</text>
+      <text x="230" y="25" font-family="JetBrains Mono, monospace" font-size="14" font-weight="700" fill="#0f172a">Admitted with Distinction</text>
     </g>
     
     <!-- Official Stamp -->
     <g transform="translate(380, 410)">
       <circle cx="50" cy="30" r="34" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="3 2" />
-      <text x="50" y="27" font-family="Inter, sans-serif" font-size="9" font-weight="bold" text-anchor="middle" fill="#dc2626">SEAL &amp; SIGN</text>
+      <text x="50" y="27" font-family="Inter, sans-serif" font-size="9" font-weight="bold" text-anchor="middle" fill="#dc2626">REGISTRY SEAL</text>
       <text x="50" y="39" font-family="Inter, sans-serif" font-size="8" text-anchor="middle" fill="#dc2626">OFFICIAL VERIFIED</text>
     </g>
     <text x="40" y="450" font-family="Inter, sans-serif" font-size="10" fill="#94a3b8">Document Security ID: SYNTHETIC-PARITY-POC-TEST-ONLY</text>
