@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { AlertTriangle, Sparkles } from 'lucide-react';
+import { AlertTriangle, Sparkles, ChevronRight, Play } from 'lucide-react';
 import { TopBar } from '@/components/TopBar';
 import { IngestionZone } from '@/components/IngestionZone';
 import { SummaryCounters } from '@/components/SummaryCounters';
 import { FieldChecklist } from '@/components/FieldChecklist';
 import { FixList } from '@/components/FixList';
 import { EvidenceDrawer } from '@/components/EvidenceDrawer';
+import { DocumentModal } from '@/components/DocumentModal';
 import {
   CLEAN_SAMPLE_META,
   MESSY_SAMPLE_META,
@@ -16,7 +17,7 @@ import {
   SamplePacketMetadata,
 } from '@/data/samples';
 import { runVerification } from '@/lib/compare/engine';
-import { VerificationResult, FieldComparison, ResolutionChoice } from '@/lib/compare/types';
+import { VerificationResult, ResolutionChoice } from '@/lib/compare/types';
 import { processUploadFile } from '@/lib/normalize/image';
 
 export default function HomePage() {
@@ -26,6 +27,7 @@ export default function HomePage() {
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
   const [apiErrorBanner, setApiErrorBanner] = useState<string | null>(null);
+  const [inspectDocModal, setInspectDocModal] = useState<{ title: string; previewUrl?: string; fileName?: string } | null>(null);
 
   const [uploadedDocs, setUploadedDocs] = useState<
     Record<
@@ -107,11 +109,12 @@ export default function HomePage() {
     setSelectedFieldId(null);
   };
 
-  const handleRunCheck = async () => {
+  const handleRunCheck = async (overrideType?: 'clean_sample' | 'messy_sample') => {
     setApiErrorBanner(null);
     setIsAnalyzing(true);
+    const effectiveType = overrideType || activePacketType || 'clean_sample';
 
-    if (activePacketType === 'live') {
+    if (effectiveType === 'live') {
       try {
         const formData = new FormData();
         if (uploadedDocs.application_form?.rawFile) {
@@ -144,20 +147,16 @@ export default function HomePage() {
       return;
     }
 
-    // Fast simulated execution (300ms) for sample packets to deliver reactive UI feel
-    setTimeout(() => {
-      let result: VerificationResult;
-      if (activePacketType === 'clean_sample') {
-        result = runVerification(CLEAN_SAMPLE_PACKET, 'clean_sample');
-      } else if (activePacketType === 'messy_sample') {
-        result = runVerification(MESSY_SAMPLE_PACKET, 'messy_sample');
-      } else {
-        result = runVerification(CLEAN_SAMPLE_PACKET, 'clean_sample');
-      }
+    // Instant execution for sample packets
+    let result: VerificationResult;
+    if (effectiveType === 'messy_sample') {
+      result = runVerification(MESSY_SAMPLE_PACKET, 'messy_sample');
+    } else {
+      result = runVerification(CLEAN_SAMPLE_PACKET, 'clean_sample');
+    }
 
-      setVerificationResult(result);
-      setIsAnalyzing(false);
-    }, 350);
+    setVerificationResult(result);
+    setIsAnalyzing(false);
   };
 
   const handleFileSelect = async (slotId: 'application_form' | 'marksheet' | 'income_certificate', rawFile: File) => {
@@ -223,17 +222,98 @@ export default function HomePage() {
   const activeField = verificationResult?.fields.find((f) => f.field_id === selectedFieldId) || null;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#080A0F] text-[#0F172A] dark:text-[#F8FAFC] flex flex-col transition-colors">
+    <div
+      className="min-h-screen w-full bg-[#ededed] p-3 sm:p-5 font-sans text-neutral-900 dark:bg-[#0b0f1a] dark:text-neutral-100 transition-colors"
+      style={{ fontFamily: "'Inter', sans-serif" }}
+    >
+      {/* Floating Pill TopBar */}
       <TopBar />
 
-      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">
+      <main id="main-content" className="max-w-7xl mx-auto px-2 sm:px-4 py-6 sm:py-8 space-y-8">
+        
+        {/* Parity Hero Header Section (Without butterfly video) */}
+        <section className="flex flex-col items-center text-center pt-4 sm:pt-6 pb-2">
+          {/* Badge Pill */}
+          <div className="inline-flex items-center gap-2 bg-white dark:bg-[#121620] rounded-full px-4 py-1.5 shadow-xs text-[13px] font-medium text-neutral-800 dark:text-neutral-200 border border-neutral-200/70 dark:border-neutral-800">
+            <span className="w-2 h-2 rounded-full bg-[#ef4d23] inline-block" />
+            <span>Parity Deterministic Verification</span>
+          </div>
+
+          {/* Headline with Instrument Serif Italic */}
+          <h1
+            className="mt-4 sm:mt-5 max-w-4xl text-neutral-900 dark:text-white tracking-tight leading-[1.06]"
+            style={{
+              fontSize: 'clamp(32px, 6.5vw, 64px)',
+              lineHeight: 1.06,
+              fontWeight: 500,
+              letterSpacing: '-0.02em',
+            }}
+          >
+            Deterministic{' '}
+            <span
+              style={{
+                fontFamily: "'Instrument Serif', Georgia, serif",
+                fontStyle: 'italic',
+                fontWeight: 400,
+              }}
+            >
+              Verification
+            </span>
+            <br />
+            for application packets
+          </h1>
+
+          {/* Subtitle */}
+          <p
+            className="mt-3 sm:mt-4 text-neutral-600 dark:text-neutral-400 px-2 font-normal max-w-2xl text-balance"
+            style={{ fontSize: 'clamp(13px, 3.5vw, 16px)' }}
+          >
+            Cross-check typed claims against marksheet scans and certificates with inspectable cited evidence before submission.
+          </p>
+
+          {/* Quick Preset Buttons in Convix Pill Language */}
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <button
+              type="button"
+              id="hero-clean-btn"
+              onClick={() => {
+                handleLoadCleanSample();
+                handleRunCheck('clean_sample');
+              }}
+              className="inline-flex items-center gap-3 bg-[#0b0f1a] hover:bg-neutral-800 text-white rounded-full pl-5 pr-2 py-2 text-xs sm:text-[13px] font-medium shadow-md transition-all hover:scale-[1.01] cursor-pointer group"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+              <span>Load Benchmark Packet (Instant Demo)</span>
+              <span className="w-6 h-6 rounded-full bg-white/15 flex items-center justify-center shrink-0 group-hover:bg-white/25 transition-colors">
+                <ChevronRight className="w-3.5 h-3.5 text-white stroke-[2.5]" />
+              </span>
+            </button>
+
+            <button
+              type="button"
+              id="hero-messy-btn"
+              onClick={() => {
+                handleLoadMessySample();
+                handleRunCheck('messy_sample');
+              }}
+              className="inline-flex items-center gap-3 bg-[#ef4d23] hover:bg-[#e03d13] text-white rounded-full pl-5 pr-2 py-2 text-xs sm:text-[13px] font-medium shadow-md transition-all hover:scale-[1.01] cursor-pointer group"
+            >
+              <AlertTriangle className="w-3.5 h-3.5 text-white" />
+              <span>Try Messy Packet (3 Conflicts)</span>
+              <span className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center shrink-0 group-hover:bg-white/30 transition-colors">
+                <ChevronRight className="w-3.5 h-3.5 text-white stroke-[2.5]" />
+              </span>
+            </button>
+          </div>
+        </section>
+
         {/* Fallback Error Banner */}
         {apiErrorBanner && (
-          <div className="p-4 bg-amber-50/90 border border-amber-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-amber-950 shadow-xs animate-fadeIn dark:bg-amber-950/40 dark:border-amber-900/60 dark:text-amber-200">
-            <div className="flex items-start space-x-3">
+          <div className="p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-amber-950 dark:text-amber-200 shadow-xs">
+            <div className="flex items-start gap-3">
               <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-bold">Live check is unavailable right now</p>
+                <p className="text-sm font-semibold">Live check is unavailable right now</p>
                 <p className="text-xs text-amber-900 dark:text-amber-300 mt-0.5">{apiErrorBanner}</p>
               </div>
             </div>
@@ -243,34 +323,53 @@ export default function HomePage() {
                 handleLoadCleanSample();
                 handleRunCheck();
               }}
-              className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-700 text-white hover:bg-amber-800 transition-all duration-150 shadow-xs hover:-translate-y-0.5 cursor-pointer shrink-0 dark:bg-amber-600 dark:hover:bg-amber-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium bg-[#ef4d23] text-white hover:bg-[#e03d13] transition-colors shadow-2xs cursor-pointer shrink-0"
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-200" />
+              <Sparkles className="w-3.5 h-3.5 text-white" />
               <span>Try instant sample packet instead</span>
             </button>
           </div>
         )}
 
-        {/* Step 1: Ingestion Zone */}
-        <IngestionZone
-          onLoadCleanSample={handleLoadCleanSample}
-          onLoadMessySample={handleLoadMessySample}
-          onReset={handleReset}
-          onRunCheck={handleRunCheck}
-          onFileSelect={handleFileSelect}
-          onViewDoc={(id) => {
-            const doc = uploadedDocs[id];
-            if (doc?.previewUrl) window.open(doc.previewUrl, '_blank');
-          }}
-          sampleMeta={sampleMeta}
-          uploadedDocs={uploadedDocs}
-          isAnalyzing={isAnalyzing}
-          hasRun={verificationResult !== null}
-        />
+        {/* Step 1: Ingestion Zone in #f5f2ee Tray */}
+        <section id="documents">
+          <IngestionZone
+            onLoadCleanSample={() => {
+              handleLoadCleanSample();
+              handleRunCheck('clean_sample');
+            }}
+            onLoadMessySample={() => {
+              handleLoadMessySample();
+              handleRunCheck('messy_sample');
+            }}
+            onReset={handleReset}
+            onRunCheck={() => handleRunCheck()}
+            onFileSelect={handleFileSelect}
+            onViewDoc={(id) => {
+              const doc = uploadedDocs[id];
+              if (doc) {
+                const labelMap: Record<string, string> = {
+                  application_form: '1. Application Form Scan',
+                  marksheet: '2. Academic Marksheet Scan',
+                  income_certificate: '3. Income Certificate Scan',
+                };
+                setInspectDocModal({
+                  title: labelMap[id] || id,
+                  previewUrl: doc.previewUrl,
+                  fileName: doc.fileName,
+                });
+              }
+            }}
+            sampleMeta={sampleMeta}
+            uploadedDocs={uploadedDocs}
+            isAnalyzing={isAnalyzing}
+            hasRun={verificationResult !== null}
+          />
+        </section>
 
-        {/* Step 2: Verification Results (Counters + Checklist + Fix List) */}
+        {/* Step 2: Verification Results (SummaryCounters with 40-Tick Gauge + Checklist + Fix List) */}
         {verificationResult && (
-          <div className="space-y-6 animate-fadeIn">
+          <section id="results" className="space-y-6 animate-fadeIn">
             <SummaryCounters
               conflicts={verificationResult.conflicts_count}
               consistent={verificationResult.consistent_count}
@@ -290,14 +389,14 @@ export default function HomePage() {
               </div>
 
               {/* Right Column: Prioritized Fix Plan Sidebar (5 cols) */}
-              <div className="lg:col-span-5 sticky top-24">
+              <div id="fixplan" className="lg:col-span-5 sticky top-20">
                 <FixList
                   fields={verificationResult.fields}
                   onSelectField={(id) => setSelectedFieldId(id)}
                 />
               </div>
             </div>
-          </div>
+          </section>
         )}
       </main>
 
@@ -311,26 +410,37 @@ export default function HomePage() {
         />
       )}
 
-      <footer className="border-t border-[#E2E8F0] py-8 text-center text-xs text-slate-500 dark:border-[#1E293B] dark:text-slate-400">
+      {/* Upload Slot Document Modal */}
+      {inspectDocModal && (
+        <DocumentModal
+          isOpen={true}
+          onClose={() => setInspectDocModal(null)}
+          title={inspectDocModal.title}
+          previewUrl={inspectDocModal.previewUrl}
+          fileName={inspectDocModal.fileName}
+        />
+      )}
+
+      {/* Footer */}
+      <footer className="border-t border-neutral-200/80 dark:border-neutral-800 py-8 text-center text-xs text-neutral-500 dark:text-neutral-400 mt-12">
         <div className="max-w-4xl mx-auto px-4 space-y-4">
-          <div className="font-semibold text-slate-800 dark:text-slate-200">
-            Parity Proof-of-Concept • Build With AI: Basics Hackathon • Deterministic Inspection Engine
+          <div className="font-medium text-neutral-700 dark:text-neutral-300">
+            Parity Proof-of-Concept • Deterministic Verification Engine
           </div>
 
-          {/* Known Limitations Box */}
-          <div className="text-left bg-slate-100/90 border border-slate-200/80 rounded-2xl p-5 space-y-2.5 text-xs text-slate-600 dark:bg-[#131926] dark:border-slate-800 dark:text-slate-300 leading-relaxed shadow-xs">
-            <span className="font-bold text-slate-900 dark:text-slate-100 block text-xs uppercase tracking-wider">
-              Known Limitations &amp; Verification Boundary
+          <div className="text-left bg-[#f5f2ee] dark:bg-[#151a24] border border-neutral-200/70 dark:border-neutral-800 rounded-2xl p-5 space-y-2.5 text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed shadow-2xs">
+            <span className="font-semibold text-neutral-900 dark:text-white block text-xs uppercase tracking-wider">
+              Verification Boundary &amp; Disclaimers
             </span>
             <ul className="list-disc pl-5 space-y-1.5 text-[11px]">
               <li>
-                <strong>Quote containment vs. scan fidelity:</strong> Parity verifies that each extracted value appears verbatim inside its cited quote excerpt (&le; 200 chars). However, string containment confirms consistency between the value and the returned text quote—it does not independently prove the quote matches the scan pixels without human review of the source image in the Evidence Drawer.
+                <strong>Deterministic String Containment:</strong> Parity cross-checks extracted claim values against verbatim quotes (&le; 200 chars) from submitted scans.
               </li>
               <li>
-                <strong>Human decision authority:</strong> Parity flags mismatches and normalizes formats, but never automatically alters official government certificates or decides which document is legally correct.
+                <strong>User Authority:</strong> Parity flags discrepancies and normalizes formats, but always requires human authority to determine which official document governs.
               </li>
               <li>
-                <strong>No genuineness or eligibility certification:</strong> Parity checks clerical consistency across submitted pages. It does not authenticate watermarks or stamps, check fraud databases, or guarantee scholarship approval.
+                <strong>No Eligibility Certification:</strong> Parity verifies clerical document consistency. It does not authenticate physical watermarks or guarantee admission.
               </li>
             </ul>
           </div>
