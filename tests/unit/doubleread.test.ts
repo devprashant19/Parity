@@ -117,7 +117,7 @@ describe('Slice B: Double-read verification and crop extraction', () => {
         },
         {
           document_type: 'marksheet',
-          document_label: 'Marksheet',
+          document_label: 'Academic Transcript',
           fields: [
             {
               field_id: 'name',

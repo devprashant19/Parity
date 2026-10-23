@@ -37,7 +37,7 @@ export function evaluateNamePairwise(
   const pairwise_details: PairwiseComparison[] = [
     {
       doc_a_label: 'Application Form',
-      doc_b_label: 'Marksheet',
+      doc_b_label: 'Academic Transcript',
       doc_a_value: formName,
       doc_b_value: marksheetName,
       status: pair1.status,
@@ -45,7 +45,7 @@ export function evaluateNamePairwise(
     },
     {
       doc_a_label: 'Application Form',
-      doc_b_label: 'Income Certificate',
+      doc_b_label: 'Proof of Income',
       doc_a_value: formName,
       doc_b_value: incomeCertName,
       status: pair2.status,
@@ -57,23 +57,23 @@ export function evaluateNamePairwise(
 
   let status_reason = '';
   if (overallStatus === 'Consistent') {
-    status_reason = 'Name matches identically across Application Form, Marksheet, and Income Certificate.';
+    status_reason = 'Name matches identically across Application Form, Academic Transcript, and Proof of Income.';
   } else if (overallStatus === 'Conflict') {
     if (pair1.status === 'Conflict' && pair2.status === 'Conflict') {
-      status_reason = `Name conflict with both Marksheet (${pair1.reason}) and Income Certificate (${pair2.reason}).`;
+      status_reason = `Name conflict with both Academic Transcript (${pair1.reason}) and Proof of Income (${pair2.reason}).`;
     } else if (pair1.status === 'Conflict') {
-      status_reason = `Name conflict with Marksheet: ${pair1.reason}.`;
+      status_reason = `Name conflict with Academic Transcript: ${pair1.reason}.`;
     } else {
-      status_reason = `Name conflict with Income Certificate: ${pair2.reason}.`;
+      status_reason = `Name conflict with Proof of Income: ${pair2.reason}.`;
     }
   } else {
     // Needs Review
     if (pair1.status === 'Needs Review' && pair2.status === 'Needs Review') {
       status_reason = `Name variation detected: ${pair1.reason}; ${pair2.reason}.`;
     } else if (pair1.status === 'Needs Review') {
-      status_reason = `Name variation with Marksheet: ${pair1.reason}.`;
+      status_reason = `Name variation with Academic Transcript: ${pair1.reason}.`;
     } else {
-      status_reason = `Name variation with Income Certificate: ${pair2.reason}.`;
+      status_reason = `Name variation with Proof of Income: ${pair2.reason}.`;
     }
   }
 

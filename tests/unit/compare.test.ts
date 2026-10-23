@@ -56,7 +56,7 @@ describe('Status Precedence (Conflict > Needs Review > Consistent)', () => {
   });
 
   it('Pairwise Name evaluation handles mixed precedence', () => {
-    // Form vs Marksheet: Consistent (Suresh Sharma vs Suresh Sharma)
+    // Form vs Transcript: Consistent (Suresh Sharma vs Suresh Sharma)
     // Form vs Income Cert: Needs Review (Suresh Sharma vs S. Sharma)
     const result = evaluateNamePairwise('Suresh Sharma', 'Suresh Sharma', 'S. Sharma');
     expect(result.status).toBe('Needs Review');
@@ -65,7 +65,7 @@ describe('Status Precedence (Conflict > Needs Review > Consistent)', () => {
   });
 
   it('Pairwise Name evaluation marks Conflict if one pair conflicts', () => {
-    // Form vs Marksheet: Needs Review (S. Sharma)
+    // Form vs Transcript: Needs Review (S. Sharma)
     // Form vs Income Cert: Conflict (Suresh Verma)
     const result = evaluateNamePairwise('Suresh Sharma', 'S. Sharma', 'Suresh Verma');
     expect(result.status).toBe('Conflict');
@@ -129,7 +129,7 @@ describe('runVerification Engine', () => {
 
   it('transitions to Needs Review if confidence is below threshold (< 0.7)', () => {
     const lowConfSample = JSON.parse(JSON.stringify(cleanSampleExtractions));
-    lowConfSample[1].fields[2].confidence = 0.55; // Marksheet marks confidence = 0.55
+    lowConfSample[1].fields[2].confidence = 0.55; // Transcript marks confidence = 0.55
 
     const result = runVerification(lowConfSample, 'live');
     const marksField = result.fields.find((f) => f.field_id === 'marks');

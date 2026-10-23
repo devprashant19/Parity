@@ -162,7 +162,7 @@ Activity mode:
   - Update eval ground truth to match regenerated fixtures and run live eval reporting honestly.
   - Unit tests & commit.
 
-- [ ] **5. Repository-Wide India-Specific Terminology Sanitization**
+- [x] **5. Repository-Wide India-Specific Terminology Sanitization**
   - Search repository for remaining regional terms (`₹`, `lakh`, `Aadhaar`, `Shri`, `tehsildar`, `marksheet`).
   - Generalize to international equivalents.
   - Verify all tests pass and commit.

@@ -54,7 +54,7 @@ describe('Slice C: Packet Presets & Custom Field Deterministic Rules', () => {
           'marksheet',
           {
             document_type: 'marksheet',
-            document_label: 'Marksheet',
+            document_label: 'Academic Transcript',
             fields: [{ field_id: 'id_number', value: 'app 2024.001', quote: 'Roll: app 2024.001', confidence: 0.95, page: 1 }],
           },
         ],
@@ -78,7 +78,7 @@ describe('Slice C: Packet Presets & Custom Field Deterministic Rules', () => {
           'marksheet',
           {
             document_type: 'marksheet',
-            document_label: 'Marksheet',
+            document_label: 'Academic Transcript',
             fields: [{ field_id: 'id_number', value: 'APP-2024-999', quote: 'Roll: APP-2024-999', confidence: 0.95, page: 1 }],
           },
         ],
@@ -110,7 +110,7 @@ describe('Slice C: Packet Presets & Custom Field Deterministic Rules', () => {
           'marksheet',
           {
             document_type: 'marksheet',
-            document_label: 'Marksheet',
+            document_label: 'Academic Transcript',
             fields: [{ field_id: 'dob', value: '2006-05-14', quote: 'Birth Date: 2006-05-14', confidence: 0.95, page: 1 }],
           },
         ],
@@ -173,7 +173,7 @@ describe('Slice C: Packet Presets & Custom Field Deterministic Rules', () => {
           'marksheet',
           {
             document_type: 'marksheet',
-            document_label: 'Marksheet',
+            document_label: 'Academic Transcript',
             fields: [{ field_id: 'name', value: 'A. Patel', quote: 'Student: A. Patel', confidence: 0.95, page: 1 }],
           },
         ],
@@ -272,7 +272,7 @@ describe('Slice C: Packet Presets & Custom Field Deterministic Rules', () => {
           'marksheet',
           {
             document_type: 'marksheet',
-            document_label: 'Marksheet',
+            document_label: 'Academic Transcript',
             fields: [{ field_id: 'id_number', value: 'APP-2024-001', quote: 'Roll: APP-2024-001', confidence: 0.95, page: 1 }],
           },
         ],

@@ -22,8 +22,9 @@ export const IssuingOfficeModal: React.FC<IssuingOfficeModalProps> = ({
   const [selectedFieldId, setSelectedFieldId] = useState<string>(
     initialFieldId || eligibleFields[0]?.field_id || fields[0]?.field_id || ''
   );
-  const [studentName, setStudentName] = useState('Suresh Sharma');
-  const [referenceId, setReferenceId] = useState('SCH-2024-8891');
+  const detectedName = fields.find((f) => f.field_id === 'name')?.documents[0]?.raw_value;
+  const [studentName, setStudentName] = useState(detectedName || 'Alex Morgan');
+  const [referenceId, setReferenceId] = useState('APP-2024-8891');
   const [copied, setCopied] = useState(false);
 
   // Sync if initialFieldId changes
