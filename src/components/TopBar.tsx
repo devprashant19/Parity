@@ -1,106 +1,77 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Moon, Sun, Sparkles } from 'lucide-react';
+import React, { useEffect } from 'react';
 
 export function TopBar() {
-  const [isDark, setIsDark] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
   useEffect(() => {
-    // 1. Initial theme hydration from localStorage or system preference
-    const savedTheme = localStorage.getItem('parity_theme_mode');
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initialDark = savedTheme ? savedTheme === 'dark' : prefersDark;
-
-    setIsDark(initialDark);
-    if (initialDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    // Ensure clean light palette as light/dark mode switch is removed
+    document.documentElement.classList.remove('dark');
+    try {
+      localStorage.removeItem('parity_theme_mode');
+    } catch {
+      // ignore
     }
-    setMounted(true);
   }, []);
 
-  const toggleTheme = () => {
-    const nextDark = !isDark;
-    setIsDark(nextDark);
-
-    // Apply smooth cross-fade animation class
-    document.documentElement.classList.add('theme-transition');
-    if (nextDark) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('parity_theme_mode', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('parity_theme_mode', 'light');
-    }
-
-    // Remove transition helper after animation settles
-    setTimeout(() => {
-      document.documentElement.classList.remove('theme-transition');
-    }, 280);
-  };
+  // 8 circles around (16,16) with radius 10 + 1 center circle
+  const petalAngles = [0, 45, 90, 135, 180, 225, 270, 315];
+  const radius = 10;
+  const cx = 16;
+  const cy = 16;
+  const rCircle = 3.5;
 
   return (
-    <header className="border-b border-[#E2E8F0] bg-white/90 backdrop-blur-md sticky top-0 z-30 transition-colors duration-200 dark:bg-[#10141E]/90 dark:border-[#1F293D]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Brand Identity */}
-        <div className="flex items-center space-x-3.5">
-          <div className="w-9 h-9 rounded-xl bg-[#0F172A] text-white flex items-center justify-center shadow-sm dark:bg-white dark:text-[#0F172A] transition-all duration-200 hover:scale-105 active:scale-95 cursor-default">
-            <ShieldCheck className="w-5 h-5 text-blue-400 dark:text-blue-600 transition-colors" />
-          </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <h1 className="font-serif-heading text-xl font-bold tracking-tight text-[#0F172A] dark:text-[#F8FAFC] inline-flex items-center">
-                Parity
-              </h1>
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200/60 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900/40 shadow-xs">
-                PoC Verification
-              </span>
-            </div>
-            <p className="text-xs text-[#475569] dark:text-[#94A3B8] transition-colors">
-              Packet Pre-Submission Consistency Verification
-            </p>
-          </div>
+    <header className="w-full flex justify-center pt-3 sm:pt-4 px-3 sm:px-4 z-30 sticky top-2">
+      <div className="bg-white/95 backdrop-blur-md rounded-full shadow-sm border border-neutral-200/90 pl-3 pr-3 py-2 w-full max-w-[1000px] relative flex items-center justify-between transition-colors">
+        {/* Left: Brand Identity with 8-Petal Flower */}
+        <div className="flex items-center gap-3 shrink-0">
+          <a href="#" className="flex items-center gap-2.5 focus:outline-none" aria-label="Parity Home">
+            <svg
+              viewBox="0 0 32 32"
+              className="w-7 h-7 sm:w-8 sm:h-8"
+              fill="#ef4d23"
+              aria-hidden="true"
+            >
+              <circle cx={cx} cy={cy} r={rCircle} />
+              {petalAngles.map((deg) => {
+                const rad = (deg * Math.PI) / 180;
+                const x = cx + radius * Math.cos(rad);
+                const y = cy + radius * Math.sin(rad);
+                return <circle key={deg} cx={x.toFixed(2)} cy={y.toFixed(2)} r={rCircle} />;
+              })}
+            </svg>
+            <span className="font-semibold text-base sm:text-lg tracking-tight text-neutral-900">
+              Parity
+            </span>
+          </a>
+          <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-neutral-100 text-neutral-700">
+            PoC Verification
+          </span>
         </div>
 
-        {/* Engine Status & Complete Dark Mode Switch */}
-        <div className="flex items-center space-x-3.5">
-          <div className="hidden sm:flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-50 border border-slate-200/80 text-xs font-medium text-slate-700 dark:bg-[#182030] dark:border-[#1F293D] dark:text-slate-200 shadow-xs">
-            <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
-            <span>Deterministic Engine Active</span>
-          </div>
-
-          {/* Calibrated Theme Switcher */}
-          <button
-            type="button"
-            role="switch"
-            aria-checked={isDark}
-            onClick={toggleTheme}
-            aria-label="Toggle dark mode"
-            className="relative flex items-center h-9 p-1 rounded-full bg-slate-100 hover:bg-slate-200/80 border border-slate-200 dark:bg-[#182030] dark:hover:bg-[#1f293d] dark:border-[#2a3854] transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 active-press shadow-xs"
-            title={isDark ? 'Switch to Light Theme' : 'Switch to Obsidian Dark Theme'}
+        {/* Center: Navigation Links */}
+        <nav className="hidden md:flex items-center gap-6 text-[13px] text-neutral-700 font-medium">
+          <a
+            href="#documents"
+            className="inline-flex items-center gap-1.5 text-neutral-900 font-semibold hover:text-[#ef4d23] transition-colors"
           >
-            {/* Sliding Thumb */}
-            <div
-              className={`absolute top-1 bottom-1 w-7 rounded-full bg-white dark:bg-blue-600 shadow-sm transition-transform duration-250 ease-out flex items-center justify-center ${
-                isDark ? 'translate-x-7 bg-blue-600 text-white' : 'translate-x-0 text-amber-500'
-              }`}
-            >
-              {isDark ? (
-                <Moon className="w-3.5 h-3.5 text-white transition-transform duration-200 rotate-0" />
-              ) : (
-                <Sun className="w-3.5 h-3.5 text-amber-500 transition-transform duration-200 rotate-0" />
-              )}
-            </div>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#ef4d23] inline-block" />
+            Documents
+          </a>
+          <a href="#results" className="hover:text-[#ef4d23] transition-colors">
+            Consistency Checks
+          </a>
+          <a href="#fixplan" className="hover:text-[#ef4d23] transition-colors">
+            Fix Plan
+          </a>
+        </nav>
 
-            {/* Background Icons */}
-            <div className="flex items-center justify-between w-14 px-1.5 text-slate-400 dark:text-slate-500 select-none">
-              <Sun className={`w-3.5 h-3.5 ${!isDark ? 'opacity-0' : 'opacity-60'}`} />
-              <Moon className={`w-3.5 h-3.5 ${isDark ? 'opacity-0' : 'opacity-60'}`} />
-            </div>
-          </button>
+        {/* Right Cluster: Engine Status (No theme switch) */}
+        <div className="ml-auto flex items-center gap-2 sm:gap-3">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60 text-[11px] font-medium shadow-2xs">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span>Engine Ready</span>
+          </div>
         </div>
       </div>
     </header>
