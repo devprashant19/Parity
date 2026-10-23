@@ -120,7 +120,7 @@ Activity mode:
   - Update field-to-document matrix in spec.
   - Unit tests & commit.
 
-- [ ] **Slice D: Downloadable report (PDF) & issuing office draft**
+- [x] **Slice D: Downloadable report (PDF) & issuing office draft**
   - Build downloadable PDF verification report.
   - Draft polite, formal correction request message for issuing authority.
   - Unit tests & commit.

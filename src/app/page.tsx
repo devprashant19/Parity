@@ -11,6 +11,7 @@ import { EvidenceDrawer } from '@/components/EvidenceDrawer';
 import { DocumentModal } from '@/components/DocumentModal';
 import { PacketPresetSelector } from '@/components/PacketPresetSelector';
 import { CustomFieldEditorModal } from '@/components/CustomFieldEditorModal';
+import { IssuingOfficeModal } from '@/components/IssuingOfficeModal';
 import {
   CLEAN_SAMPLE_META,
   MESSY_SAMPLE_META,
@@ -32,6 +33,8 @@ export default function HomePage() {
     PACKET_PRESETS[0].fields
   );
   const [isCustomEditorOpen, setIsCustomEditorOpen] = useState(false);
+  const [isOfficeModalOpen, setIsOfficeModalOpen] = useState(false);
+  const [officeModalFieldId, setOfficeModalFieldId] = useState<string | null>(null);
   const [sampleMeta, setSampleMeta] = useState<SamplePacketMetadata | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
@@ -274,6 +277,7 @@ export default function HomePage() {
   };
 
   const activeField = verificationResult?.fields.find((f) => f.field_id === selectedFieldId) || null;
+  const activePreset = PACKET_PRESETS.find((p) => p.id === activePresetId) || PACKET_PRESETS[0];
 
   return (
     <div
@@ -457,6 +461,12 @@ export default function HomePage() {
                 <FixList
                   fields={verificationResult.fields}
                   onSelectField={(id) => setSelectedFieldId(id)}
+                  onOpenOfficeModal={(fieldId) => {
+                    setOfficeModalFieldId(fieldId || null);
+                    setIsOfficeModalOpen(true);
+                  }}
+                  verificationResult={verificationResult}
+                  presetTitle={activePreset.title}
                 />
               </div>
             </div>
@@ -471,6 +481,10 @@ export default function HomePage() {
           onClose={() => setSelectedFieldId(null)}
           onDecision={handleDecision}
           onManualOverride={handleManualOverride}
+          onOpenOfficeModal={(fieldId) => {
+            setOfficeModalFieldId(fieldId);
+            setIsOfficeModalOpen(true);
+          }}
         />
       )}
 
@@ -493,6 +507,16 @@ export default function HomePage() {
         onSave={handleSaveCustomFields}
         onReset={handleResetCustomFields}
       />
+
+      {/* Issuing Authority Correction Request Modal */}
+      {verificationResult && (
+        <IssuingOfficeModal
+          isOpen={isOfficeModalOpen}
+          onClose={() => setIsOfficeModalOpen(false)}
+          fields={verificationResult.fields}
+          initialFieldId={officeModalFieldId}
+        />
+      )}
 
       {/* Footer */}
       <footer className="border-t border-neutral-200/80 dark:border-neutral-800 py-8 text-center text-xs text-neutral-500 dark:text-neutral-400 mt-12">
