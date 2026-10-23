@@ -1,10 +1,16 @@
 import fs from 'fs';
 import path from 'path';
 
+import sharp from 'sharp';
+
 const SAMPLES_DIR = path.resolve(process.cwd(), 'public/samples');
 
 if (!fs.existsSync(SAMPLES_DIR)) {
   fs.mkdirSync(SAMPLES_DIR, { recursive: true });
+}
+
+function escapeXml(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 function createDocSvg(
@@ -15,13 +21,18 @@ function createDocSvg(
   borderColor = '#3b82f6',
   extraNote = 'Verified Official Record Excerpt • Higher Education Application Portal'
 ) {
+  const safeTitle = escapeXml(title);
+  const safeSubtitle = escapeXml(subtitle);
+  const safeNote = escapeXml(extraNote);
+  const safeSeal = escapeXml(sealText);
+
   const fieldRows = fields
     .map(
       ([label, val], i) => `
     <g transform="translate(40, ${180 + i * 48})">
       <rect width="520" height="40" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" />
-      <text x="16" y="25" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#475569">${label}:</text>
-      <text x="230" y="25" font-family="JetBrains Mono, monospace" font-size="14" font-weight="700" fill="#0f172a">${val}</text>
+      <text x="16" y="25" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#475569">${escapeXml(label)}:</text>
+      <text x="230" y="25" font-family="JetBrains Mono, monospace" font-size="14" font-weight="700" fill="#0f172a">${escapeXml(val)}</text>
     </g>`
     )
     .join('');
@@ -39,11 +50,11 @@ function createDocSvg(
     <rect x="8" y="8" width="554" height="474" rx="4" fill="none" stroke="${borderColor}" stroke-width="1.5" stroke-dasharray="4 2" />
     
     <!-- Header -->
-    <text x="285" y="55" font-family="Georgia, serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#0f172a">${title}</text>
-    <text x="285" y="80" font-family="Inter, sans-serif" font-size="12" text-anchor="middle" fill="#64748b">${subtitle}</text>
+    <text x="285" y="55" font-family="Georgia, serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#0f172a">${safeTitle}</text>
+    <text x="285" y="80" font-family="Inter, sans-serif" font-size="12" text-anchor="middle" fill="#64748b">${safeSubtitle}</text>
     <line x1="40" y1="100" x2="530" y2="100" stroke="#e2e8f0" stroke-width="1.5" />
     
-    <text x="40" y="140" font-family="Inter, sans-serif" font-size="12" font-style="italic" fill="#64748b">${extraNote}</text>
+    <text x="40" y="140" font-family="Inter, sans-serif" font-size="12" font-style="italic" fill="#64748b">${safeNote}</text>
     
     <!-- Fields -->
     ${fieldRows}
@@ -51,7 +62,7 @@ function createDocSvg(
     <!-- Official Stamp -->
     <g transform="translate(380, 410)">
       <circle cx="50" cy="30" r="34" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="3 2" />
-      <text x="50" y="27" font-family="Inter, sans-serif" font-size="9" font-weight="bold" text-anchor="middle" fill="#dc2626">${sealText}</text>
+      <text x="50" y="27" font-family="Inter, sans-serif" font-size="9" font-weight="bold" text-anchor="middle" fill="#dc2626">${safeSeal}</text>
       <text x="50" y="39" font-family="Inter, sans-serif" font-size="8" text-anchor="middle" fill="#dc2626">OFFICIAL VERIFIED</text>
     </g>
     <text x="40" y="450" font-family="Inter, sans-serif" font-size="10" fill="#94a3b8">Document Security ID: SYNTHETIC-PARITY-POC-TEST-ONLY</text>
@@ -150,12 +161,18 @@ fs.writeFileSync(path.join(SAMPLES_DIR, 'messy_form.svg'), messyForm);
 fs.writeFileSync(path.join(SAMPLES_DIR, 'messy_marksheet.svg'), messyMarksheet);
 fs.writeFileSync(path.join(SAMPLES_DIR, 'messy_income_cert.svg'), messyIncome);
 
-// Also copy to png naming for backwards compatibility
-fs.writeFileSync(path.join(SAMPLES_DIR, 'clean_form.png'), cleanForm);
-fs.writeFileSync(path.join(SAMPLES_DIR, 'clean_marksheet.png'), cleanMarksheet);
-fs.writeFileSync(path.join(SAMPLES_DIR, 'clean_income_cert.png'), cleanIncome);
-fs.writeFileSync(path.join(SAMPLES_DIR, 'messy_form.png'), messyForm);
-fs.writeFileSync(path.join(SAMPLES_DIR, 'messy_marksheet.png'), messyMarksheet);
-fs.writeFileSync(path.join(SAMPLES_DIR, 'messy_income_cert.png'), messyIncome);
+// Render true PNG files from the SVG buffers
+async function renderPngs() {
+  await sharp(Buffer.from(cleanForm)).png().toFile(path.join(SAMPLES_DIR, 'clean_form.png'));
+  await sharp(Buffer.from(cleanMarksheet)).png().toFile(path.join(SAMPLES_DIR, 'clean_marksheet.png'));
+  await sharp(Buffer.from(cleanIncome)).png().toFile(path.join(SAMPLES_DIR, 'clean_income_cert.png'));
+  await sharp(Buffer.from(messyForm)).png().toFile(path.join(SAMPLES_DIR, 'messy_form.png'));
+  await sharp(Buffer.from(messyMarksheet)).png().toFile(path.join(SAMPLES_DIR, 'messy_marksheet.png'));
+  await sharp(Buffer.from(messyIncome)).png().toFile(path.join(SAMPLES_DIR, 'messy_income_cert.png'));
+  console.log('Successfully generated synthetic sample document assets (SVGs and PNGs) in public/samples/');
+}
 
-console.log('Successfully generated synthetic sample document assets in public/samples/');
+renderPngs().catch((err) => {
+  console.error('Error generating sample PNGs:', err);
+  process.exit(1);
+});
