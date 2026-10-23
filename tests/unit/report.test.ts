@@ -6,12 +6,15 @@ import { VerificationResult, FieldComparison } from '@/lib/compare/types';
 describe('Slice D: Downloadable Report (PDF) & Issuing Office Draft', () => {
   const mockResult: VerificationResult = {
     packet_type: 'clean_sample',
+    total_fields: 3,
     fields: [
       {
         field_id: 'name',
         field_label: 'Candidate Name',
         status: 'Consistent',
         status_reason: 'All names match canonical representation',
+        diff_explanation: 'All names match canonical representation',
+        resolution: 'unresolved',
         documents: [
           {
             doc_type: 'application_form',
@@ -22,7 +25,7 @@ describe('Slice D: Downloadable Report (PDF) & Issuing Office Draft', () => {
             page: 1,
             confidence: 0.98,
             source: 'extracted',
-            bbox: { ymin: 100, xmin: 150, ymax: 130, xmax: 400 },
+            highlight_bbox: { x: 0.15, y: 0.1, width: 0.25, height: 0.03 },
           },
           {
             doc_type: 'marksheet',
@@ -33,7 +36,7 @@ describe('Slice D: Downloadable Report (PDF) & Issuing Office Draft', () => {
             page: 1,
             confidence: 0.98,
             source: 'extracted',
-            bbox: { ymin: 105, xmin: 152, ymax: 132, xmax: 395 },
+            highlight_bbox: { x: 0.152, y: 0.105, width: 0.243, height: 0.027 },
           },
         ],
       },
@@ -43,6 +46,7 @@ describe('Slice D: Downloadable Report (PDF) & Issuing Office Draft', () => {
         status: 'Conflict',
         status_reason: 'Values differ by $17,000 (exceeds tolerance of $0)',
         diff_explanation: 'Application states $65,000, Proof of Income records $48,000.',
+        resolution: 'unresolved',
         documents: [
           {
             doc_type: 'application_form',
@@ -53,7 +57,7 @@ describe('Slice D: Downloadable Report (PDF) & Issuing Office Draft', () => {
             page: 1,
             confidence: 0.95,
             source: 'extracted',
-            bbox: { ymin: 450, xmin: 200, ymax: 480, xmax: 380 },
+            highlight_bbox: { x: 0.2, y: 0.45, width: 0.18, height: 0.03 },
           },
           {
             doc_type: 'income_certificate',
@@ -64,7 +68,7 @@ describe('Slice D: Downloadable Report (PDF) & Issuing Office Draft', () => {
             page: 1,
             confidence: 0.92,
             source: 'extracted',
-            bbox: { ymin: 380, xmin: 210, ymax: 410, xmax: 420 },
+            highlight_bbox: { x: 0.21, y: 0.38, width: 0.21, height: 0.03 },
           },
         ],
       },
@@ -74,6 +78,7 @@ describe('Slice D: Downloadable Report (PDF) & Issuing Office Draft', () => {
         status: 'Needs Review',
         status_reason: 'Crop-level double-read verification disagreement',
         diff_explanation: 'Primary pass extracted "92.4%", but crop verification read "89.4%".',
+        resolution: 'unresolved',
         documents: [
           {
             doc_type: 'application_form',
@@ -95,9 +100,9 @@ describe('Slice D: Downloadable Report (PDF) & Issuing Office Draft', () => {
             confidence: 0.88,
             source: 'extracted',
             double_read: {
-              value: '89.4%',
-              matches_primary: false,
-              verified_at: '2026-10-23T12:00:00Z',
+              agreed: false,
+              crop_value: '89.4%',
+              disagreement_reason: 'Mismatch between full page and crop read',
             },
           },
         ],
@@ -106,7 +111,6 @@ describe('Slice D: Downloadable Report (PDF) & Issuing Office Draft', () => {
     conflicts_count: 1,
     consistent_count: 1,
     needs_review_count: 1,
-    generated_at: '2026-10-23T15:00:00Z',
   };
 
   describe('generatePdfReport', () => {
@@ -129,6 +133,8 @@ describe('Slice D: Downloadable Report (PDF) & Issuing Office Draft', () => {
         field_label: `Custom Test Field ${i}`,
         status: i % 2 === 0 ? 'Consistent' : 'Conflict',
         status_reason: `Reason for field ${i}`,
+        diff_explanation: `Explanation for field ${i}`,
+        resolution: 'unresolved',
         documents: [
           {
             doc_type: 'application_form',
@@ -141,7 +147,7 @@ describe('Slice D: Downloadable Report (PDF) & Issuing Office Draft', () => {
             source: 'extracted',
           },
           {
-            doc_type: 'supporting_doc',
+            doc_type: 'marksheet',
             doc_label: 'Supporting Document',
             raw_value: `ValB_${i}`,
             normalized_value: `ValB_${i}`,
@@ -155,11 +161,11 @@ describe('Slice D: Downloadable Report (PDF) & Issuing Office Draft', () => {
 
       const longResult: VerificationResult = {
         packet_type: 'clean_sample',
+        total_fields: 15,
         fields: manyFields,
         conflicts_count: 7,
         consistent_count: 8,
         needs_review_count: 0,
-        generated_at: '2026-10-23T15:00:00Z',
       };
 
       const doc = generatePdfReport(longResult, 'Multi-page Test Packet');

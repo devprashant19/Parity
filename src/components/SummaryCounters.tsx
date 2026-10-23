@@ -57,7 +57,7 @@ export function SummaryCounters({
               <span className="text-neutral-500 dark:text-neutral-400 font-normal">This Packet</span>
             </div>
             <div className="flex items-center gap-2.5 mt-2.5">
-              <span className="text-[28px] font-semibold text-neutral-900 dark:text-white leading-none tracking-tight">
+              <span className="text-3xl text-[28px] font-semibold text-neutral-900 dark:text-white leading-none tracking-tight">
                 {isAnalyzing ? '—' : conflicts}
               </span>
               <span className="inline-flex items-center gap-1 bg-red-50 text-red-600 dark:bg-red-950/60 dark:text-red-300 rounded-full px-2 py-0.5 text-[11px] font-medium">
@@ -105,7 +105,7 @@ export function SummaryCounters({
               <span className="text-neutral-500 dark:text-neutral-400 font-normal">Consistent</span>
             </div>
             <div className="flex items-center gap-2.5 mt-2.5">
-              <span className="text-[28px] font-semibold text-neutral-900 dark:text-white leading-none tracking-tight">
+              <span className="text-3xl text-[28px] font-semibold text-neutral-900 dark:text-white leading-none tracking-tight">
                 {isAnalyzing ? '—' : consistent}
               </span>
               <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 rounded-full px-2 py-0.5 text-[11px] font-medium">
@@ -131,7 +131,7 @@ export function SummaryCounters({
               <span className="text-neutral-500 dark:text-neutral-400 font-normal">Pending</span>
             </div>
             <div className="flex items-center gap-2.5 mt-2.5">
-              <span className="text-[28px] font-semibold text-neutral-900 dark:text-white leading-none tracking-tight">
+              <span className="text-3xl text-[28px] font-semibold text-neutral-900 dark:text-white leading-none tracking-tight">
                 {isAnalyzing ? '—' : needsReview}
               </span>
               <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 rounded-full px-2 py-0.5 text-[11px] font-medium">

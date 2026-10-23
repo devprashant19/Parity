@@ -9,15 +9,15 @@ test.describe('60-Second Sample Demo Flow (End-to-End)', () => {
     await expect(page).toHaveTitle(/Parity/i);
 
     // 2. Load clean sample
-    const loadCleanBtn = page.getByRole('button', { name: /Load sample scholarship packet/i });
+    const loadCleanBtn = page.getByRole('button', { name: /Load sample clean packet|Load sample scholarship packet/i });
     await expect(loadCleanBtn).toBeVisible();
     await loadCleanBtn.click();
 
     // Verify sample documents populated
-    await expect(page.locator('text=application-form-suresh.pdf')).toBeVisible();
+    await expect(page.locator('text=application-form-alex.pdf')).toBeVisible();
 
     // 3. Run check
-    const runCheckBtn = page.getByRole('button', { name: /Run check/i });
+    const runCheckBtn = page.getByTestId('run-verification-check-btn');
     await expect(runCheckBtn).toBeEnabled();
     await runCheckBtn.click();
 
@@ -33,20 +33,20 @@ test.describe('60-Second Sample Demo Flow (End-to-End)', () => {
     // Verify persistent Sample Result label is visible
     await expect(page.getByText(/Sample Result/i).first()).toBeVisible();
 
-    // 5. Open Evidence Drawer for Marks Percentage
-    const marksRow = page.locator('text=Marks Percentage').first();
+    // 5. Open Evidence Drawer for Academic Performance / GPA
+    const marksRow = page.getByTestId('field-row-marks');
     await marksRow.click();
 
     const drawer = page.locator('aside');
     await expect(drawer).toBeVisible();
-    await expect(drawer.locator('text=Marks Percentage')).toBeVisible();
+    await expect(drawer.locator('text=Academic Performance / GPA')).toBeVisible();
 
     // Verify side-by-side evidence quotes
-    await expect(drawer.getByText('92.4%').first()).toBeVisible();
-    await expect(drawer.getByText('89.4%').first()).toBeVisible();
+    await expect(drawer.getByText('3.80 GPA').first()).toBeVisible();
+    await expect(drawer.getByText('3.50 GPA').first()).toBeVisible();
 
-    // 6. Record decision: Marksheet is authoritative
-    const marksheetChoiceBtn = drawer.getByRole('button', { name: /Marksheet is correct/i });
+    // 6. Record decision: Academic Transcript is authoritative
+    const marksheetChoiceBtn = drawer.getByRole('button', { name: /Academic Transcript is correct/i });
     await expect(marksheetChoiceBtn).toBeVisible();
     await marksheetChoiceBtn.click();
 
@@ -55,26 +55,26 @@ test.describe('60-Second Sample Demo Flow (End-to-End)', () => {
     await expect(drawer).not.toBeVisible();
 
     // 7. Verify Fix List updated with authoritative resolution
-    await expect(page.locator('text=Update the application form to 89.4%')).toBeVisible();
+    await expect(page.locator('text=Update the application form to 3.50 GPA')).toBeVisible();
 
     // 8. Test CSV Export trigger
-    const exportCsvBtn = page.getByRole('button', { name: /Export CSV/i });
+    const exportCsvBtn = page.getByRole('button', { name: /CSV/i });
     await expect(exportCsvBtn).toBeVisible();
 
     // 9. Switch to Messy Packet without refreshing
-    const loadMessyBtn = page.getByRole('button', { name: /Try a messy packet/i });
+    const loadMessyBtn = page.getByTestId('ingestion-load-messy-btn');
     await loadMessyBtn.click();
 
-    const rerunBtn = page.getByRole('button', { name: /Run check|Re-run check/i });
+    const rerunBtn = page.getByTestId('run-verification-check-btn');
     await rerunBtn.click();
 
     // 10. Verify Messy Packet results show Needs Review
     await expect(needsReviewCard.locator('.text-3xl')).toHaveText('1');
-    await expect(page.getByText(/Possible match/i).first()).toBeVisible();
+    await expect(page.getByText(/Review/i).first()).toBeVisible();
 
     // 11. Test Reset
     const resetBtn = page.getByRole('button', { name: /Reset/i });
     await resetBtn.click();
-    await expect(page.getByRole('button', { name: /Run check/i })).toBeDisabled();
+    await expect(page.getByRole('button', { name: /Run.*check/i })).toBeDisabled();
   });
 });

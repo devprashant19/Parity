@@ -23,9 +23,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://convix.software'),
-  title: 'Convix Software — Shaping Agencies of Tomorrow',
-  description: 'The All-In-One Software Powering the Future of PR Agencies',
+  metadataBase: new URL('https://parity.devprashant.com'),
+  title: 'Parity — Make your documents agree before you submit',
+  description: 'Evidence-first application packet verification that catches subtle clerical data mismatches before submission.',
 
   alternates: {
     canonical: '/',

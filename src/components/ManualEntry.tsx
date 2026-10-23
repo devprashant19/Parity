@@ -83,6 +83,7 @@ export function ManualEntry({ documents, onSaveManualValue }: ManualEntryProps) 
           <span className="text-neutral-400 mr-2 font-mono text-xs">#</span>
           <input
             type="text"
+            data-testid="manual-value-input"
             value={manualValue}
             onChange={(e) => setManualValue(e.target.value)}
             placeholder="e.g. 89.4% or $24,000"
@@ -95,6 +96,7 @@ export function ManualEntry({ documents, onSaveManualValue }: ManualEntryProps) 
       <div className="flex items-center gap-3 pt-2 text-xs">
         <button
           type="submit"
+          data-testid="manual-save-btn"
           className="bg-[#ef4d23] hover:bg-[#e03d13] text-white rounded-lg px-4 py-1.5 font-medium transition-colors shadow-2xs cursor-pointer inline-flex items-center gap-1.5"
         >
           <Check className="w-3.5 h-3.5 stroke-[2.5]" />
