@@ -138,5 +138,61 @@
       "income": { "value": "₹2,40,000 per annum", "quote": "Declared Annual Family Income: ₹2,40,000 per annum" },
       "issue_date": { "value": "15/07/2024", "quote": "Date of Submission: 15/07/2024" }
     }
+  },
+  {
+    "scan_id": "scan_11_us_transcript",
+    "file": "scan_11_us_transcript.png",
+    "document_type": "marksheet",
+    "document_label": "Marksheet",
+    "difficulty": "us_transcript",
+    "expected_fields": {
+      "name": { "value": "Alex Morgan", "quote": "Student Name: Alex Morgan" },
+      "academic_year": { "value": "2024-25", "quote": "Academic Year: 2024-25" },
+      "marks": { "value": "3.82 GPA", "quote": "Cumulative GPA: 3.82 GPA" },
+      "income": null,
+      "issue_date": null
+    }
+  },
+  {
+    "scan_id": "scan_12_us_payslip",
+    "file": "scan_12_us_payslip.png",
+    "document_type": "income_certificate",
+    "document_label": "Income Certificate",
+    "difficulty": "biweekly_payslip",
+    "expected_fields": {
+      "name": { "value": "Alex Morgan", "quote": "Employee Name: Alex Morgan" },
+      "academic_year": null,
+      "marks": null,
+      "income": { "value": "$2,500 every two weeks", "quote": "Net Pay: $2,500 every two weeks" },
+      "issue_date": { "value": "12/08/2024", "quote": "Pay Date: 12/08/2024" }
+    }
+  },
+  {
+    "scan_id": "scan_13_tax_statement",
+    "file": "scan_13_tax_statement.png",
+    "document_type": "income_certificate",
+    "document_label": "Income Certificate",
+    "difficulty": "w2_tax_statement",
+    "expected_fields": {
+      "name": { "value": "Alex Morgan", "quote": "Taxpayer: Alex Morgan" },
+      "academic_year": { "value": "2024-25", "quote": "Session: 2024-25" },
+      "marks": null,
+      "income": { "value": "$65,000 per year", "quote": "Total Compensation: $65,000 per year" },
+      "issue_date": { "value": "15/07/2024", "quote": "Date Filed: 15/07/2024" }
+    }
+  },
+  {
+    "scan_id": "scan_14_eur_income",
+    "file": "scan_14_eur_income.png",
+    "document_type": "income_certificate",
+    "document_label": "Income Certificate",
+    "difficulty": "eur_income",
+    "expected_fields": {
+      "name": { "value": "José Alvarez", "quote": "Bénéficiaire: José Alvarez" },
+      "academic_year": { "value": "2024-25", "quote": "Période: 2024-25" },
+      "marks": null,
+      "income": { "value": "€3,500 per month", "quote": "Revenu Mensuel Net: €3,500 per month" },
+      "issue_date": { "value": "12 Aug 2024", "quote": "Fait le: 12 Aug 2024" }
+    }
   }
 ]

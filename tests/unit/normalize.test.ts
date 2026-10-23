@@ -44,6 +44,15 @@ describe('normalizeIncome', () => {
     expect(gbpAnnual.period).toBe('annual');
   });
 
+  it('uses quote to detect monthly frequency when value lacks period indicator', () => {
+    const result = normalizeIncome('15,000', 'Monthly Family Income is ₹15,000 per month');
+    expect(result.value).toBe(180000);
+    expect(result.period).toBe('monthly');
+    expect(result.frequencyFactor).toBe(12);
+    expect(result.currencySymbol).toBe('₹');
+    expect(result.isAmbiguous).toBe(false);
+  });
+
   it('flags empty or unparseable income as ambiguous', () => {
     const result = normalizeIncome('N/A');
     expect(result.value).toBeNull();

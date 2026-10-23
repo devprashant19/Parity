@@ -111,7 +111,7 @@ export function evaluateCustomField(
         const d = normalizeDate(raw.value, dateFormatSetting);
         normalizedVal = d.iso;
       } else if (fieldDef.type === 'amount') {
-        const inc = normalizeIncome(raw.value);
+        const inc = normalizeIncome(raw.value, raw.quote);
         if (inc.value !== null) {
           normalizedVal = inc.value;
         } else {
@@ -282,8 +282,8 @@ export function evaluateCustomField(
     }
 
     if (fieldDef.type === 'amount') {
-      const incA = normalizeIncome(firstDoc.raw_value);
-      const incB = normalizeIncome(currentDoc.raw_value);
+      const incA = normalizeIncome(firstDoc.raw_value, firstDoc.quote);
+      const incB = normalizeIncome(currentDoc.raw_value, currentDoc.quote);
 
       if (incA.value !== null && incB.value !== null) {
         if (incA.isAmbiguous || incB.isAmbiguous) {

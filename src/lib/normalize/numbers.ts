@@ -112,7 +112,7 @@ export function parseLocaleNumber(rawNum: string): number | null {
  * Normalizes international currency string (e.g. "$65,000/yr", "€3.000 per month", "£2,500/biweekly")
  * to canonical annual integer, extracting currency and frequency factor.
  */
-export function normalizeIncome(rawInput: string | null): NormalizedIncome {
+export function normalizeIncome(rawInput: string | null, quote?: string | null): NormalizedIncome {
   if (!rawInput || !rawInput.trim()) {
     return {
       value: null,
@@ -143,16 +143,36 @@ export function normalizeIncome(rawInput: string | null): NormalizedIncome {
     };
   }
 
-  const currencyInfo = extractCurrency(clean);
+  let currencyInfo = extractCurrency(clean);
+  if (currencyInfo.code === 'UNKNOWN' && quote && quote.trim()) {
+    const quoteCurrency = extractCurrency(quote);
+    if (quoteCurrency.code !== 'UNKNOWN') {
+      currencyInfo = quoteCurrency;
+    }
+  }
 
-  // Detect frequency
+  // Detect frequency from raw value first
   let period: 'annual' | 'monthly' | 'biweekly' | 'weekly' | 'unknown' = 'unknown';
   let factor = 1;
 
-  const weeklyMatch = /(\bper\s*week|\s*\/\s*week|\bweekly|\s*\/\s*wk\b|\bpor\s*semana\b|\bsemanal\b|\bpar\s*semaine\b|\bpro\s*woche\b)/i.test(lower);
-  const biweeklyMatch = /(\bbiweekly|\bbi-weekly|\bfortnightly|\bevery\s*two\s*weeks|\s*\/\s*biweekly\b)/i.test(lower);
-  const monthlyMatch = /(\bper\s*month|\s*\/\s*month|\bp\.?m\.?|\bmonthly|\s*\/\s*mo\b|\bal\s*mes\b|\bpor\s*mes\b|\bmensual\b|\bpar\s*mois\b|\bpro\s*monat\b|\bmonatlich\b)/i.test(lower);
-  const annualMatch = /(\bper\s*annum|\s*\/\s*year|\bp\.?a\.?|\bannual|\bannually|\bper\s*year|\s*\/\s*yr\b|\bal\s*a[ñn]o\b|\bpor\s*a[ñn]o\b|\banual\b|\bpar\s*an\b|\bpro\s*jahr\b|\bj[äa]hrlich\b)/i.test(lower);
+  const weeklyRegex = /(\bper\s*week|\s*\/\s*week|\bweekly|\s*\/\s*wk\b|\bpor\s*semana\b|\bsemanal\b|\bpar\s*semaine\b|\bpro\s*woche\b)/i;
+  const biweeklyRegex = /(\bbiweekly|\bbi-weekly|\bfortnightly|\bevery\s*two\s*weeks|\s*\/\s*biweekly\b)/i;
+  const monthlyRegex = /(\bper\s*month|\s*\/\s*month|\bp\.?m\.?|\bmonthly|\s*\/\s*mo\b|\bal\s*mes\b|\bpor\s*mes\b|\bmensual\b|\bpar\s*mois\b|\bpro\s*monat\b|\bmonatlich\b)/i;
+  const annualRegex = /(\bper\s*annum|\s*\/\s*year|\bp\.?a\.?|\bannual|\bannually|\bper\s*year|\s*\/\s*yr\b|\bal\s*a[ñn]o\b|\bpor\s*a[ñn]o\b|\banual\b|\bpar\s*an\b|\bpro\s*jahr\b|\bj[äa]hrlich\b)/i;
+
+  let weeklyMatch = weeklyRegex.test(lower);
+  let biweeklyMatch = biweeklyRegex.test(lower);
+  let monthlyMatch = monthlyRegex.test(lower);
+  let annualMatch = annualRegex.test(lower);
+
+  // If value lacks explicit frequency indicators, inspect quote if available
+  if (!weeklyMatch && !biweeklyMatch && !monthlyMatch && !annualMatch && quote && quote.trim()) {
+    const qLower = quote.toLowerCase();
+    weeklyMatch = weeklyRegex.test(qLower);
+    biweeklyMatch = biweeklyRegex.test(qLower);
+    monthlyMatch = monthlyRegex.test(qLower);
+    annualMatch = annualRegex.test(qLower);
+  }
 
   if (weeklyMatch) {
     period = 'weekly';
@@ -167,7 +187,7 @@ export function normalizeIncome(rawInput: string | null): NormalizedIncome {
     period = 'annual';
     factor = 1;
   } else if (!monthlyMatch && !annualMatch && !weeklyMatch && !biweeklyMatch) {
-    // If no frequency token specified, default to annual
+    // If no frequency token specified in value or quote, default to annual
     period = 'annual';
     factor = 1;
   } else {

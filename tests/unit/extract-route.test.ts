@@ -1,7 +1,16 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { NextRequest } from 'next/server';
+import { checkRateLimit, extractDocumentFacts } from '@/lib/gemini/client';
+
+vi.mock('@/lib/gemini/client', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/gemini/client')>();
+  return {
+    ...actual,
+    extractDocumentFacts: vi.fn(),
+  };
+});
+
 import { POST } from '@/app/api/extract/route';
-import { checkRateLimit } from '@/lib/gemini/client';
 
 describe('Live Extraction Route and Security Controls', () => {
   const originalEnv = process.env;
@@ -91,5 +100,30 @@ describe('Live Extraction Route and Security Controls', () => {
     }
     // 7th request from same IP should be blocked
     expect(checkRateLimit(testIp)).toBe(false);
+  });
+
+  it('returns 503 service_unavailable when Gemini returns 503 high demand', async () => {
+    process.env.GEMINI_API_KEY = 'test_key';
+    delete process.env.LIVE_CHECK_ENABLED;
+
+    vi.mocked(extractDocumentFacts).mockRejectedValue(
+      new Error('503 Service Unavailable: The model is overloaded. Please try again later.')
+    );
+
+    const formData = new FormData();
+    formData.append('application_form', new File(['form'], 'form.png', { type: 'image/png' }));
+    formData.append('marksheet', new File(['marksheet'], 'marksheet.png', { type: 'image/png' }));
+    formData.append('income_certificate', new File(['income'], 'income.png', { type: 'image/png' }));
+
+    const req = new NextRequest('http://localhost:3000/api/extract', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const res = await POST(req);
+    const data = await res.json();
+    expect(res.status).toBe(503);
+    expect(data.error).toBe('service_unavailable');
+    expect(data.message).toContain('503');
   });
 });

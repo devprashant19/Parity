@@ -167,4 +167,14 @@ Activity mode:
   - Generalize to international equivalents.
   - Verify all tests pass and commit.
 
+- [x] **6. Fallback Model, 503 Retry Strategy, Honest Double-Read Crop Reporting, and Redefined False-Consistent Metric (2026-10-23)**
+  - Model fallback (`gemini-3.1-flash-lite` -> `gemini-2.5-flash`) and exponential backoff retry loop for 503/429/timeout upstream errors.
+  - Test and verify the HTTP 503 route handling in `tests/unit/extract-route.test.ts` and `tests/unit/gemini-fallback.test.ts`.
+  - Fix income period detection to inspect both `value` and verbatim `quote`, verified with unit test (`15,000` with quote `"...15,000 per month"`).
+  - Generate 4 new USD and EUR raster scans (`scan_11_us_transcript`, `scan_12_us_payslip`, `scan_13_tax_statement`, `scan_14_eur_income`) and append ground truth.
+  - Run physical double-read crop checks live with Gemini on real PNGs; report real results honestly (14 crop passes, 4 agreed, 10 real disagreements detected due to bounding box row offsets).
+  - Redefine false-consistent metric strictly over differing ground-truth pairs: **0 of 31 differing pairs across 9 distinct scan sets (0.0% false-consistent rate)**.
+  - Update `README.md` to document observed 503 and timeout behavior, model fallback, and live double-read evaluation.
+
+
 
