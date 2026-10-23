@@ -32,6 +32,19 @@ export function runVerification(
     return doc?.fields.find((f) => f.field_id === fieldId) || null;
   };
 
+  const sampleUrls: Record<string, Record<string, string>> = {
+    clean_sample: {
+      application_form: '/samples/clean_form.svg',
+      marksheet: '/samples/clean_marksheet.svg',
+      income_certificate: '/samples/clean_income_cert.svg',
+    },
+    messy_sample: {
+      application_form: '/samples/messy_form.svg',
+      marksheet: '/samples/messy_marksheet.svg',
+      income_certificate: '/samples/messy_income_cert.svg',
+    },
+  };
+
   const toDocEntry = (
     docType: 'application_form' | 'marksheet' | 'income_certificate',
     docLabel: string,
@@ -49,6 +62,7 @@ export function runVerification(
       confidence: raw?.confidence ?? 0,
       source: raw?.source || 'extracted',
       highlight_bbox: raw?.highlight_bbox,
+      preview_url: sampleUrls[packetType]?.[docType],
     };
   };
 
