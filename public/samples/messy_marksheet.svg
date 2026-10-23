@@ -43,7 +43,7 @@
     <!-- Official Stamp -->
     <g transform="translate(380, 410)">
       <circle cx="50" cy="30" r="34" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="3 2" />
-      <text x="50" y="27" font-family="Inter, sans-serif" font-size="9" font-weight="bold" text-anchor="middle" fill="#dc2626">SEAL & SIGN</text>
+      <text x="50" y="27" font-family="Inter, sans-serif" font-size="9" font-weight="bold" text-anchor="middle" fill="#dc2626">SEAL &amp; SIGN</text>
       <text x="50" y="39" font-family="Inter, sans-serif" font-size="8" text-anchor="middle" fill="#dc2626">OFFICIAL VERIFIED</text>
     </g>
     <text x="40" y="450" font-family="Inter, sans-serif" font-size="10" fill="#94a3b8">Document Security ID: SYNTHETIC-PARITY-POC-TEST-ONLY</text>
