@@ -15,15 +15,15 @@ interface CustomFieldEditorModalProps {
 const FIELD_TYPES: { type: FieldDataType; label: string; desc: string }[] = [
   { type: 'name', label: 'Name', desc: 'Token set & initial permutation matching' },
   { type: 'date', label: 'Date', desc: 'Normalized ISO calendar date comparison (DD/MM/YYYY, etc.)' },
-  { type: 'amount', label: 'Amount / Score', desc: 'Monetary values (INR/USD, monthly scaling) or percentages' },
+  { type: 'amount', label: 'Amount / Score', desc: 'Monetary values (USD/EUR/GBP, monthly scaling) or numeric GPA/grades' },
   { type: 'id', label: 'ID / Code', desc: 'Alphanumeric uppercase stripped equality' },
   { type: 'text', label: 'General Text', desc: 'Normalized verbatim text comparison' },
 ];
 
 const AVAILABLE_DOCS: { type: DocumentType; label: string }[] = [
   { type: 'application_form', label: 'Application Form' },
-  { type: 'marksheet', label: 'Marksheet' },
-  { type: 'income_certificate', label: 'Certificate / Proof' },
+  { type: 'marksheet', label: 'Academic Transcript' },
+  { type: 'income_certificate', label: 'Income / Tax Statement' },
 ];
 
 export const CustomFieldEditorModal: React.FC<CustomFieldEditorModalProps> = ({

@@ -414,3 +414,18 @@ e:\Parity/
   - Built an automated letter generator drafting formal correction request messages addressed to the issuing registrar or authority for flagged official certificate discrepancies.
   *Why:* Provides actionable, professional artifacts that students can physically print or email directly to college authorities to rectify certificate mismatches before deadlines.
 
+### 2026-10-23 — International Generalization & Multi-Locale Verification
+- **Global Architecture & Positioning:** Removed regional assumptions across data schemas, components, and documentation. Replaced "marksheet" with "transcript" and standardized on tagline *"Make your documents agree before you submit."*
+- **International Fixture Specifications:**
+  - USD Scholarship Packet: Application form, academic transcript (GPA out of 4.0), and tax statement (dates formatted as "12 Aug 2024"). Maintains 3 Conflicts / 2 Consistent benchmark.
+  - EUR/GBP Multi-Locale Packet: Compound surnames ("Maria J. Alvarez" vs "Maria Alvarez"), diacritics/accents ("José" vs "Jose"), and monthly income annualization producing `Needs Review`.
+- **Locale-Aware Deterministic Rules Specification:**
+  - `evaluateDate`: Ambiguous numeric dates (e.g. `03/04/2024` where both day and month $\le 12$) flag `Needs Review` unless disambiguated by textual month or an explicit setting (`Auto`, `DMY`, `MDY`).
+  - `normalizeNumeric`: Support US/UK grouping (`1,234.56`), European dot/comma grouping (`1.234,56`), space-separated (`1 234,56`), and South Asian grouping (`1,20,000`).
+  - `evaluateCurrency`: Different currency tokens (e.g. `$` vs `€` vs `£`) trigger `Needs Review` without unverified foreign exchange assumptions.
+  - `evaluateIncome`: Weekly ($\times 52$), biweekly ($\times 26$), and monthly ($\times 12$) conversions with explicit multiplication factor shown in `diff_explanation`.
+  - `evaluateName`: Accent folding (NFD normalization), double/hyphenated surnames, cultural particles (`de`, `van`, `von`), and family-name-first order detection flagging `Needs Review`.
+  - `evaluateGPA`: GPA scale differentiation (4.0, 5.0, percentage), flagging scale mismatches for human review.
+  - `evaluateAcademicYear`: Support diverse international academic terms (`2024/2025`, `2024-2025`, `2024-25`, `AY 24/25`, `Fall 2024 - Spring 2025`).
+
+

@@ -125,3 +125,46 @@ Activity mode:
   - Draft polite, formal correction request message for issuing authority.
   - Unit tests & commit.
 
+### 2026-10-23 — International Generalization & Multi-Locale Verification
+- **Positioning & Global Copy:** Generalized UI copy, README, and documentation for global audiences. Replaced "marksheet" with "transcript", removed regional institutions and honorifics, and adopted tagline: *"Make your documents agree before you submit."*
+- **International Fixtures & Samples:** Created USD scholarship packet (GPA out of 4.0, tax statement, textual dates) keeping 3 Conflicts / 2 Consistent, and EUR/GBP multi-locale packet (compound/accented names, monthly income) producing `Needs Review`.
+- **Locale-Aware Engine Rules:** Ambiguous numeric dates, US/EU/space number grouping, currency mismatches, weekly/biweekly/monthly annualization factors, cultural name forms, GPA scale awareness.
+- **Multi-Country Tests & Honest Eval:** Unit tests with examples from $\ge 5$ countries; preserved fixture sanity; updated ground truth only for newly generated fixtures with honest live evaluation reporting.
+- **Repository-Wide Sanitization:** Searched and generalized remaining India-specific text across code, fixtures, and docs.
+
+## International Generalization Slices
+
+- [x] **1. Positioning & Copy Rewrite**
+  - Rewrite UI copy, topbar, hero, checklist, and README for global audience.
+  - Replace "marksheet" with "transcript".
+  - Update tagline to "Make your documents agree before you submit."
+  - Unit tests & commit.
+
+- [ ] **2. International Sample Packets & Synthetic Fixtures**
+  - Regenerate USD scholarship sample packet (form, transcript with 4.0 GPA, tax statement; dates like "12 Aug 2024").
+  - Regenerate EUR/GBP messy packet (compound names, accented variants, monthly income).
+  - Ensure clean packet produces 3 Conflicts / 2 Consistent and messy packet produces Needs Review via real engine.
+  - Unit tests & commit.
+
+- [ ] **3. Locale-Aware Verification Engine Rules**
+  - Ambiguous numeric dates $\rightarrow$ Needs Review (unless day > 12, written month, or explicit format setting).
+  - EU/US/Indian/space number grouping normalization.
+  - Different currencies $\rightarrow$ Needs Review.
+  - Weekly ($\times 52$), biweekly ($\times 26$), monthly ($\times 12$) annualization with factor in diff explanation.
+  - Cultural name normalization (accents, particles, double/hyphenated surnames, family-name-first) $\rightarrow$ Needs Review.
+  - GPA scales (4.0, 5.0, percentage) with Needs Review when scales differ.
+  - Expanded academic-year formats.
+  - Unit tests & commit.
+
+- [ ] **4. Multi-Country Test Suite & Honest Eval Harness**
+  - Comprehensive unit tests covering $\ge 5$ countries.
+  - Retain fixture sanity tests.
+  - Update eval ground truth to match regenerated fixtures and run live eval reporting honestly.
+  - Unit tests & commit.
+
+- [ ] **5. Repository-Wide India-Specific Terminology Sanitization**
+  - Search repository for remaining regional terms (`₹`, `lakh`, `Aadhaar`, `Shri`, `tehsildar`, `marksheet`).
+  - Generalize to international equivalents.
+  - Verify all tests pass and commit.
+
+

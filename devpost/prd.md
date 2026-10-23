@@ -235,3 +235,17 @@ Source: `learner-profile.md > Collaboration and Communication Preferences`, `sco
 - **Slice D (Downloadable PDF Report & Issuing Office Correction Draft):** Added downloadable PDF verification report and automated drafting of formal correction request letters to issuing registrars/offices for official document errors.
   *Why:* Students need authoritative, offline-shareable documentation to present to college administrative desks and issuing authorities to dispute errors before deadlines.
 
+### 2026-10-23 — International Generalization & Multi-Locale Verification
+- **Global Positioning & Tagline:** Replaced regional assumptions and terminology (e.g., "marksheet" $\rightarrow$ "academic transcript") across UI copy, documentation, and metadata. Standardized on the universal tagline: *"Make your documents agree before you submit."*
+- **International Benchmark Fixtures:**
+  1. USD Scholarship Packet: Application form, academic transcript with GPA (e.g., 3.8 vs 3.5 out of 4.0), tax statement proof of income, and standard international dates ("12 Aug 2024"). Preserves the 3 Conflicts / 2 Consistent benchmark.
+  2. Multi-Locale Packet (EUR/GBP): Features compound names ("Maria J. Alvarez" vs "Maria Alvarez"), accented names ("José" vs "Jose"), and monthly income frequency conversions producing `Needs Review`.
+- **Locale-Aware Deterministic Engine Features:**
+  - Date format ambiguity: Pure numeric dates (e.g., `03/04/2024`) flag `Needs Review` when day $\le 12$, unless disambiguated by textual months or an explicit date format setting (Auto/DMY/MDY).
+  - Multi-locale numeric grouping: US standard (`1,234.56`), European dot/comma (`1.234,56`), space-separated (`1 234,56`), and South Asian grouping.
+  - Multi-currency disparity: Cross-currency comparisons flag `Needs Review` without speculative currency conversions.
+  - Income frequency scaling: Weekly ($\times 52$), biweekly ($\times 26$), and monthly ($\times 12$) annualized conversions explicitly displaying the multiplication factor in the explanation.
+  - Cultural name normalization: Accent folding, double/hyphenated surnames, particles (`de`, `van`, `von`), and family-name-first orders flag `Needs Review`.
+  - GPA scale awareness: Handles 4.0, 5.0, and percentage grading scales, flagging scale mismatches as `Needs Review`.
+
+

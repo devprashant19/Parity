@@ -1,8 +1,8 @@
 # Parity
 
-> **Evidence-first, pre-submission packet verification for scholarship, financial aid, and admissions packets.**
+> **Make your documents agree before you submit.**
 
-Parity prevents clerical rejections in high-stakes multi-document applications—such as university admissions, merit scholarships, and financial aid grants—by cross-referencing the three core documents—**Candidate Application Form**, **Academic Transcript / Marksheet**, and **Financial / Income Certificate**—before submission.
+Parity prevents clerical rejections in high-stakes multi-document applications—such as university admissions, merit scholarships, and financial aid grants—by cross-referencing the three core documents—**Candidate Application Form**, **Official Academic Transcript**, and **Financial / Tax Statement**—before submission.
 
 ---
 
@@ -11,7 +11,7 @@ Parity prevents clerical rejections in high-stakes multi-document applications�
 Most AI document tools delegate decisions to an LLM prompt. Parity enforces strict architectural boundaries:
 
 1. **Multimodal Perception Only:** Google Gemini 3.1 Flash Lite is restricted strictly to document reading: extracting values alongside verbatim source text quotes ($\le 200$ characters) and page numbers.
-2. **Deterministic Evaluation Core:** An isolated TypeScript engine executes universal normalization (global currencies `$` `€` `£` `₹`, frequency multipliers, ISO and DD/MM/YYYY dates, and name tokenization), quote containment checks, and tri-state classification:
+2. **Deterministic Evaluation Core:** An isolated TypeScript engine executes universal normalization (global currencies `$` `€` `£` `¥` `₹`, frequency multipliers, ISO and international dates, GPA and grade scales, and name tokenization), quote containment checks, and tri-state classification:
    $$\mathbf{Conflict} > \mathbf{Needs\ Review} > \mathbf{Consistent}$$
 3. **Human Decision Authority:** The software never auto-edits official credentials or guesses legal authority. The applicant inspects side-by-side evidence quotes and selects which document is authoritative, dynamically generating an ethical fix checklist.
 
@@ -20,17 +20,17 @@ Most AI document tools delegate decisions to an LLM prompt. Parity enforces stri
 ## What is Verified vs. What Isn't
 
 ### What IS Verified
-- **Deterministic Core Logic (50/50 Unit Tests Passing):** Full unit test coverage for international and regional currency parsing (`$45,000/yr`, `€3,000/mo`, `£28,000/yr`, `₹15,000 per month` $\rightarrow$ `₹1,80,000/year`), marks normalization (`92.4%`), ISO / DD/MM/YYYY date matching, name tokenization & initials handling (`S. Sharma` $\rightarrow$ `Needs Review`), quote containment checks, and status precedence.
-- **Dual Sample Demonstration (Playwright Verified):**
-  - **Clean Sample Packet:** Produces exactly **3 Conflicts**, **2 Consistent**, and **0 Needs Review** offline in $<2$ seconds.
-  - **Messy Sample Packet:** Demonstrates the third state (**Needs Review** on initials match) and monthly-to-annual income normalization.
+- **Deterministic Core Logic:** Full unit test coverage for international currency parsing (`$45,000/yr`, `€3,000/mo`, `£28,000/yr`, `$3,500 per month` $\rightarrow$ `$42,000/year`), GPA and academic marks normalization (`3.8 / 4.0`, `89.4%`), international date matching (ISO, DD/MM/YYYY, MM/DD/YYYY, and textual dates like `12 Aug 2024`), cultural name tokenization, compound surnames, diacritics, quote containment checks, and status precedence.
+- **Dual Sample Demonstration (Playwright & Vitest Verified):**
+  - **Clean Sample Packet (USD):** Produces exactly **3 Conflicts**, **2 Consistent**, and **0 Needs Review** offline in $<2$ seconds.
+  - **Messy Sample Packet (EUR/GBP):** Demonstrates **Needs Review** on compound/accented names (`Maria J. Alvarez` vs `Maria Alvarez`, `José` vs `Jose`) and per-month income normalization.
 - **Side-by-Side Evidence Inspection:** Interactive slide-over drawer on desktop (bottom sheet on mobile) displaying side-by-side verbatim quotes, diff callouts, source scan previews, authoritative decision controls, and inline manual overrides.
 - **Serverless & Upload Safety:** Client-side image downscaling (max 1600px JPEG, $\le 1.5$MB/file, $<4.0$MB total request payload), in-memory IP rate limiting, and zero-PII logging.
 
 ### What IS NOT Verified & Known Limitations
 - **Quote Containment vs. Scan Pixel Grounding:** Quote containment verifies that each extracted value is contained verbatim within the model's returned quote excerpt ($\le 200$ chars). However, string containment confirms consistency between the value and the returned text excerpt—it does **not** independently prove the model read the raw pixels with 100% fidelity without human inspection of the source scan in the Evidence Drawer.
 - **No Legal Genuineness or Fraud Detection:** Parity checks clerical text consistency across submitted pages. It does not authenticate watermarks, verify official seals with issuing authorities, or guarantee scholarship approval.
-- **Benchmark Scope:** The included benchmark reference suite evaluates a 3-document packet (Application Form, Academic Marksheet/Transcript, Income Certificate) covering 5 cross-referenced fields.
+- **Benchmark Scope:** The included benchmark reference suite evaluates a 3-document packet (Application Form, Academic Transcript, Proof of Income / Tax Statement) covering cross-referenced fields.
 
 ---
 

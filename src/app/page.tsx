@@ -307,7 +307,7 @@ export default function HomePage() {
               letterSpacing: '-0.02em',
             }}
           >
-            Deterministic{' '}
+            Make your documents{' '}
             <span
               style={{
                 fontFamily: "'Instrument Serif', Georgia, serif",
@@ -315,10 +315,10 @@ export default function HomePage() {
                 fontWeight: 400,
               }}
             >
-              Verification
+              agree
             </span>
             <br />
-            for application packets
+            before you submit.
           </h1>
 
           {/* Subtitle */}
@@ -326,7 +326,7 @@ export default function HomePage() {
             className="mt-3 sm:mt-4 text-neutral-600 dark:text-neutral-400 px-2 font-normal max-w-2xl text-balance"
             style={{ fontSize: 'clamp(13px, 3.5vw, 16px)' }}
           >
-            Cross-check typed claims against marksheet scans and certificates with inspectable cited evidence before submission.
+            Deterministic pre-submission packet verification. Cross-check typed claims against official transcripts, tax records, and certificates with inspectable cited evidence.
           </p>
 
           {/* Quick Preset Buttons in Convix Pill Language */}
@@ -418,8 +418,8 @@ export default function HomePage() {
               if (doc) {
                 const labelMap: Record<string, string> = {
                   application_form: '1. Application Form Scan',
-                  marksheet: '2. Academic Marksheet Scan',
-                  income_certificate: '3. Income Certificate Scan',
+                  marksheet: '2. Academic Transcript Scan',
+                  income_certificate: '3. Proof of Income / Tax Statement',
                 };
                 setInspectDocModal({
                   title: labelMap[id] || id,

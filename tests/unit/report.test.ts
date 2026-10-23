@@ -178,7 +178,7 @@ describe('Slice D: Downloadable Report (PDF) & Issuing Office Draft', () => {
 
       expect(letter.subject).toContain('Urgent: Request for Clerical Correction in Annual Family Income');
       expect(letter.subject).toContain('[Ref / Roll No: INC-2024-9912]');
-      expect(letter.recipient).toContain('Revenue Department');
+      expect(letter.recipient).toContain('Revenue Office');
       expect(letter.body).toContain('Aarav Patel');
       expect(letter.body).toContain('Primary Application Record (Application Form): "₹2,40,000"');
       expect(letter.body).toContain('Issued Certificate Record (Income Certificate): "₹1,80,000"');
@@ -186,7 +186,7 @@ describe('Slice D: Downloadable Report (PDF) & Issuing Office Draft', () => {
       expect(letter.enclosures.length).toBe(3);
     });
 
-    it('drafts a letter for marks discrepancy targeting Board of Secondary Education', () => {
+    it('drafts a letter for marks discrepancy targeting Academic Examination Board', () => {
       const marksField = mockResult.fields.find((f) => f.field_id === 'marks')!;
       const letter = draftIssuingOfficeMessage({
         field: marksField,
@@ -195,7 +195,7 @@ describe('Slice D: Downloadable Report (PDF) & Issuing Office Draft', () => {
         studentPhone: '+91 98765 43210',
       });
 
-      expect(letter.recipient).toContain('Board of Secondary Education');
+      expect(letter.recipient).toContain('Examination Board');
       expect(letter.body).toContain('Priya Nair');
       expect(letter.body).toContain('Email: priya@example.com');
       expect(letter.body).toContain('Phone: +91 98765 43210');
