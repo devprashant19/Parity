@@ -66,6 +66,14 @@ describe('Fixture Sanity - Generator & Samples Duplication Checks', () => {
       '92.4%',
       '12/08/2024',
       '15/07/2024',
+      'Alex Morgan',
+      'Maria J. Alvarez',
+      'Maria Alvarez',
+      'José Alvarez',
+      '3.80 GPA',
+      '3.92 GPA',
+      '65,000',
+      '48,000',
     ];
 
     for (const file of files) {

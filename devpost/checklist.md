@@ -156,7 +156,7 @@ Activity mode:
   - Expanded academic-year formats.
   - Unit tests & commit.
 
-- [ ] **4. Multi-Country Test Suite & Honest Eval Harness**
+- [x] **4. Multi-Country Test Suite & Honest Eval Harness**
   - Comprehensive unit tests covering $\ge 5$ countries.
   - Retain fixture sanity tests.
   - Update eval ground truth to match regenerated fixtures and run live eval reporting honestly.
