@@ -92,6 +92,7 @@ export function FieldChecklist({ fields, selectedFieldId, onSelectField }: Field
           return (
             <div
               key={field.field_id}
+              data-testid={`field-row-${field.field_id}`}
               onClick={() => onSelectField(field.field_id)}
               className={`p-4 sm:p-5 flex items-center justify-between cursor-pointer transition-colors ${
                 isSelected

@@ -61,6 +61,7 @@ export function IngestionZone({
         <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
           <button
             type="button"
+            data-testid="ingestion-load-clean-btn"
             onClick={onLoadCleanSample}
             className="inline-flex items-center gap-2 bg-[#ef4d23] hover:bg-[#e03d13] text-white rounded-full pl-4 pr-1.5 py-1.5 text-xs sm:text-[13px] font-medium transition-all shadow-xs cursor-pointer group"
           >
@@ -72,6 +73,7 @@ export function IngestionZone({
 
           <button
             type="button"
+            data-testid="ingestion-load-messy-btn"
             onClick={onLoadMessySample}
             className="inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:py-2 rounded-full text-xs sm:text-[13px] font-medium border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-200 bg-white dark:bg-[#121620] hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all shadow-2xs cursor-pointer"
           >
@@ -172,6 +174,7 @@ export function IngestionZone({
         {/* Dark Execution CTA Pill */}
         <button
           type="button"
+          data-testid="run-verification-check-btn"
           disabled={!hasDocuments || isAnalyzing}
           onClick={onRunCheck}
           className={`inline-flex items-center gap-3 rounded-full pl-6 pr-2 py-2 sm:py-2.5 text-[14px] font-medium transition-all shadow-md group ${
