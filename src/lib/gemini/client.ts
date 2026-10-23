@@ -1,7 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
-import { DocumentExtractionSchema, DocumentExtraction } from './schema';
+import { DocumentExtractionSchema } from './schema';
 import { EXTRACTION_SYSTEM_PROMPT } from './prompt';
-import { DocumentType } from '../compare/types';
+import { DocumentType, DocumentExtraction, FieldId } from '../compare/types';
 
 // Rate limiter: Max 6 requests per minute per IP (in-memory)
 const rateLimitMap = new Map<string, number[]>();
@@ -125,7 +125,16 @@ export async function extractDocumentFacts({
 
   const validated = DocumentExtractionSchema.parse(structuredDoc);
   return {
-    ...validated,
+    document_type: docType,
     document_label: docLabel,
+    fields: validated.fields.map((f) => ({
+      field_id: f.field_id as FieldId,
+      value: f.value,
+      quote: f.quote,
+      page: f.page,
+      confidence: f.confidence,
+      source: 'extracted' as const,
+      highlight_bbox: f.highlight_bbox ?? undefined,
+    })),
   };
 }

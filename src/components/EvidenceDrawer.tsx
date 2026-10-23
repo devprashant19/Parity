@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { X, AlertTriangle, CheckCircle2, HelpCircle, Eye, Check } from 'lucide-react';
-import { FieldComparison, ResolutionChoice } from '@/lib/compare/types';
+import { FieldComparison, ResolutionChoice, BoundingBox } from '@/lib/compare/types';
 import { DocumentModal } from './DocumentModal';
 import { ManualEntry } from './ManualEntry';
 
@@ -19,7 +19,13 @@ export function EvidenceDrawer({
   onDecision,
   onManualOverride,
 }: EvidenceDrawerProps) {
-  const [modalDoc, setModalDoc] = useState<{ title: string; previewUrl?: string; fileName?: string } | null>(null);
+  const [modalDoc, setModalDoc] = useState<{
+    title: string;
+    previewUrl?: string;
+    fileName?: string;
+    highlightBbox?: BoundingBox | null;
+    highlightLabel?: string;
+  } | null>(null);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -78,6 +84,61 @@ export function EvidenceDrawer({
   };
 
   const isSelected = (choice: ResolutionChoice) => field.resolution === choice;
+
+  const renderDocPreviewWithOverlay = (doc: typeof docA) => {
+    if (!doc || !doc.preview_url) return null;
+    const bbox = doc.highlight_bbox;
+
+    return (
+      <div className="space-y-1.5 pt-1">
+        <div className="flex items-center justify-between text-[11px] text-neutral-500">
+          <span className="font-medium">Scan Preview &amp; Bounding Box:</span>
+          {bbox && (
+            <span className="text-[10px] text-[#ef4d23] font-mono font-medium bg-[#ef4d23]/10 px-1.5 py-0.5 rounded">
+              Region: {Math.round(bbox.x * 100)}%, {Math.round(bbox.y * 100)}% ({Math.round(bbox.width * 100)}%×{Math.round(bbox.height * 100)}%)
+            </span>
+          )}
+        </div>
+        <div
+          onClick={() =>
+            setModalDoc({
+              title: doc.doc_label,
+              previewUrl: doc.preview_url,
+              fileName: doc.doc_label,
+              highlightBbox: doc.highlight_bbox,
+              highlightLabel: doc.raw_value ?? doc.doc_label,
+            })
+          }
+          className="relative rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900 group cursor-pointer aspect-16/10 flex items-center justify-center hover:border-[#ef4d23]/60 transition-colors shadow-2xs"
+          title="Click to enlarge scan"
+        >
+          <img
+            src={doc.preview_url}
+            alt={doc.doc_label}
+            className="w-full h-full object-contain pointer-events-none"
+          />
+          {bbox && (
+            <div
+              className="absolute border-2 border-[#ef4d23] bg-[#ef4d23]/25 rounded-xs pointer-events-none shadow-[0_0_10px_rgba(239,77,35,0.4)] animate-pulse"
+              style={{
+                left: `${bbox.x * 100}%`,
+                top: `${bbox.y * 100}%`,
+                width: `${bbox.width * 100}%`,
+                height: `${bbox.height * 100}%`,
+              }}
+            >
+              <span className="absolute -top-4 left-0 text-[9px] font-mono font-semibold bg-[#ef4d23] text-white px-1 py-0.2 rounded shadow-2xs whitespace-nowrap">
+                {doc.raw_value ?? 'target region'}
+              </span>
+            </div>
+          )}
+          <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/75 text-white text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1 shadow-xs pointer-events-none">
+            <Eye className="w-3 h-3" /> Inspect Scan
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <>
@@ -163,6 +224,8 @@ export function EvidenceDrawer({
                           title: docA.doc_label,
                           previewUrl: docA.preview_url,
                           fileName: docA.doc_label,
+                          highlightBbox: docA.highlight_bbox,
+                          highlightLabel: docA.raw_value ?? docA.doc_label,
                         })
                       }
                       className="border border-neutral-200 dark:border-neutral-700 rounded-lg px-2.5 py-1 text-xs text-neutral-700 dark:text-neutral-200 bg-white dark:bg-[#121620] hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors inline-flex items-center gap-1 shadow-2xs cursor-pointer"
@@ -188,6 +251,8 @@ export function EvidenceDrawer({
                     {renderQuoteWithHighlight(docA.quote, docA.raw_value)}
                   </div>
                 </div>
+
+                {renderDocPreviewWithOverlay(docA)}
               </div>
             )}
 
@@ -206,6 +271,8 @@ export function EvidenceDrawer({
                           title: docB.doc_label,
                           previewUrl: docB.preview_url,
                           fileName: docB.doc_label,
+                          highlightBbox: docB.highlight_bbox,
+                          highlightLabel: docB.raw_value ?? docB.doc_label,
                         })
                       }
                       className="border border-neutral-200 dark:border-neutral-700 rounded-lg px-2.5 py-1 text-xs text-neutral-700 dark:text-neutral-200 bg-white dark:bg-[#121620] hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors inline-flex items-center gap-1 shadow-2xs cursor-pointer"
@@ -231,6 +298,8 @@ export function EvidenceDrawer({
                     {renderQuoteWithHighlight(docB.quote, docB.raw_value)}
                   </div>
                 </div>
+
+                {renderDocPreviewWithOverlay(docB)}
               </div>
             )}
 
@@ -249,6 +318,8 @@ export function EvidenceDrawer({
                           title: docC.doc_label,
                           previewUrl: docC.preview_url,
                           fileName: docC.doc_label,
+                          highlightBbox: docC.highlight_bbox,
+                          highlightLabel: docC.raw_value ?? docC.doc_label,
                         })
                       }
                       className="border border-neutral-200 dark:border-neutral-700 rounded-lg px-2.5 py-1 text-xs text-neutral-700 dark:text-neutral-200 bg-white dark:bg-[#121620] hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors inline-flex items-center gap-1 shadow-2xs cursor-pointer"
@@ -274,6 +345,8 @@ export function EvidenceDrawer({
                     {renderQuoteWithHighlight(docC.quote, docC.raw_value)}
                   </div>
                 </div>
+
+                {renderDocPreviewWithOverlay(docC)}
               </div>
             )}
           </div>
@@ -383,6 +456,8 @@ export function EvidenceDrawer({
           title={modalDoc.title}
           previewUrl={modalDoc.previewUrl}
           fileName={modalDoc.fileName}
+          highlightBbox={modalDoc.highlightBbox}
+          highlightLabel={modalDoc.highlightLabel}
         />
       )}
     </>
