@@ -32,12 +32,12 @@ export function EvidenceDrawer({
   if (!field) return null;
 
   const docA = field.documents[0]; // Application Form
-  const docB = field.documents[1]; // Supporting Document (Marksheet or Income Cert)
+  const docB = field.documents[1]; // Supporting Document
   const docC = field.documents[2]; // If 3 docs (Name)
 
   const renderQuoteWithHighlight = (quote: string | null, value: string | null) => {
     if (!quote) {
-      return <span className="text-slate-400 italic">No quoted text extracted</span>;
+      return <span className="text-neutral-400 italic">No quoted text extracted</span>;
     }
     if (!value) {
       return <span>&ldquo;{quote}&rdquo;</span>;
@@ -47,7 +47,6 @@ export function EvidenceDrawer({
     const idx = quote.toLowerCase().indexOf(cleanVal.toLowerCase());
 
     if (idx === -1) {
-      // Try stripping currency / symbols
       const stripped = cleanVal.replace(/[₹\$\€\,%]/g, '').trim();
       const idx2 = stripped.length >= 2 ? quote.toLowerCase().indexOf(stripped.toLowerCase()) : -1;
       if (idx2 !== -1) {
@@ -57,7 +56,7 @@ export function EvidenceDrawer({
         return (
           <span>
             &ldquo;{before}
-            <mark className="evidence-highlight">{match}</mark>
+            <mark className="bg-[#ef4d23]/20 text-neutral-900 dark:text-white px-1 py-0.5 rounded font-semibold">{match}</mark>
             {after}&rdquo;
           </span>
         );
@@ -72,7 +71,7 @@ export function EvidenceDrawer({
     return (
       <span>
         &ldquo;{before}
-        <mark className="evidence-highlight">{match}</mark>
+        <mark className="bg-[#ef4d23]/20 text-neutral-900 dark:text-white px-1 py-0.5 rounded font-semibold">{match}</mark>
         {after}&rdquo;
       </span>
     );
@@ -82,61 +81,78 @@ export function EvidenceDrawer({
 
   return (
     <>
-      {/* Backdrop (Mobile/Tablet only: checklist remains directly clickable on desktop) */}
+      {/* Backdrop */}
       <div
         onClick={onClose}
-        className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs transition-opacity lg:hidden"
+        className="fixed inset-0 z-40 bg-black/40 backdrop-blur-xs transition-opacity lg:hidden"
       />
 
       {/* Drawer Surface */}
-      <aside className="fixed inset-y-0 right-0 z-50 w-full max-w-xl bg-white dark:bg-[#10141E] border-l border-[#E2E8F0] dark:border-[#1F293D] shadow-2xl flex flex-col overflow-hidden animate-slideIn">
-        {/* Header */}
-        <div className="p-5 sm:p-6 border-b border-[#E2E8F0] dark:border-[#1F293D] flex items-center justify-between">
+      <aside className="fixed inset-y-0 right-0 z-50 w-full max-w-xl bg-white dark:bg-[#121620] border-l border-neutral-200 dark:border-neutral-800 shadow-2xl flex flex-col overflow-hidden animate-slideIn">
+        {/* Header in #f5f2ee */}
+        <div className="p-4 sm:p-5 bg-[#f5f2ee] dark:bg-[#182030] border-b border-neutral-200/80 dark:border-neutral-700/80 flex items-center justify-between">
           <div>
-            <div className="flex items-center space-x-2.5">
-              <h3 className="font-serif-heading text-lg sm:text-xl font-bold text-[#0F172A] dark:text-[#F8FAFC]">
-                {field.field_label}
-              </h3>
-              <span
-                className={`inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                  field.status === 'Conflict'
-                    ? 'bg-red-100 text-red-800 dark:bg-red-950/70 dark:text-red-300 border border-red-200 dark:border-red-900'
-                    : field.status === 'Consistent'
-                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900'
-                    : 'bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300 border border-blue-200 dark:border-blue-900'
-                }`}
-              >
-                {field.status === 'Conflict' && <AlertTriangle className="w-3 h-3 text-red-600 dark:text-red-400" />}
-                {field.status === 'Consistent' && <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />}
-                {field.status === 'Needs Review' && <HelpCircle className="w-3 h-3 text-blue-600 dark:text-blue-400" />}
-                <span>{field.status}</span>
-              </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[#ef4d23] font-medium text-xs">Inspect Evidence</span>
+              <span className="text-neutral-400">•</span>
+              <span className="text-xs text-neutral-500 font-mono">{field.field_id}</span>
             </div>
-            <p className="text-xs text-[#475569] dark:text-[#94A3B8] mt-1">{field.diff_explanation}</p>
+            <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mt-0.5">
+              {field.field_label}
+            </h3>
           </div>
 
           <button
+            type="button"
             onClick={onClose}
+            className="p-1.5 text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 rounded-full hover:bg-neutral-200/60 dark:hover:bg-neutral-700 transition-colors cursor-pointer"
             aria-label="Close drawer"
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:text-white dark:hover:bg-[#182030] transition-all duration-200 cursor-pointer active-press group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           >
-            <X className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Scrollable Content Body */}
-        <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6">
-          {/* Side-by-Side Document Comparison Cards */}
-          <div className="space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              Side-by-Side Extracted Evidence
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
+          {/* Status Explanation Card */}
+          <div className="p-4 rounded-2xl bg-[#f5f2ee]/60 dark:bg-[#182030]/60 border border-neutral-200/70 dark:border-neutral-700/70">
+            <div className="flex items-center gap-2 mb-1.5">
+              {field.status === 'Conflict' ? (
+                <span className="inline-flex items-center gap-1 bg-red-50 text-red-600 rounded-full px-2 py-0.5 text-[11px] font-medium border border-red-200/60">
+                  <AlertTriangle className="w-3 h-3 stroke-[2.5]" />
+                  Conflict
+                </span>
+              ) : field.status === 'Consistent' ? (
+                <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 rounded-full px-2 py-0.5 text-[11px] font-medium border border-emerald-200/60">
+                  <CheckCircle2 className="w-3 h-3 stroke-[2.5]" />
+                  Consistent
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 rounded-full px-2 py-0.5 text-[11px] font-medium border border-amber-200/60">
+                  <HelpCircle className="w-3 h-3 stroke-[2.5]" />
+                  Needs Review
+                </span>
+              )}
+              <span className="text-xs font-semibold text-neutral-900 dark:text-white">
+                Deterministic Explanation
+              </span>
+            </div>
+            <p className="text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed">
+              {field.diff_explanation}
+            </p>
+          </div>
+
+          {/* Compared Documents Cited List */}
+          <div className="space-y-3.5">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+              Cited Evidence from Scans
             </h4>
 
-            {/* Document A (Typed Application Claim) */}
+            {/* Doc A */}
             {docA && (
-              <div className="p-4 rounded-xl border border-slate-200 dark:border-[#2A3854] bg-slate-50/70 dark:bg-[#182030] space-y-3 transition-all hover-card-lift">
+              <div className="p-4 rounded-2xl border border-neutral-200 dark:border-neutral-700/80 bg-white dark:bg-[#151a24] space-y-3 shadow-2xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                  <span className="text-xs font-semibold text-neutral-900 dark:text-white">
                     {docA.doc_label} (Typed Claim)
                   </span>
                   {docA.preview_url && (
@@ -149,37 +165,37 @@ export function EvidenceDrawer({
                           fileName: docA.doc_label,
                         })
                       }
-                      className="inline-flex items-center space-x-1 text-xs text-blue-600 dark:text-blue-400 hover:underline cursor-pointer active-press"
+                      className="border border-neutral-200 dark:border-neutral-700 rounded-lg px-2.5 py-1 text-xs text-neutral-700 dark:text-neutral-200 bg-white dark:bg-[#121620] hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors inline-flex items-center gap-1 shadow-2xs cursor-pointer"
                     >
-                      <Eye className="w-3.5 h-3.5" />
+                      <Eye className="w-3 h-3 text-neutral-500" />
                       <span>Inspect scan</span>
                     </button>
                   )}
                 </div>
 
-                <div className="p-3 bg-white dark:bg-[#10141E] rounded-lg border border-slate-200/80 dark:border-[#1F293D]">
-                  <span className="text-[11px] text-slate-500 block mb-0.5">Reported Value</span>
-                  <span className="text-base font-bold font-mono-val text-slate-900 dark:text-white">
-                    {docA.raw_value ?? '—'}
+                <div className="p-3 bg-[#f5f2ee] dark:bg-[#10141e] rounded-xl border border-neutral-200/60 dark:border-neutral-800">
+                  <span className="text-[11px] text-neutral-500 block mb-0.5">Extracted Value:</span>
+                  <span className="text-base font-semibold text-neutral-900 dark:text-white">
+                    {docA.raw_value ?? 'Not present'}
                   </span>
                 </div>
 
                 <div className="text-xs space-y-1">
-                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
-                    Cited Quote from Scan:
+                  <span className="text-[11px] font-medium text-neutral-500 block">
+                    Cited Quote Excerpt (&le;200 chars):
                   </span>
-                  <div className="p-2.5 rounded-lg bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 font-mono-val text-xs text-slate-800 dark:text-slate-200 leading-relaxed">
+                  <div className="p-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200/60 dark:border-neutral-800 text-xs text-neutral-800 dark:text-neutral-200 leading-relaxed">
                     {renderQuoteWithHighlight(docA.quote, docA.raw_value)}
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Document B (Official Scan) */}
+            {/* Doc B */}
             {docB && (
-              <div className="p-4 rounded-xl border border-slate-200 dark:border-[#2A3854] bg-slate-50/70 dark:bg-[#182030] space-y-3 transition-all hover-card-lift">
+              <div className="p-4 rounded-2xl border border-neutral-200 dark:border-neutral-700/80 bg-white dark:bg-[#151a24] space-y-3 shadow-2xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                  <span className="text-xs font-semibold text-neutral-900 dark:text-white">
                     {docB.doc_label} (Official Record)
                   </span>
                   {docB.preview_url && (
@@ -192,38 +208,38 @@ export function EvidenceDrawer({
                           fileName: docB.doc_label,
                         })
                       }
-                      className="inline-flex items-center space-x-1 text-xs text-blue-600 dark:text-blue-400 hover:underline cursor-pointer active-press"
+                      className="border border-neutral-200 dark:border-neutral-700 rounded-lg px-2.5 py-1 text-xs text-neutral-700 dark:text-neutral-200 bg-white dark:bg-[#121620] hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors inline-flex items-center gap-1 shadow-2xs cursor-pointer"
                     >
-                      <Eye className="w-3.5 h-3.5" />
+                      <Eye className="w-3 h-3 text-neutral-500" />
                       <span>Inspect scan</span>
                     </button>
                   )}
                 </div>
 
-                <div className="p-3 bg-white dark:bg-[#10141E] rounded-lg border border-slate-200/80 dark:border-[#1F293D]">
-                  <span className="text-[11px] text-slate-500 block mb-0.5">Official Value</span>
-                  <span className="text-base font-bold font-mono-val text-slate-900 dark:text-white">
-                    {docB.raw_value ?? '—'}
+                <div className="p-3 bg-[#f5f2ee] dark:bg-[#10141e] rounded-xl border border-neutral-200/60 dark:border-neutral-800">
+                  <span className="text-[11px] text-neutral-500 block mb-0.5">Extracted Value:</span>
+                  <span className="text-base font-semibold text-neutral-900 dark:text-white">
+                    {docB.raw_value ?? 'Not present'}
                   </span>
                 </div>
 
                 <div className="text-xs space-y-1">
-                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
+                  <span className="text-[11px] font-medium text-neutral-500 block">
                     Cited Quote from Scan:
                   </span>
-                  <div className="p-2.5 rounded-lg bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 font-mono-val text-xs text-slate-800 dark:text-slate-200 leading-relaxed">
+                  <div className="p-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200/60 dark:border-neutral-800 text-xs text-neutral-800 dark:text-neutral-200 leading-relaxed">
                     {renderQuoteWithHighlight(docB.quote, docB.raw_value)}
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Document C (If present, e.g. Name verification) */}
+            {/* Doc C */}
             {docC && (
-              <div className="p-4 rounded-xl border border-slate-200 dark:border-[#2A3854] bg-slate-50/70 dark:bg-[#182030] space-y-3 transition-all hover-card-lift">
+              <div className="p-4 rounded-2xl border border-neutral-200 dark:border-neutral-700/80 bg-white dark:bg-[#151a24] space-y-3 shadow-2xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                    {docC.doc_label} (Third Document)
+                  <span className="text-xs font-semibold text-neutral-900 dark:text-white">
+                    {docC.doc_label}
                   </span>
                   {docC.preview_url && (
                     <button
@@ -235,26 +251,26 @@ export function EvidenceDrawer({
                           fileName: docC.doc_label,
                         })
                       }
-                      className="inline-flex items-center space-x-1 text-xs text-blue-600 dark:text-blue-400 hover:underline cursor-pointer active-press"
+                      className="border border-neutral-200 dark:border-neutral-700 rounded-lg px-2.5 py-1 text-xs text-neutral-700 dark:text-neutral-200 bg-white dark:bg-[#121620] hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors inline-flex items-center gap-1 shadow-2xs cursor-pointer"
                     >
-                      <Eye className="w-3.5 h-3.5" />
+                      <Eye className="w-3 h-3 text-neutral-500" />
                       <span>Inspect scan</span>
                     </button>
                   )}
                 </div>
 
-                <div className="p-3 bg-white dark:bg-[#10141E] rounded-lg border border-slate-200/80 dark:border-[#1F293D]">
-                  <span className="text-[11px] text-slate-500 block mb-0.5">Value</span>
-                  <span className="text-base font-bold font-mono-val text-slate-900 dark:text-white">
-                    {docC.raw_value ?? '—'}
+                <div className="p-3 bg-[#f5f2ee] dark:bg-[#10141e] rounded-xl border border-neutral-200/60 dark:border-neutral-800">
+                  <span className="text-[11px] text-neutral-500 block mb-0.5">Extracted Value:</span>
+                  <span className="text-base font-semibold text-neutral-900 dark:text-white">
+                    {docC.raw_value ?? 'Not present'}
                   </span>
                 </div>
 
                 <div className="text-xs space-y-1">
-                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
+                  <span className="text-[11px] font-medium text-neutral-500 block">
                     Cited Quote from Scan:
                   </span>
-                  <div className="p-2.5 rounded-lg bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 font-mono-val text-xs text-slate-800 dark:text-slate-200 leading-relaxed">
+                  <div className="p-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200/60 dark:border-neutral-800 text-xs text-neutral-800 dark:text-neutral-200 leading-relaxed">
                     {renderQuoteWithHighlight(docC.quote, docC.raw_value)}
                   </div>
                 </div>
@@ -262,60 +278,60 @@ export function EvidenceDrawer({
             )}
           </div>
 
-          {/* Student Authority Decision Group */}
+          {/* Decision Resolution Options */}
           <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
                 Which document is correct?
               </h4>
-              <span className="text-[11px] text-blue-600 dark:text-blue-400 font-semibold">Student decision required</span>
+              <span className="text-[11px] text-[#ef4d23] font-medium">User decision required</span>
             </div>
 
             <div className="space-y-2.5">
-              {/* Option 1: Supporting Document is correct */}
+              {/* Option 1: Supporting Document correct */}
               {docB && (
                 <button
                   type="button"
                   onClick={() => onDecision(field.field_id, 'document_b_correct')}
-                  className={`w-full p-3.5 rounded-xl border text-left text-xs transition-all duration-200 flex items-center justify-between cursor-pointer active-press focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 hover-card-lift ${
+                  className={`w-full p-3.5 rounded-2xl border text-left text-xs transition-all flex items-center justify-between cursor-pointer ${
                     isSelected('document_b_correct')
-                      ? 'bg-blue-50/90 border-blue-600 text-blue-950 dark:bg-blue-950/50 dark:border-blue-500 dark:text-blue-100 shadow-xs'
-                      : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-800 dark:bg-[#10141E] dark:hover:bg-[#182030] dark:border-[#2A3854] dark:text-slate-200'
+                      ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 border-neutral-900 shadow-sm'
+                      : 'bg-white hover:bg-neutral-50/80 border-neutral-200 dark:bg-[#121620] dark:hover:bg-[#182030] dark:border-neutral-700 text-neutral-800 dark:text-neutral-200'
                   }`}
                 >
                   <div>
-                    <span className="font-bold text-sm block">{docB.doc_label} is correct</span>
-                    <span className="text-slate-500 dark:text-slate-400 block text-[11px] mt-1">
-                      Fix plan will instruct: Update the application form to {docB.raw_value}
+                    <span className="font-semibold text-sm block">{docB.doc_label} is correct</span>
+                    <span className={`block text-[11px] mt-0.5 ${isSelected('document_b_correct') ? 'text-neutral-300 dark:text-neutral-600' : 'text-neutral-500'}`}>
+                      Fix plan will instruct: Update application form to {docB.raw_value}
                     </span>
                   </div>
                   {isSelected('document_b_correct') && (
-                    <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs animate-checkmarkPop">
+                    <span className="w-5 h-5 rounded-full bg-[#ef4d23] text-white flex items-center justify-center shrink-0">
                       <Check className="w-3 h-3 stroke-[3]" />
                     </span>
                   )}
                 </button>
               )}
 
-              {/* Option 2: Application Form is correct */}
+              {/* Option 2: Application Form correct */}
               {docA && (
                 <button
                   type="button"
                   onClick={() => onDecision(field.field_id, 'document_a_correct')}
-                  className={`w-full p-3.5 rounded-xl border text-left text-xs transition-all duration-200 flex items-center justify-between cursor-pointer active-press focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 hover-card-lift ${
+                  className={`w-full p-3.5 rounded-2xl border text-left text-xs transition-all flex items-center justify-between cursor-pointer ${
                     isSelected('document_a_correct')
-                      ? 'bg-blue-50/90 border-blue-600 text-blue-950 dark:bg-blue-950/50 dark:border-blue-500 dark:text-blue-100 shadow-xs'
-                      : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-800 dark:bg-[#10141E] dark:hover:bg-[#182030] dark:border-[#2A3854] dark:text-slate-200'
+                      ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 border-neutral-900 shadow-sm'
+                      : 'bg-white hover:bg-neutral-50/80 border-neutral-200 dark:bg-[#121620] dark:hover:bg-[#182030] dark:border-neutral-700 text-neutral-800 dark:text-neutral-200'
                   }`}
                 >
                   <div>
-                    <span className="font-bold text-sm block">{docA.doc_label} is correct</span>
-                    <span className="text-slate-500 dark:text-slate-400 block text-[11px] mt-1">
-                      Fix plan will instruct: Request a corrected document from the issuing office
+                    <span className="font-semibold text-sm block">{docA.doc_label} is correct</span>
+                    <span className={`block text-[11px] mt-0.5 ${isSelected('document_a_correct') ? 'text-neutral-300 dark:text-neutral-600' : 'text-neutral-500'}`}>
+                      Fix plan will instruct: Request corrected document from issuing office
                     </span>
                   </div>
                   {isSelected('document_a_correct') && (
-                    <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs animate-checkmarkPop">
+                    <span className="w-5 h-5 rounded-full bg-[#ef4d23] text-white flex items-center justify-center shrink-0">
                       <Check className="w-3 h-3 stroke-[3]" />
                     </span>
                   )}
@@ -326,20 +342,20 @@ export function EvidenceDrawer({
               <button
                 type="button"
                 onClick={() => onDecision(field.field_id, 'not_sure')}
-                className={`w-full p-3.5 rounded-xl border text-left text-xs transition-all duration-200 flex items-center justify-between cursor-pointer active-press focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 hover-card-lift ${
+                className={`w-full p-3.5 rounded-2xl border text-left text-xs transition-all flex items-center justify-between cursor-pointer ${
                   isSelected('not_sure')
-                    ? 'bg-blue-50/90 border-blue-600 text-blue-950 dark:bg-blue-950/50 dark:border-blue-500 dark:text-blue-100 shadow-xs'
-                    : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-800 dark:bg-[#10141E] dark:hover:bg-[#182030] dark:border-[#2A3854] dark:text-slate-200'
+                    ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 border-neutral-900 shadow-sm'
+                    : 'bg-white hover:bg-neutral-50/80 border-neutral-200 dark:bg-[#121620] dark:hover:bg-[#182030] dark:border-neutral-700 text-neutral-800 dark:text-neutral-200'
                 }`}
               >
                 <div>
-                  <span className="font-bold text-sm block">I&apos;m not sure / Needs manual review</span>
-                  <span className="text-slate-500 dark:text-slate-400 block text-[11px] mt-1">
-                    Item will be placed in Needs Manual Review for physical original cross-checking
+                  <span className="font-semibold text-sm block">Not sure / Needs manual review</span>
+                  <span className={`block text-[11px] mt-0.5 ${isSelected('not_sure') ? 'text-neutral-300 dark:text-neutral-600' : 'text-neutral-500'}`}>
+                    Item placed in Needs Manual Review for physical original cross-checking
                   </span>
                 </div>
                 {isSelected('not_sure') && (
-                  <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs animate-checkmarkPop">
+                  <span className="w-5 h-5 rounded-full bg-[#ef4d23] text-white flex items-center justify-center shrink-0">
                     <Check className="w-3 h-3 stroke-[3]" />
                   </span>
                 )}
@@ -349,7 +365,7 @@ export function EvidenceDrawer({
 
           {/* Manual Entry Component */}
           {onManualOverride && (
-            <div className="pt-2 border-t border-slate-200 dark:border-[#1F293D]">
+            <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800">
               <ManualEntry
                 documents={field.documents}
                 onSaveManualValue={(docType, newVal) => onManualOverride(field.field_id, docType, newVal)}
