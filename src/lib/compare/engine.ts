@@ -5,32 +5,24 @@ import {
   FieldId,
   FieldStatus,
   VerificationResult,
+  CustomFieldDefinition,
   CONFIDENCE_THRESHOLD,
 } from './types';
 import { verifyQuoteContainment } from './containment';
 import { evaluateNamePairwise } from './name';
 import { normalizeIncome, normalizeMarks } from '../normalize/numbers';
 import { normalizeDate } from '../normalize/dates';
+import { evaluateCustomField } from './custom';
 
 export function runVerification(
   extractions: DocumentExtraction[],
-  packetType: 'clean_sample' | 'messy_sample' | 'live' = 'live'
+  packetType: 'clean_sample' | 'messy_sample' | 'live' = 'live',
+  customFieldDefs?: CustomFieldDefinition[]
 ): VerificationResult {
   const docMap = new Map<string, DocumentExtraction>();
   for (const doc of extractions) {
     docMap.set(doc.document_type, doc);
   }
-
-  const form = docMap.get('application_form');
-  const marksheet = docMap.get('marksheet');
-  const incomeCert = docMap.get('income_certificate');
-
-  const fields: FieldComparison[] = [];
-
-  // Helper to get field from doc
-  const getField = (doc: DocumentExtraction | undefined, fieldId: FieldId) => {
-    return doc?.fields.find((f) => f.field_id === fieldId) || null;
-  };
 
   const sampleUrls: Record<string, Record<string, string>> = {
     clean_sample: {
@@ -43,6 +35,43 @@ export function runVerification(
       marksheet: '/samples/messy_marksheet.svg',
       income_certificate: '/samples/messy_income_cert.svg',
     },
+  };
+
+  // If custom field definitions are provided, evaluate them with the custom deterministic engine
+  if (customFieldDefs && customFieldDefs.length > 0) {
+    const fields: FieldComparison[] = customFieldDefs.map((def) =>
+      evaluateCustomField(def, docMap, sampleUrls[packetType])
+    );
+
+    let conflicts_count = 0;
+    let consistent_count = 0;
+    let needs_review_count = 0;
+
+    for (const f of fields) {
+      if (f.status === 'Conflict') conflicts_count++;
+      else if (f.status === 'Consistent') consistent_count++;
+      else needs_review_count++;
+    }
+
+    return {
+      packet_type: packetType,
+      total_fields: fields.length,
+      conflicts_count,
+      consistent_count,
+      needs_review_count,
+      fields,
+    };
+  }
+
+  const form = docMap.get('application_form');
+  const marksheet = docMap.get('marksheet');
+  const incomeCert = docMap.get('income_certificate');
+
+  const fields: FieldComparison[] = [];
+
+  // Helper to get field from doc
+  const getField = (doc: DocumentExtraction | undefined, fieldId: FieldId) => {
+    return doc?.fields.find((f) => f.field_id === fieldId) || null;
   };
 
   const toDocEntry = (

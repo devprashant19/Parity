@@ -113,7 +113,7 @@ Activity mode:
   - Integrate into eval harness and report live figures honestly.
   - Unit tests & commit.
 
-- [ ] **Slice C: Packet presets and custom field editor**
+- [x] **Slice C: Packet presets and custom field editor**
   - Add preset selector (`scholarship`, `college_admission`, `financial_aid`).
   - Build custom field editor supporting 5 field types (`name`, `date`, `amount`, `id`, `text`).
   - Reuse deterministic comparison engine rules across all custom types.

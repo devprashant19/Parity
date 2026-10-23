@@ -9,19 +9,29 @@ import { FieldChecklist } from '@/components/FieldChecklist';
 import { FixList } from '@/components/FixList';
 import { EvidenceDrawer } from '@/components/EvidenceDrawer';
 import { DocumentModal } from '@/components/DocumentModal';
+import { PacketPresetSelector } from '@/components/PacketPresetSelector';
+import { CustomFieldEditorModal } from '@/components/CustomFieldEditorModal';
 import {
   CLEAN_SAMPLE_META,
   MESSY_SAMPLE_META,
   CLEAN_SAMPLE_PACKET,
   MESSY_SAMPLE_PACKET,
+  COLLEGE_ADMISSION_SAMPLE_PACKET,
+  FINANCIAL_AID_SAMPLE_PACKET,
   SamplePacketMetadata,
 } from '@/data/samples';
 import { runVerification } from '@/lib/compare/engine';
-import { VerificationResult, ResolutionChoice } from '@/lib/compare/types';
+import { VerificationResult, ResolutionChoice, PacketPresetId, CustomFieldDefinition } from '@/lib/compare/types';
+import { PACKET_PRESETS } from '@/lib/compare/custom';
 import { processUploadFile } from '@/lib/normalize/image';
 
 export default function HomePage() {
   const [activePacketType, setActivePacketType] = useState<'clean_sample' | 'messy_sample' | 'live' | null>(null);
+  const [activePresetId, setActivePresetId] = useState<PacketPresetId>('scholarship');
+  const [customFields, setCustomFields] = useState<CustomFieldDefinition[]>(
+    PACKET_PRESETS[0].fields
+  );
+  const [isCustomEditorOpen, setIsCustomEditorOpen] = useState(false);
   const [sampleMeta, setSampleMeta] = useState<SamplePacketMetadata | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
@@ -150,13 +160,57 @@ export default function HomePage() {
     // Instant execution for sample packets
     let result: VerificationResult;
     if (effectiveType === 'messy_sample') {
-      result = runVerification(MESSY_SAMPLE_PACKET, 'messy_sample');
+      result = runVerification(MESSY_SAMPLE_PACKET, 'messy_sample', customFields);
+    } else if (activePresetId === 'college_admission') {
+      result = runVerification(COLLEGE_ADMISSION_SAMPLE_PACKET, 'clean_sample', customFields);
+    } else if (activePresetId === 'financial_aid') {
+      result = runVerification(FINANCIAL_AID_SAMPLE_PACKET, 'clean_sample', customFields);
     } else {
-      result = runVerification(CLEAN_SAMPLE_PACKET, 'clean_sample');
+      result = runVerification(CLEAN_SAMPLE_PACKET, 'clean_sample', customFields);
     }
 
     setVerificationResult(result);
     setIsAnalyzing(false);
+  };
+
+  const handleSelectPreset = (presetId: PacketPresetId) => {
+    setActivePresetId(presetId);
+    const preset = PACKET_PRESETS.find((p) => p.id === presetId) || PACKET_PRESETS[0];
+    setCustomFields(preset.fields);
+    setActivePacketType('clean_sample');
+    setApiErrorBanner(null);
+
+    let packet = CLEAN_SAMPLE_PACKET;
+    if (presetId === 'college_admission') {
+      packet = COLLEGE_ADMISSION_SAMPLE_PACKET;
+    } else if (presetId === 'financial_aid') {
+      packet = FINANCIAL_AID_SAMPLE_PACKET;
+    }
+
+    const res = runVerification(packet, 'clean_sample', preset.fields);
+    setVerificationResult(res);
+    setSelectedFieldId(null);
+  };
+
+  const handleSaveCustomFields = (newFields: CustomFieldDefinition[]) => {
+    setCustomFields(newFields);
+    let packet = CLEAN_SAMPLE_PACKET;
+    if (activePresetId === 'college_admission') packet = COLLEGE_ADMISSION_SAMPLE_PACKET;
+    else if (activePresetId === 'financial_aid') packet = FINANCIAL_AID_SAMPLE_PACKET;
+    else if (activePacketType === 'messy_sample') packet = MESSY_SAMPLE_PACKET;
+
+    const res = runVerification(
+      packet,
+      activePacketType === 'messy_sample' ? 'messy_sample' : 'clean_sample',
+      newFields
+    );
+    setVerificationResult(res);
+    setSelectedFieldId(null);
+  };
+
+  const handleResetCustomFields = () => {
+    const preset = PACKET_PRESETS.find((p) => p.id === activePresetId) || PACKET_PRESETS[0];
+    handleSaveCustomFields(preset.fields);
   };
 
   const handleFileSelect = async (slotId: 'application_form' | 'marksheet' | 'income_certificate', rawFile: File) => {
@@ -331,6 +385,16 @@ export default function HomePage() {
           </div>
         )}
 
+        {/* Packet Presets & Custom Fields */}
+        <section id="presets">
+          <PacketPresetSelector
+            activePresetId={activePresetId}
+            onSelectPreset={handleSelectPreset}
+            onOpenCustomEditor={() => setIsCustomEditorOpen(true)}
+            customFieldCount={customFields.length}
+          />
+        </section>
+
         {/* Step 1: Ingestion Zone in #f5f2ee Tray */}
         <section id="documents">
           <IngestionZone
@@ -420,6 +484,15 @@ export default function HomePage() {
           fileName={inspectDocModal.fileName}
         />
       )}
+
+      {/* Custom Field Editor Modal */}
+      <CustomFieldEditorModal
+        isOpen={isCustomEditorOpen}
+        onClose={() => setIsCustomEditorOpen(false)}
+        fields={customFields}
+        onSave={handleSaveCustomFields}
+        onReset={handleResetCustomFields}
+      />
 
       {/* Footer */}
       <footer className="border-t border-neutral-200/80 dark:border-neutral-800 py-8 text-center text-xs text-neutral-500 dark:text-neutral-400 mt-12">
