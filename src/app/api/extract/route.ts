@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { checkRateLimit, extractDocumentFacts } from '@/lib/gemini/client';
+import * as geminiClient from '@/lib/gemini/client';
 import { verifyFieldDoubleRead } from '@/lib/gemini/doubleRead';
 import { runVerification } from '@/lib/compare/engine';
 import { DocumentExtraction, DocumentType } from '@/lib/compare/types';
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
     // 3. Best-effort in-memory IP rate limiting
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || '127.0.0.1';
-    if (!checkRateLimit(ip)) {
+    if (!geminiClient.checkRateLimit(ip)) {
       return NextResponse.json(
         {
           error: 'rate_limited',
@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
       docsToExtract.map(async ({ docType, docLabel, file }) => {
         const base64Data = await toBase64(file);
         const mimeType = file.type || 'image/jpeg';
-        return extractDocumentFacts({
+        return geminiClient.extractDocumentFacts({
           docType,
           docLabel,
           base64Data,
@@ -128,12 +128,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(verificationResult);
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : 'Unknown error during document verification.';
+    const is503 =
+      errorMsg.includes('503') ||
+      errorMsg.includes('UNAVAILABLE') ||
+      errorMsg.includes('overloaded') ||
+      (err as any)?.status === 503;
+
     return NextResponse.json(
       {
-        error: 'extraction_failed',
-        message: `Live extraction failed: ${errorMsg}. You can test the instant sample packet below.`,
+        error: is503 ? 'service_unavailable' : 'extraction_failed',
+        message: is503
+          ? `Gemini service is temporarily unavailable (503 / high demand) after retries and fallback: ${errorMsg}. Please try again or test the instant sample packet.`
+          : `Live extraction failed: ${errorMsg}. You can test the instant sample packet below.`,
       },
-      { status: 500 }
+      { status: is503 ? 503 : 500 }
     );
   }
 }

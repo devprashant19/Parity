@@ -196,15 +196,16 @@ async function runEvaluation() {
 
       // Test double-read bounding-box crop and verification
       let doubleReadOk = true;
-      if (extractedField.highlight_bbox && extractedField.value) {
+      const bbox = extractedField.highlight_bbox || DEFAULT_BBOXES[item.document_type]?.[fieldId];
+      if (bbox && extractedField.value) {
         doubleReadsAttempted++;
         try {
-          // Verify physical cropping of raster scan
-          await cropImageToBoundingBox(fileBuffer, extractedField.highlight_bbox);
+          // Verify physical cropping of raster scan via Sharp
+          await cropImageToBoundingBox(fileBuffer, bbox);
           if (executionMode === 'LIVE') {
             const dr = await verifyFieldDoubleRead({
               imageBuffer: fileBuffer,
-              field: extractedField,
+              field: { ...extractedField, highlight_bbox: bbox },
               fieldId: fieldId as any,
               apiKey,
               modelName,
@@ -215,6 +216,7 @@ async function runEvaluation() {
             } else {
               doubleReadsDisagreed++;
               doubleReadOk = false;
+              console.log(' '.padEnd(8) + `↳ Double-read DISAGREED on ${fieldId}: full "${extractedField.value}" vs crop "${dr.crop_value}" (${dr.disagreement_reason})`);
             }
           } else {
             // OFFLINE mode: verify crop integrity and baseline deterministic agreement
@@ -295,8 +297,9 @@ async function runEvaluation() {
       presetDocs: CLEAN_SAMPLE_PACKET,
       packetType: 'clean_sample' as const,
       dateFormat: 'Auto' as const,
-      expectedConflicts: 3, // marks (3.92 vs 3.80 GPA), income ($65k vs $48k), issue_date (15 Jul vs 12 Aug)
-      expectedConsistent: 2, // name (Alex Morgan), academic_year (2024-25)
+      differingFields: ['marks', 'income', 'issue_date'],
+      expectedConflicts: 3,
+      expectedConsistent: 2,
       expectedNeedsReview: 0,
     },
     {
@@ -304,55 +307,80 @@ async function runEvaluation() {
       presetDocs: MESSY_SAMPLE_PACKET,
       packetType: 'messy_sample' as const,
       dateFormat: 'Auto' as const,
-      expectedConflicts: 2, // marks (3.85 vs 3.70 GPA), issue_date (15 Jul vs 12 Aug)
-      expectedConsistent: 2, // income (€54k vs €4.5k/mo x12 = €54k), academic_year (2024-25)
-      expectedNeedsReview: 1, // name ("Maria J. Alvarez" vs "Maria Alvarez" middle initial omitted)
+      differingFields: ['marks', 'issue_date', 'name'],
+      expectedConflicts: 2,
+      expectedConsistent: 2,
+      expectedNeedsReview: 1,
     },
     {
       name: 'Regional Scan Packet (DMY Date Setting)',
       scanIds: ['scan_01_clean_form', 'scan_02_clean_marksheet', 'scan_03_clean_income_cert'],
       dateFormat: 'DMY' as const,
-      expectedConflicts: 3, // marks, income, date
-      expectedConsistent: 2, // name, year
+      differingFields: ['marks', 'income', 'issue_date'],
+      expectedConflicts: 3,
+      expectedConsistent: 2,
       expectedNeedsReview: 0,
     },
     {
       name: 'Regional Scan Packet (Auto Date Setting - Ambiguous Numeric Date)',
       scanIds: ['scan_01_clean_form', 'scan_02_clean_marksheet', 'scan_03_clean_income_cert'],
       dateFormat: 'Auto' as const,
-      expectedConflicts: 2, // marks, income
-      expectedConsistent: 2, // name, year
-      expectedNeedsReview: 1, // date: "12/08/2024" is ambiguous numeric date in auto mode
+      differingFields: ['marks', 'income', 'issue_date'],
+      expectedConflicts: 2,
+      expectedConsistent: 2,
+      expectedNeedsReview: 1,
     },
     {
       name: 'Messy Scan Packet (Initials + Monthly, DMY Date Setting)',
       scanIds: ['scan_01_clean_form', 'scan_06_messy_initials_marksheet', 'scan_07_monthly_income_cert'],
       dateFormat: 'DMY' as const,
-      expectedConflicts: 3, // marks, income, date
-      expectedConsistent: 1, // year
-      expectedNeedsReview: 1, // name ("S. Sharma")
+      differingFields: ['name', 'marks', 'income', 'issue_date'],
+      expectedConflicts: 3,
+      expectedConsistent: 1,
+      expectedNeedsReview: 1,
     },
     {
       name: 'Disjoint Name Scan Packet (Conflicting Surname, DMY Date Setting)',
       scanIds: ['scan_10_conflict_name_form', 'scan_02_clean_marksheet', 'scan_03_clean_income_cert'],
       dateFormat: 'DMY' as const,
-      expectedConflicts: 4, // name (Verma vs Sharma), marks, income, date
-      expectedConsistent: 1, // year
+      differingFields: ['name', 'marks', 'income', 'issue_date'],
+      expectedConflicts: 4,
+      expectedConsistent: 1,
       expectedNeedsReview: 0,
     },
     {
       name: 'Double-Read Disagreement Packet (Simulated OCR Crop Mismatch)',
       scanIds: ['scan_01_clean_form', 'scan_02_clean_marksheet', 'scan_03_clean_income_cert'],
       dateFormat: 'DMY' as const,
+      differingFields: ['name', 'marks', 'income', 'issue_date'],
       expectedConflicts: 3,
       expectedConsistent: 1,
       expectedNeedsReview: 1,
       injectDisagreement: true,
     },
+    {
+      name: 'International US Academic & Payroll Scan Set',
+      scanIds: ['scan_01_clean_form', 'scan_11_us_transcript', 'scan_12_us_payslip'],
+      dateFormat: 'Auto' as const,
+      differingFields: ['name', 'marks', 'income', 'issue_date'],
+      expectedConflicts: 4,
+      expectedConsistent: 1,
+      expectedNeedsReview: 0,
+    },
+    {
+      name: 'International Tax Statement & European Revenue Scan Set',
+      scanIds: ['scan_01_clean_form', 'scan_13_tax_statement', 'scan_14_eur_income'],
+      dateFormat: 'Auto' as const,
+      differingFields: ['name', 'income', 'issue_date'],
+      expectedConflicts: 3,
+      expectedConsistent: 1,
+      expectedNeedsReview: 0,
+    },
   ];
 
-  let totalFieldPairsChecked = 0;
+  let totalDifferingGroundTruthPairs = 0;
   let falseConsistentCount = 0;
+  let totalFieldPairsChecked = 0;
 
   for (const pkt of testPackets) {
     let docs: DocumentExtraction[];
@@ -393,13 +421,16 @@ async function runEvaluation() {
 
     totalFieldPairsChecked += result.fields.length;
 
-    // Check false-consistent
+    // Redefined False-Consistent Check:
+    // Of the field pairs whose ground truth differs, how many were labelled Consistent?
     for (const f of result.fields) {
-      if (pkt.name.includes('Disjoint Name') && f.field_id === 'name' && f.status === 'Consistent') {
-        falseConsistentCount++;
-      }
-      if (f.field_id === 'marks' && f.status === 'Consistent') {
-        falseConsistentCount++;
+      const isDifferingGroundTruth = pkt.differingFields.includes(f.field_id);
+      if (isDifferingGroundTruth) {
+        totalDifferingGroundTruthPairs++;
+        if (f.status === 'Consistent') {
+          falseConsistentCount++;
+          console.error(`🚨 False-Consistent detected on packet "${pkt.name}" field "${f.field_id}"!`);
+        }
       }
     }
 
@@ -415,7 +446,9 @@ async function runEvaluation() {
   const quotePassRate =
     quoteContainmentChecks > 0 ? ((quoteContainmentPassed / quoteContainmentChecks) * 100).toFixed(1) : '0.0';
   const falseConsistentRate =
-    totalFieldPairsChecked > 0 ? ((falseConsistentCount / totalFieldPairsChecked) * 100).toFixed(1) : '0.0';
+    totalDifferingGroundTruthPairs > 0
+      ? ((falseConsistentCount / totalDifferingGroundTruthPairs) * 100).toFixed(1)
+      : '0.0';
   const doubleReadRate =
     doubleReadsAttempted > 0 ? ((doubleReadsAgreed / doubleReadsAttempted) * 100).toFixed(1) : '100.0';
 
@@ -432,8 +465,8 @@ async function runEvaluation() {
   console.log(`Double-Read Verification Checks:      ${doubleReadsAttempted} physical crop passes`);
   console.log(`Double-Read Agreement Rate:           ${doubleReadRate}% (${doubleReadsAgreed}/${doubleReadsAttempted})`);
   console.log(`Double-Read Disagreements Detected:   ${doubleReadsDisagreed}`);
-  console.log(`Total Cross-Document Field Pairs:     ${totalFieldPairsChecked}`);
-  console.log(`CRITICAL METRIC - False-Consistent:   ${falseConsistentCount} of ${totalFieldPairsChecked} pairs in this test set (${falseConsistentRate}%)`);
+  console.log(`Total Distinct Scan Sets Evaluated:   ${testPackets.length} scan sets (${totalFieldPairsChecked} total pairs)`);
+  console.log(`CRITICAL METRIC - False-Consistent:   ${falseConsistentCount} of ${totalDifferingGroundTruthPairs} differing ground-truth pairs across ${testPackets.length} distinct scan sets (${falseConsistentRate}%)`);
   if (executionMode === 'LIVE' && Object.keys(freshExtractions).length === groundTruth.length) {
     fs.writeFileSync(path.join(scansDir, 'live-extractions.json'), JSON.stringify(freshExtractions, null, 2));
     console.log(`\n💾 Saved all ${groundTruth.length} fresh live extractions to tests/fixtures/scans/live-extractions.json`);
@@ -494,8 +527,9 @@ const DEFAULT_BBOXES: Record<string, Record<string, BoundingBox>> = {
   },
   income_certificate: {
     name: { x: 0.067, y: 0.346, width: 0.867, height: 0.077 },
-    income: { x: 0.067, y: 0.438, width: 0.867, height: 0.077 },
-    issue_date: { x: 0.067, y: 0.531, width: 0.867, height: 0.077 },
+    academic_year: { x: 0.067, y: 0.438, width: 0.867, height: 0.077 },
+    income: { x: 0.067, y: 0.531, width: 0.867, height: 0.077 },
+    issue_date: { x: 0.067, y: 0.623, width: 0.867, height: 0.077 },
   },
 };
 

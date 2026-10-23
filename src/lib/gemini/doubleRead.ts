@@ -185,29 +185,45 @@ Return valid JSON in this exact structure:
   "quote": "..." // short excerpt or null
 }`;
 
-    const response = await ai.models.generateContent({
-      model: effectiveModel,
-      contents: [
-        {
-          role: 'user',
-          parts: [
-            { text: prompt },
+    let text = '';
+    let attempts = 0;
+    while (attempts < 3) {
+      attempts++;
+      try {
+        const response = await ai.models.generateContent({
+          model: effectiveModel,
+          contents: [
             {
-              inlineData: {
-                data: cropBase64,
-                mimeType: 'image/png',
-              },
+              role: 'user',
+              parts: [
+                { text: prompt },
+                {
+                  inlineData: {
+                    data: cropBase64,
+                    mimeType: 'image/png',
+                  },
+                },
+              ],
             },
           ],
-        },
-      ],
-      config: {
-        responseMimeType: 'application/json',
-        temperature: 0.0,
-      },
-    });
+          config: {
+            responseMimeType: 'application/json',
+            temperature: 0.0,
+          },
+        });
+        text = response.text || '';
+        break;
+      } catch (genErr: any) {
+        const errMsg = String(genErr?.message || genErr);
+        const isTransient = genErr?.status === 503 || genErr?.status === 429 || errMsg.includes('503') || errMsg.includes('429') || errMsg.includes('overloaded');
+        if (isTransient && attempts < 3) {
+          await new Promise((r) => setTimeout(r, 1500 * attempts));
+        } else {
+          throw genErr;
+        }
+      }
+    }
 
-    const text = response.text || '';
     const parsed = JSON.parse(text);
     const cropValue = parsed?.value ?? null;
     const cropQuote = parsed?.quote ?? null;

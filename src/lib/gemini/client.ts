@@ -28,11 +28,42 @@ export interface ExtractDocumentParams {
   docLabel: string;
   base64Data: string;
   mimeType: string;
+  maxRetries?: number;
+  initialDelayMs?: number;
+  primaryModel?: string;
+  fallbackModel?: string;
+}
+
+export function isRetryableError(err: unknown): boolean {
+  if (!err) return false;
+  const msg = String((err as any)?.message || err).toLowerCase();
+  const status = (err as any)?.status || (err as any)?.statusCode;
+  return (
+    status === 503 ||
+    status === 429 ||
+    status === 500 ||
+    status === 502 ||
+    status === 504 ||
+    msg.includes('503') ||
+    msg.includes('429') ||
+    msg.includes('unavailable') ||
+    msg.includes('overloaded') ||
+    msg.includes('high demand') ||
+    msg.includes('resource_exhausted') ||
+    msg.includes('rate limit') ||
+    msg.includes('quota') ||
+    msg.includes('timed out') ||
+    msg.includes('timeout') ||
+    msg.includes('econnreset') ||
+    msg.includes('fetch failed')
+  );
 }
 
 /**
  * Extracts 5 fields from an uploaded document using Gemini Multimodal Vision API.
- * Uses @google/genai with structured JSON response schema and strict 20s timeout.
+ * Uses @google/genai with structured JSON response schema and strict 35s timeout.
+ * Includes automatic retry with exponential backoff and seamless model fallback (e.g. gemini-3.1-flash-lite -> gemini-2.5-flash)
+ * for 503 / high-demand transient errors.
  * Zero-PII logging compliance: never logs student data or base64 buffers.
  */
 export async function extractDocumentFacts({
@@ -40,47 +71,85 @@ export async function extractDocumentFacts({
   docLabel,
   base64Data,
   mimeType,
+  maxRetries = 2,
+  initialDelayMs = 600,
+  primaryModel,
+  fallbackModel,
 }: ExtractDocumentParams): Promise<DocumentExtraction> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error('GEMINI_API_KEY environment variable is not configured.');
   }
 
-  const model = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
+  const modelPrimary = primaryModel || process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
+  const modelFallback = fallbackModel || process.env.GEMINI_FALLBACK_MODEL || 'gemini-2.5-flash';
   const ai = new GoogleGenAI({ apiKey });
 
   const promptText = `${EXTRACTION_SYSTEM_PROMPT}\n\nTarget document type: "${docType}" (${docLabel}). Return structured JSON matching the DocumentExtraction schema.`;
 
-  // Timeout wrapper: 35 seconds for network headroom
-  const timeoutPromise = new Promise<never>((_, reject) => {
-    setTimeout(() => reject(new Error('Gemini API call timed out after 35 seconds.')), 35000);
-  });
+  const modelsToTry = [modelPrimary];
+  if (modelFallback && modelFallback !== modelPrimary) {
+    modelsToTry.push(modelFallback);
+  }
 
-  const apiCall = ai.models.generateContent({
-    model,
-    contents: [
-      {
-        role: 'user',
-        parts: [
-          { text: promptText },
-          {
-            inlineData: {
-              mimeType,
-              data: base64Data,
+  let textResponse: string | null = null;
+  let lastError: unknown;
+
+  for (let m = 0; m < modelsToTry.length; m++) {
+    const currentModel = modelsToTry[m];
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error('Gemini API call timed out after 35 seconds.')), 35000);
+        });
+
+        const apiCall = ai.models.generateContent({
+          model: currentModel,
+          contents: [
+            {
+              role: 'user',
+              parts: [
+                { text: promptText },
+                {
+                  inlineData: {
+                    mimeType,
+                    data: base64Data,
+                  },
+                },
+              ],
             },
+          ],
+          config: {
+            responseMimeType: 'application/json',
           },
-        ],
-      },
-    ],
-    config: {
-      responseMimeType: 'application/json',
-    },
-  });
+        });
 
-  const response = await Promise.race([apiCall, timeoutPromise]);
-  const textResponse = response.text;
+        const response = await Promise.race([apiCall, timeoutPromise]);
+        textResponse = response.text || null;
+        if (textResponse) {
+          break; // Succeeded!
+        }
+      } catch (err: unknown) {
+        lastError = err;
+        const retryable = isRetryableError(err);
+        if (!retryable || attempt === maxRetries) {
+          // If not retryable or final retry for this model, break to attempt fallback model
+          break;
+        }
+        const delay = initialDelayMs * Math.pow(2, attempt);
+        await new Promise((r) => setTimeout(r, delay));
+      }
+    }
+
+    if (textResponse) {
+      break;
+    }
+  }
 
   if (!textResponse) {
+    if (lastError) {
+      throw lastError;
+    }
     throw new Error('Empty response received from Gemini.');
   }
 

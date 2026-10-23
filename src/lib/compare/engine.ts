@@ -292,8 +292,8 @@ export function runVerification(
   const formIncome = getField(form, 'income');
   const certIncome = getField(incomeCert, 'income');
 
-  const normIncomeForm = normalizeIncome(formIncome?.value || null);
-  const normIncomeCert = normalizeIncome(certIncome?.value || null);
+  const normIncomeForm = normalizeIncome(formIncome?.value || null, formIncome?.quote);
+  const normIncomeCert = normalizeIncome(certIncome?.value || null, certIncome?.quote);
 
   const formatIncomeDisplay = (inc: typeof normIncomeForm) => {
     if (inc.value === null) return null;
