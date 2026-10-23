@@ -31,7 +31,12 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   icons: {
-    icon: '/favicon.svg',
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico' },
+    ],
+    apple: '/apple-touch-icon.png',
+    shortcut: '/favicon.svg',
   },
   openGraph: {
     title: 'Parity — Evidence-First Application Packet Verification',

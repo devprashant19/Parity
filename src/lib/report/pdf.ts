@@ -28,18 +28,31 @@ export function generatePdfReport(
   doc.setFillColor(239, 77, 35); // #ef4d23 parity orange
   doc.rect(0, 28, pageWidth, 2, 'F');
 
+  // Brand Logo: 8 circles around center in #ef4d23
+  const logoX = margin + 3.5;
+  const logoY = 13;
+  const petalAngles = [0, 45, 90, 135, 180, 225, 270, 315];
+  const rCircle = 0.9;
+  const radius = 2.6;
+  doc.setFillColor(239, 77, 35); // #ef4d23
+  doc.circle(logoX, logoY, rCircle, 'F');
+  for (const deg of petalAngles) {
+    const rad = (deg * Math.PI) / 180;
+    doc.circle(logoX + radius * Math.cos(rad), logoY + radius * Math.sin(rad), rCircle, 'F');
+  }
+
   // Title
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(16);
-  doc.text('PARITY — VERIFICATION AUDIT REPORT', margin, 14);
+  doc.setFontSize(15);
+  doc.text('PARITY — VERIFICATION AUDIT REPORT', margin + 10, 14);
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
   doc.setTextColor(200, 205, 215);
   doc.text(
     `Deterministic Pre-Submission Document Verification • Generated: ${new Date().toLocaleString()}`,
-    margin,
+    margin + 10,
     21
   );
 

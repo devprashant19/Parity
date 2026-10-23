@@ -12,6 +12,7 @@ import { DocumentModal } from '@/components/DocumentModal';
 import { PacketPresetSelector } from '@/components/PacketPresetSelector';
 import { CustomFieldEditorModal } from '@/components/CustomFieldEditorModal';
 import { IssuingOfficeModal } from '@/components/IssuingOfficeModal';
+import { ParityLogo } from '@/components/ParityLogo';
 import {
   CLEAN_SAMPLE_META,
   MESSY_SAMPLE_META,
@@ -295,7 +296,7 @@ export default function HomePage() {
         <section className="flex flex-col items-center text-center pt-4 sm:pt-6 pb-2">
           {/* Badge Pill */}
           <div className="inline-flex items-center gap-2 bg-white dark:bg-[#121620] rounded-full px-4 py-1.5 shadow-xs text-[13px] font-medium text-neutral-800 dark:text-neutral-200 border border-neutral-200/70 dark:border-neutral-800">
-            <span className="w-2 h-2 rounded-full bg-[#ef4d23] inline-block" />
+            <ParityLogo className="w-3.5 h-3.5 shrink-0" />
             <span>Parity Deterministic Verification</span>
           </div>
 
@@ -525,8 +526,9 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="border-t border-neutral-200/80 dark:border-neutral-800 py-8 text-center text-xs text-neutral-500 dark:text-neutral-400 mt-12">
         <div className="max-w-4xl mx-auto px-4 space-y-4">
-          <div className="font-medium text-neutral-700 dark:text-neutral-300">
-            Parity Proof-of-Concept • Deterministic Verification Engine
+          <div className="font-medium text-neutral-700 dark:text-neutral-300 flex items-center justify-center gap-2">
+            <ParityLogo className="w-4 h-4 shrink-0" />
+            <span>Parity Proof-of-Concept • Deterministic Verification Engine</span>
           </div>
 
           <div className="text-left bg-[#f5f2ee] dark:bg-[#151a24] border border-neutral-200/70 dark:border-neutral-800 rounded-2xl p-5 space-y-2.5 text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed shadow-2xs">
