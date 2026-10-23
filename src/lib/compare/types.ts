@@ -40,6 +40,7 @@ export interface DocumentComparisonEntry {
   page: number;
   confidence: number;
   source: 'extracted' | 'manual';
+  preview_url?: string;
   highlight_bbox?: {
     x: number;
     y: number;
