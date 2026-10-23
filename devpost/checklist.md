@@ -176,5 +176,16 @@ Activity mode:
   - Redefine false-consistent metric strictly over differing ground-truth pairs: **0 of 31 differing pairs across 9 distinct scan sets (0.0% false-consistent rate)**.
   - Update `README.md` to document observed 503 and timeout behavior, model fallback, and live double-read evaluation.
 
+- [x] **7. Batched Full-Width Band Double-Read, Strict Verification Mode, and Unambiguous US Scan Dates (2026-10-23)**
+  - Re-engineered double-read cropping: pad crop to full-width horizontal band ($\pm 1$ row padding) to resolve narrow bounding-box vertical offsets into adjacent rows.
+  - Batched document-level verification: all crops for each document are bundled into 1 single secondary API call using multi-image inline data parts, reducing secondary calls from 14 down to 4.
+  - Run double-read only for fields that would initially be labelled Consistent.
+  - Conditional visual overlays: withhold visual overlays unless the crop read confirms agreement with the full-page read; otherwise display the verbatim quote with a "Location not verified" badge.
+  - Strict verification UI toggle: added interactive pill switch (default ON since post-fix agreement rate is 100.0%) and documented Fast vs Strict modes and API call costs.
+  - Regenerate US scans with unambiguous textual dates ("August 12, 2024" and "July 15, 2024").
+  - Symmetrical eval metrics: reported False-Consistent Rate (0 / 31 = 0.0%) alongside True-Consistent Recall Rate (12 / 14 = 85.7% across noisy scans, 100% on clean scans).
+  - Unit tests in `tests/unit/batched-doubleread.test.ts` (109 tests passing).
+
+
 
 

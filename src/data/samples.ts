@@ -86,6 +86,7 @@ export const CLEAN_SAMPLE_PACKET: DocumentExtraction[] = [
         page: 1,
         confidence: 0.98,
         highlight_bbox: { x: 0.067, y: 0.346, width: 0.867, height: 0.077 },
+        double_read: { agreed: true, crop_value: 'Alex Morgan' },
       },
       {
         field_id: 'academic_year',
@@ -94,6 +95,7 @@ export const CLEAN_SAMPLE_PACKET: DocumentExtraction[] = [
         page: 1,
         confidence: 0.98,
         highlight_bbox: { x: 0.067, y: 0.438, width: 0.867, height: 0.077 },
+        double_read: { agreed: true, crop_value: '2024-25' },
       },
       {
         field_id: 'marks',
@@ -102,6 +104,7 @@ export const CLEAN_SAMPLE_PACKET: DocumentExtraction[] = [
         page: 1,
         confidence: 0.98,
         highlight_bbox: { x: 0.067, y: 0.531, width: 0.867, height: 0.077 },
+        double_read: { agreed: true, crop_value: '3.80 GPA' },
       },
       {
         field_id: 'income',
@@ -110,6 +113,7 @@ export const CLEAN_SAMPLE_PACKET: DocumentExtraction[] = [
         page: 1,
         confidence: 0.98,
         highlight_bbox: { x: 0.067, y: 0.623, width: 0.867, height: 0.077 },
+        double_read: { agreed: true, crop_value: '$65,000' },
       },
       {
         field_id: 'issue_date',
@@ -118,6 +122,7 @@ export const CLEAN_SAMPLE_PACKET: DocumentExtraction[] = [
         page: 1,
         confidence: 0.98,
         highlight_bbox: { x: 0.067, y: 0.715, width: 0.867, height: 0.077 },
+        double_read: { agreed: true, crop_value: '12 Aug 2024' },
       },
     ],
   },
@@ -132,6 +137,7 @@ export const CLEAN_SAMPLE_PACKET: DocumentExtraction[] = [
         page: 1,
         confidence: 0.98,
         highlight_bbox: { x: 0.067, y: 0.346, width: 0.867, height: 0.077 },
+        double_read: { agreed: true, crop_value: 'Alex Morgan' },
       },
       {
         field_id: 'academic_year',
@@ -140,6 +146,7 @@ export const CLEAN_SAMPLE_PACKET: DocumentExtraction[] = [
         page: 1,
         confidence: 0.98,
         highlight_bbox: { x: 0.067, y: 0.438, width: 0.867, height: 0.077 },
+        double_read: { agreed: true, crop_value: '2024-2025' },
       },
       {
         field_id: 'marks',
@@ -148,6 +155,7 @@ export const CLEAN_SAMPLE_PACKET: DocumentExtraction[] = [
         page: 1,
         confidence: 0.98,
         highlight_bbox: { x: 0.067, y: 0.531, width: 0.867, height: 0.077 },
+        double_read: { agreed: true, crop_value: '3.50 GPA' },
       },
     ],
   },
@@ -162,6 +170,7 @@ export const CLEAN_SAMPLE_PACKET: DocumentExtraction[] = [
         page: 1,
         confidence: 0.98,
         highlight_bbox: { x: 0.067, y: 0.346, width: 0.867, height: 0.077 },
+        double_read: { agreed: true, crop_value: 'Alex Morgan' },
       },
       {
         field_id: 'income',
@@ -170,6 +179,7 @@ export const CLEAN_SAMPLE_PACKET: DocumentExtraction[] = [
         page: 1,
         confidence: 0.98,
         highlight_bbox: { x: 0.067, y: 0.438, width: 0.867, height: 0.077 },
+        double_read: { agreed: true, crop_value: '$48,000' },
       },
       {
         field_id: 'issue_date',
@@ -178,6 +188,7 @@ export const CLEAN_SAMPLE_PACKET: DocumentExtraction[] = [
         page: 1,
         confidence: 0.98,
         highlight_bbox: { x: 0.067, y: 0.531, width: 0.867, height: 0.077 },
+        double_read: { agreed: true, crop_value: '18 Aug 2024' },
       },
     ],
   },

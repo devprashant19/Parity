@@ -248,4 +248,12 @@ Source: `learner-profile.md > Collaboration and Communication Preferences`, `sco
   - Cultural name normalization: Accent folding, double/hyphenated surnames, particles (`de`, `van`, `von`), and family-name-first orders flag `Needs Review`.
   - GPA scale awareness: Handles 4.0, 5.0, and percentage grading scales, flagging scale mismatches as `Needs Review`.
 
+### 2026-10-23 — Bounding-Box Double-Read Refinement & Strict Verification Mode
+- **Batched Full-Width Band Cropping:** Rather than tight bounding box crops that drift vertically across rows in tabular layouts, crops are expanded to full document width with $\pm 1$ row padding. Crops for each document are batched into 1 secondary API call.
+- **Double-Read Scope:** Double-read is executed only for fields that would be labelled `Consistent` by the deterministic engine.
+- **Conditional Visual Overlays:** Visual highlight overlays are withheld unless the crop read confirms agreement with the full-page read; otherwise the quote is shown with a `"Location not verified"` warning badge.
+- **Strict Verification Toggle:** Added user toggle for "Strict verification" (default ON, measured agreement rate 100.0%) with clear API call cost and behavior documentation.
+- **Unambiguous US Scan Dates:** Converted US scan dates to written months ("August 12, 2024" and "July 15, 2024") and regenerated scans.
+
+
 

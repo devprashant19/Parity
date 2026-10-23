@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as geminiClient from '@/lib/gemini/client';
-import { verifyFieldDoubleRead } from '@/lib/gemini/doubleRead';
+import { runDoubleReadForConsistentFields } from '@/lib/gemini/doubleRead';
 import { runVerification } from '@/lib/compare/engine';
 import { DocumentExtraction, DocumentType } from '@/lib/compare/types';
 
@@ -87,6 +87,10 @@ export async function POST(req: NextRequest) {
       { docType: 'income_certificate', docLabel: 'Income Certificate', file: incomeCertFile },
     ];
 
+    // 5. Check strict verification toggle (default true or from form data)
+    const strictVerificationParam = formData.get('strict_verification');
+    const isStrict = strictVerificationParam !== null ? strictVerificationParam !== 'false' : true;
+
     // 6. Parallel Gemini Extraction with zero PII logging
     const extractions: DocumentExtraction[] = await Promise.all(
       docsToExtract.map(async ({ docType, docLabel, file }) => {
@@ -101,29 +105,24 @@ export async function POST(req: NextRequest) {
       })
     );
 
-    // 7. Double-read secondary verification (crop & re-extract isolated value)
-    if (process.env.DOUBLE_READ_ENABLED !== 'false') {
-      await Promise.all(
-        extractions.map(async (doc, idx) => {
-          const file = docsToExtract[idx].file;
-          const imageBuffer = Buffer.from(await file.arrayBuffer());
-          await Promise.all(
-            doc.fields.map(async (field) => {
-              if (field.highlight_bbox && field.value) {
-                field.double_read = await verifyFieldDoubleRead({
-                  imageBuffer,
-                  field,
-                  fieldId: field.field_id,
-                });
-              }
-            })
-          );
-        })
-      );
+    // 7. Double-read secondary verification (batched full-width band per document for consistent fields only)
+    if (isStrict && process.env.DOUBLE_READ_ENABLED !== 'false') {
+      const documentBuffers = new Map<string, Buffer>();
+      for (const d of docsToExtract) {
+        const buf = Buffer.from(await d.file.arrayBuffer());
+        documentBuffers.set(d.docLabel, buf);
+        documentBuffers.set(d.docType, buf);
+      }
+
+      await runDoubleReadForConsistentFields({
+        extractions,
+        documentBuffers,
+      });
     }
 
     // 8. Deterministic comparison engine execution
     const verificationResult = runVerification(extractions, 'live');
+    verificationResult.strict_verification = isStrict;
 
     return NextResponse.json(verificationResult);
   } catch (err: unknown) {

@@ -41,6 +41,7 @@ export default function HomePage() {
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
   const [apiErrorBanner, setApiErrorBanner] = useState<string | null>(null);
   const [inspectDocModal, setInspectDocModal] = useState<{ title: string; previewUrl?: string; fileName?: string } | null>(null);
+  const [isStrictVerification, setIsStrictVerification] = useState(true);
 
   const [uploadedDocs, setUploadedDocs] = useState<
     Record<
@@ -139,6 +140,7 @@ export default function HomePage() {
         if (uploadedDocs.income_certificate?.rawFile) {
           formData.append('income_certificate', uploadedDocs.income_certificate.rawFile);
         }
+        formData.append('strict_verification', isStrictVerification ? 'true' : 'false');
 
         const res = await fetch('/api/extract', {
           method: 'POST',
@@ -432,6 +434,8 @@ export default function HomePage() {
             uploadedDocs={uploadedDocs}
             isAnalyzing={isAnalyzing}
             hasRun={verificationResult !== null}
+            strictVerification={isStrictVerification}
+            onToggleStrictVerification={setIsStrictVerification}
           />
         </section>
 

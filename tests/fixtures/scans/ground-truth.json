@@ -164,7 +164,7 @@
       "academic_year": null,
       "marks": null,
       "income": { "value": "$2,500 every two weeks", "quote": "Net Pay: $2,500 every two weeks" },
-      "issue_date": { "value": "12/08/2024", "quote": "Pay Date: 12/08/2024" }
+      "issue_date": { "value": "August 12, 2024", "quote": "Pay Date: August 12, 2024" }
     }
   },
   {
@@ -178,7 +178,7 @@
       "academic_year": { "value": "2024-25", "quote": "Session: 2024-25" },
       "marks": null,
       "income": { "value": "$65,000 per year", "quote": "Total Compensation: $65,000 per year" },
-      "issue_date": { "value": "15/07/2024", "quote": "Date Filed: 15/07/2024" }
+      "issue_date": { "value": "July 15, 2024", "quote": "Date Filed: July 15, 2024" }
     }
   },
   {

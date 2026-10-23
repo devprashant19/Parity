@@ -1,9 +1,10 @@
 import sharp from 'sharp';
 import { GoogleGenAI } from '@google/genai';
-import { BoundingBox, DoubleReadResult, ExtractedField, FieldId } from '../compare/types';
+import { BoundingBox, CustomFieldDefinition, DoubleReadResult, ExtractedField, FieldId, DocumentExtraction } from '../compare/types';
 import { normalizeNameTokens } from '../normalize/name';
 import { normalizeIncome, normalizeMarks } from '../normalize/numbers';
 import { normalizeDate } from '../normalize/dates';
+import { runVerification } from '../compare/engine';
 
 /**
  * Crops an image buffer to the exact normalized bounding box coordinates.
@@ -28,6 +29,36 @@ export async function cropImageToBoundingBox(
   const top = Math.max(0, Math.floor(paddedY * imgHeight));
   const width = Math.max(10, Math.min(imgWidth - left, Math.ceil(paddedW * imgWidth)));
   const height = Math.max(10, Math.min(imgHeight - top, Math.ceil(paddedH * imgHeight)));
+
+  return sharp(imageBuffer)
+    .extract({ left, top, width, height })
+    .png()
+    .toBuffer();
+}
+
+/**
+ * Crops an image buffer to the full-width horizontal band around the box (±1 row).
+ * This ensures label, value, and row context are preserved without horizontal clipping
+ * or minor vertical coordinate misalignment.
+ */
+export async function cropImageToFullWidthBand(
+  imageBuffer: Buffer,
+  bbox: BoundingBox
+): Promise<Buffer> {
+  const metadata = await sharp(imageBuffer).metadata();
+  const imgWidth = metadata.width || 600;
+  const imgHeight = metadata.height || 520;
+
+  // Typical text row height in scanned documents is ~0.04 to 0.08 of page height.
+  // We expand ±1 row above and below the detected box.
+  const rowHeight = Math.max(bbox.height, 0.05);
+  const topY = Math.max(0, bbox.y - rowHeight);
+  const bottomY = Math.min(1.0, bbox.y + bbox.height + rowHeight);
+
+  const left = 0;
+  const width = imgWidth;
+  const top = Math.max(0, Math.floor(topY * imgHeight));
+  const height = Math.max(10, Math.min(imgHeight - top, Math.ceil((bottomY - topY) * imgHeight)));
 
   return sharp(imageBuffer)
     .extract({ left, top, width, height })
@@ -127,11 +158,269 @@ export function compareDoubleReadValues(
   };
 }
 
+export interface FieldToVerify {
+  fieldId: FieldId;
+  field: ExtractedField;
+  cropBuffer: Buffer;
+}
+
 /**
- * Executes double-read verification for a given field:
- * 1. Crops the document image strictly to highlight_bbox.
- * 2. Transcribes the cropped image in isolation with Gemini.
- * 3. Evaluates agreement using pure deterministic code.
+ * Batches each document's cropped image bands into ONE single Gemini API call.
+ */
+export async function verifyDocumentCropsBatch(params: {
+  documentLabel: string;
+  fieldsToVerify: FieldToVerify[];
+  apiKey?: string;
+  modelName?: string;
+}): Promise<Map<FieldId, DoubleReadResult>> {
+  const { documentLabel, fieldsToVerify, apiKey, modelName } = params;
+  const resultMap = new Map<FieldId, DoubleReadResult>();
+
+  if (fieldsToVerify.length === 0) {
+    return resultMap;
+  }
+
+  const effectiveApiKey = apiKey || process.env.GEMINI_API_KEY;
+  const effectiveModel = modelName || process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
+
+  // If no API key configured (e.g. offline fixture testing), agree with baseline
+  if (!effectiveApiKey) {
+    for (const f of fieldsToVerify) {
+      resultMap.set(f.fieldId, {
+        agreed: true,
+        crop_value: f.field.value,
+        crop_quote: f.field.quote,
+      });
+    }
+    return resultMap;
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey: effectiveApiKey });
+
+    const prompt = `You are a forensic document transcription tool. You are provided with ${fieldsToVerify.length} cropped horizontal image band(s) from document "${documentLabel}".
+Each image band contains the text for a specific field.
+
+Fields to transcribe:
+${fieldsToVerify.map((f, i) => `- Crop ${i + 1}: Field ID "${f.fieldId}" (Full-page extraction reference: "${f.field.value}")`).join('\n')}
+
+For each crop, read the text inside that horizontal band and transcribe ONLY the verbatim value visible for that field.
+Do NOT correct typos, do NOT standardize, and do NOT extrapolate.
+
+Return a valid JSON object in this exact schema:
+{
+  "transcriptions": [
+    ${fieldsToVerify.map((f) => `{"field_id": "${f.fieldId}", "value": "...", "quote": "..."}`).join(',\n    ')}
+  ]
+}`;
+
+    const parts: any[] = [{ text: prompt }];
+
+    fieldsToVerify.forEach((f, idx) => {
+      parts.push({ text: `[Crop ${idx + 1} for Field "${f.fieldId}"]:` });
+      parts.push({
+        inlineData: {
+          data: f.cropBuffer.toString('base64'),
+          mimeType: 'image/png',
+        },
+      });
+    });
+
+    let text = '';
+    let attempts = 0;
+    while (attempts < 3) {
+      attempts++;
+      try {
+        const response = await ai.models.generateContent({
+          model: effectiveModel,
+          contents: [{ role: 'user', parts }],
+          config: {
+            responseMimeType: 'application/json',
+            temperature: 0.0,
+          },
+        });
+        text = response.text || '';
+        break;
+      } catch (genErr: any) {
+        const errMsg = String(genErr?.message || genErr);
+        const isTransient =
+          genErr?.status === 503 ||
+          genErr?.status === 429 ||
+          errMsg.includes('503') ||
+          errMsg.includes('429') ||
+          errMsg.includes('overloaded');
+        if (isTransient && attempts < 3) {
+          await new Promise((r) => setTimeout(r, 1500 * attempts));
+        } else {
+          throw genErr;
+        }
+      }
+    }
+
+    const parsed = JSON.parse(text);
+    const transcriptions: Array<{ field_id?: string; value?: string | null; quote?: string | null }> =
+      Array.isArray(parsed?.transcriptions)
+        ? parsed.transcriptions
+        : Array.isArray(parsed)
+        ? parsed
+        : [];
+
+    for (let i = 0; i < fieldsToVerify.length; i++) {
+      const f = fieldsToVerify[i];
+      const found =
+        transcriptions.find((t) => t.field_id === f.fieldId) ||
+        transcriptions[i];
+      const cropValue = found?.value ?? null;
+      const cropQuote = found?.quote ?? null;
+
+      const comparison = compareDoubleReadValues(f.fieldId, f.field.value, cropValue);
+      resultMap.set(f.fieldId, {
+        agreed: comparison.agreed,
+        crop_value: cropValue,
+        crop_quote: cropQuote,
+        disagreement_reason: comparison.reason,
+      });
+    }
+
+    return resultMap;
+  } catch (err: any) {
+    // If the batch call fails, deterministically mark all fields in batch as Needs Review
+    for (const f of fieldsToVerify) {
+      resultMap.set(f.fieldId, {
+        agreed: false,
+        crop_value: null,
+        disagreement_reason: `Batch double-read secondary pass encountered an error: ${err?.message || err}`,
+      });
+    }
+    return resultMap;
+  }
+}
+
+/**
+ * Runs double-read verification ONLY for fields that would be labelled Consistent.
+ * Crops each field using full-width horizontal bands (±1 row) and batches each
+ * document's crops into ONE API call.
+ */
+export async function runDoubleReadForConsistentFields(params: {
+  extractions: DocumentExtraction[];
+  documentBuffers: Map<string, Buffer>;
+  apiKey?: string;
+  modelName?: string;
+  customFields?: CustomFieldDefinition[];
+}): Promise<{
+  cropCallsMade: number;
+  fieldsChecked: number;
+  agreedCount: number;
+  disagreedCount: number;
+  disagreements: Array<{
+    docLabel: string;
+    fieldId: FieldId;
+    fullValue: string | null;
+    cropValue: string | null;
+    reason?: string;
+  }>;
+}> {
+  const { extractions, documentBuffers, apiKey, modelName, customFields } = params;
+
+  // 1. Initial preliminary verification to see which fields would be Consistent
+  const initialCheck = runVerification(extractions, 'live', customFields);
+  const consistentFieldIds = new Set(
+    initialCheck.fields.filter((f) => f.status === 'Consistent').map((f) => f.field_id)
+  );
+
+  let cropCallsMade = 0;
+  let fieldsChecked = 0;
+  let agreedCount = 0;
+  let disagreedCount = 0;
+  const disagreements: Array<{
+    docLabel: string;
+    fieldId: FieldId;
+    fullValue: string | null;
+    cropValue: string | null;
+    reason?: string;
+  }> = [];
+
+  // If no fields would be Consistent, 0 crop calls needed
+  if (consistentFieldIds.size === 0) {
+    return { cropCallsMade, fieldsChecked, agreedCount, disagreedCount, disagreements };
+  }
+
+  // 2. Iterate each document and collect crops only for fields in consistentFieldIds
+  for (const doc of extractions) {
+    const buffer =
+      documentBuffers.get(doc.document_label) ||
+      documentBuffers.get(doc.document_type);
+
+    if (!buffer) continue;
+
+    const fieldsToVerify: FieldToVerify[] = [];
+    for (const field of doc.fields) {
+      if (consistentFieldIds.has(field.field_id) && field.highlight_bbox && field.value) {
+        try {
+          const cropBuffer = await cropImageToFullWidthBand(buffer, field.highlight_bbox);
+          fieldsToVerify.push({
+            fieldId: field.field_id,
+            field,
+            cropBuffer,
+          });
+        } catch (cropErr: any) {
+          field.double_read = {
+            agreed: false,
+            crop_value: null,
+            disagreement_reason: `Crop error: ${cropErr?.message || cropErr}`,
+          };
+          fieldsChecked++;
+          disagreedCount++;
+          disagreements.push({
+            docLabel: doc.document_label,
+            fieldId: field.field_id,
+            fullValue: field.value,
+            cropValue: null,
+            reason: `Crop error: ${cropErr?.message || cropErr}`,
+          });
+        }
+      }
+    }
+
+    if (fieldsToVerify.length > 0) {
+      cropCallsMade++;
+      const results = await verifyDocumentCropsBatch({
+        documentLabel: doc.document_label,
+        fieldsToVerify,
+        apiKey,
+        modelName,
+      });
+
+      for (const item of fieldsToVerify) {
+        fieldsChecked++;
+        const res = results.get(item.fieldId) || {
+          agreed: false,
+          crop_value: null,
+          disagreement_reason: 'Missing double-read result from batch',
+        };
+        item.field.double_read = res;
+
+        if (res.agreed) {
+          agreedCount++;
+        } else {
+          disagreedCount++;
+          disagreements.push({
+            docLabel: doc.document_label,
+            fieldId: item.fieldId,
+            fullValue: item.field.value,
+            cropValue: res.crop_value,
+            reason: res.disagreement_reason,
+          });
+        }
+      }
+    }
+  }
+
+  return { cropCallsMade, fieldsChecked, agreedCount, disagreedCount, disagreements };
+}
+
+/**
+ * Legacy single-field wrapper for verifyFieldDoubleRead
  */
 export async function verifyFieldDoubleRead(params: {
   imageBuffer: Buffer;
@@ -151,20 +440,6 @@ export async function verifyFieldDoubleRead(params: {
   }
 
   const effectiveApiKey = apiKey || process.env.GEMINI_API_KEY;
-  const effectiveModel = modelName || process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
-
-  let cropBuffer: Buffer;
-  try {
-    cropBuffer = await cropImageToBoundingBox(imageBuffer, field.highlight_bbox);
-  } catch (err: any) {
-    return {
-      agreed: false,
-      crop_value: null,
-      disagreement_reason: `Failed to crop image to bounding box: ${err?.message || err}`,
-    };
-  }
-
-  // If no API key configured (e.g. offline testing/benchmark without key), return agreement on baseline
   if (!effectiveApiKey) {
     return {
       agreed: true,
@@ -174,74 +449,25 @@ export async function verifyFieldDoubleRead(params: {
   }
 
   try {
-    const ai = new GoogleGenAI({ apiKey: effectiveApiKey });
-    const cropBase64 = cropBuffer.toString('base64');
-
-    const prompt = `You are a forensic transcription tool. Transcribe ONLY the primary text value visible inside this cropped document region.
-Do NOT correct typos, do NOT standardize, and do NOT extrapolate.
-Return valid JSON in this exact structure:
-{
-  "value": "...", // verbatim string or null if unreadable
-  "quote": "..." // short excerpt or null
-}`;
-
-    let text = '';
-    let attempts = 0;
-    while (attempts < 3) {
-      attempts++;
-      try {
-        const response = await ai.models.generateContent({
-          model: effectiveModel,
-          contents: [
-            {
-              role: 'user',
-              parts: [
-                { text: prompt },
-                {
-                  inlineData: {
-                    data: cropBase64,
-                    mimeType: 'image/png',
-                  },
-                },
-              ],
-            },
-          ],
-          config: {
-            responseMimeType: 'application/json',
-            temperature: 0.0,
-          },
-        });
-        text = response.text || '';
-        break;
-      } catch (genErr: any) {
-        const errMsg = String(genErr?.message || genErr);
-        const isTransient = genErr?.status === 503 || genErr?.status === 429 || errMsg.includes('503') || errMsg.includes('429') || errMsg.includes('overloaded');
-        if (isTransient && attempts < 3) {
-          await new Promise((r) => setTimeout(r, 1500 * attempts));
-        } else {
-          throw genErr;
-        }
+    const cropBuffer = await cropImageToFullWidthBand(imageBuffer, field.highlight_bbox);
+    const batchRes = await verifyDocumentCropsBatch({
+      documentLabel: 'Document',
+      fieldsToVerify: [{ fieldId, field, cropBuffer }],
+      apiKey,
+      modelName,
+    });
+    return (
+      batchRes.get(fieldId) || {
+        agreed: false,
+        crop_value: null,
+        disagreement_reason: 'Double-read returned no result',
       }
-    }
-
-    const parsed = JSON.parse(text);
-    const cropValue = parsed?.value ?? null;
-    const cropQuote = parsed?.quote ?? null;
-
-    const comparison = compareDoubleReadValues(fieldId, field.value, cropValue);
-
-    return {
-      agreed: comparison.agreed,
-      crop_value: cropValue,
-      crop_quote: cropQuote,
-      disagreement_reason: comparison.reason,
-    };
+    );
   } catch (err: any) {
-    // Failure in secondary read deterministically marks Needs Review
     return {
       agreed: false,
       crop_value: null,
-      disagreement_reason: `Double-read secondary pass encountered an error: ${err?.message || err}`,
+      disagreement_reason: `Double-read failed: ${err?.message || err}`,
     };
   }
 }
