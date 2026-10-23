@@ -7,14 +7,21 @@ if (!fs.existsSync(SAMPLES_DIR)) {
   fs.mkdirSync(SAMPLES_DIR, { recursive: true });
 }
 
-function createDocSvg(title: string, subtitle: string, fields: [string, string][], sealText: string, borderColor = '#3b82f6') {
+function createDocSvg(
+  title: string,
+  subtitle: string,
+  fields: [string, string][],
+  sealText: string,
+  borderColor = '#3b82f6',
+  extraNote = 'Verified Official Record Excerpt • Higher Education Application Portal'
+) {
   const fieldRows = fields
     .map(
       ([label, val], i) => `
     <g transform="translate(40, ${180 + i * 48})">
       <rect width="520" height="40" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" />
       <text x="16" y="25" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#475569">${label}:</text>
-      <text x="220" y="25" font-family="JetBrains Mono, monospace" font-size="14" font-weight="700" fill="#0f172a">${val}</text>
+      <text x="230" y="25" font-family="JetBrains Mono, monospace" font-size="14" font-weight="700" fill="#0f172a">${val}</text>
     </g>`
     )
     .join('');
@@ -32,11 +39,11 @@ function createDocSvg(title: string, subtitle: string, fields: [string, string][
     <rect x="8" y="8" width="554" height="474" rx="4" fill="none" stroke="${borderColor}" stroke-width="1.5" stroke-dasharray="4 2" />
     
     <!-- Header -->
-    <text x="285" y="55" font-family="Georgia, serif" font-size="19" font-weight="bold" text-anchor="middle" fill="#0f172a">${title}</text>
+    <text x="285" y="55" font-family="Georgia, serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#0f172a">${title}</text>
     <text x="285" y="80" font-family="Inter, sans-serif" font-size="12" text-anchor="middle" fill="#64748b">${subtitle}</text>
     <line x1="40" y1="100" x2="530" y2="100" stroke="#e2e8f0" stroke-width="1.5" />
     
-    <text x="40" y="140" font-family="Inter, sans-serif" font-size="12" font-style="italic" fill="#64748b">Verified Official Record Excerpt • Higher Education Application Portal</text>
+    <text x="40" y="140" font-family="Inter, sans-serif" font-size="12" font-style="italic" fill="#64748b">${extraNote}</text>
     
     <!-- Fields -->
     ${fieldRows}
@@ -52,83 +59,83 @@ function createDocSvg(title: string, subtitle: string, fields: [string, string][
 </svg>`;
 }
 
-// Generate Clean Samples
+// Generate Clean Samples (USD Scholarship Packet)
 const cleanForm = createDocSvg(
   'MERIT & FINANCIAL AID SCHOLARSHIP',
   'Candidate Application Form (Form ID: SCH-2024-8841)',
   [
-    ['Applicant Name', 'Suresh Sharma'],
+    ['Applicant Name', 'Alex Morgan'],
     ['Academic Year', '2024-25'],
-    ['Qualifying Examination Marks', '92.4%'],
-    ['Total Annual Family Income', '₹2,40,000 per annum'],
-    ['Date of Declaration', '15/07/2024'],
+    ['Cumulative GPA', '3.80 out of 4.0'],
+    ['Total Annual Household Income', '$65,000 per year'],
+    ['Date of Submission', '12 Aug 2024'],
   ],
   'SUBMITTED',
   '#2563eb'
 );
 
 const cleanMarksheet = createDocSvg(
-  'BOARD OF HIGHER SECONDARY EDUCATION',
-  'Senior Secondary Certificate Examination Marksheet',
+  'OFFICE OF THE ACADEMIC REGISTRAR',
+  'Official Academic Transcript of Records',
   [
-    ['Student Name', 'Suresh Sharma'],
-    ['Session / Academic Year', '2024-25'],
-    ['Aggregate Marks Obtained', '89.4%'],
-    ['Result Status', 'PASS (First Division)'],
+    ['Student Name', 'Alex Morgan'],
+    ['Academic Session', '2024-2025'],
+    ['Cumulative Grade Point Average', '3.50 / 4.0 GPA'],
+    ['Academic Standing', 'Good Standing (Honors)'],
   ],
-  'SEAL & SIGN',
+  'REGISTRAR SEAL',
   '#059669'
 );
 
 const cleanIncome = createDocSvg(
-  'OFFICE OF THE REVENUE & TAX AUTHORITY',
-  'Annual Family Income Certificate (Form No. 16-B)',
+  'INTERNAL REVENUE & TAX ADMINISTRATION',
+  'Official Tax Return Transcript & Income Summary',
   [
-    ['Certified Applicant Name', 'Suresh Sharma'],
-    ['Assessed Annual Income', 'Rs. 1,80,000 per annum'],
-    ['Certificate Issue Date', '12/08/2024'],
-    ['Validity Period', '1 Year (FY 2024-2025)'],
+    ['Taxpayer / Dependent', 'Alex Morgan'],
+    ['Adjusted Gross Income', '$48,000 per annum'],
+    ['Statement Issue Date', '18 Aug 2024'],
+    ['Filing Status', 'Single / Independent'],
   ],
-  'REVENUE DEPT',
+  'TAX VERIFIED',
   '#d97706'
 );
 
-// Generate Messy Samples
+// Generate Messy Samples (EUR Scholarship Packet)
 const messyForm = createDocSvg(
-  'MERIT & FINANCIAL AID SCHOLARSHIP',
-  'Candidate Application Form (Form ID: SCH-2024-9104)',
+  'EUROPEAN SCHOLARSHIP FOUNDATION',
+  'Candidate Application Form (Form ID: EUR-2024-9104)',
   [
-    ['Applicant Name', 'Suresh Sharma'],
-    ['Academic Year', '2024-25'],
-    ['Qualifying Examination Marks', '92.4%'],
-    ['Total Annual Family Income', '₹1,80,000 per annum'],
-    ['Date of Declaration', '15/07/2024'],
+    ['Applicant Name', 'Maria J. Alvarez'],
+    ['Academic Year', '2024-2025'],
+    ['Cumulative GPA', '3.90 out of 4.0'],
+    ['Total Annual Household Income', '€36,000 per year'],
+    ['Application Date', '15 Sep 2024'],
   ],
   'SUBMITTED',
   '#2563eb'
 );
 
 const messyMarksheet = createDocSvg(
-  'BOARD OF HIGHER SECONDARY EDUCATION',
-  'Senior Secondary Certificate Examination Marksheet',
+  'FACULTY ACADEMIC REGISTRY',
+  'Official Academic Transcript of Records',
   [
-    ['Student Name', 'Suresh Sharma'],
-    ['Session / Academic Year', '2024-25'],
-    ['Aggregate Marks Obtained', '89.4%'],
-    ['Result Status', 'PASS (First Division)'],
+    ['Student Name', 'Maria Alvarez'],
+    ['Academic Session', '2024-25'],
+    ['Cumulative GPA', '3.65 / 4.0 GPA'],
+    ['Evaluation Status', 'Admitted with Distinction'],
   ],
-  'SEAL & SIGN',
+  'REGISTRY SEAL',
   '#059669'
 );
 
 const messyIncome = createDocSvg(
-  'OFFICE OF THE REVENUE & TAX AUTHORITY',
-  'Annual Family Income Certificate (Form No. 16-B)',
+  'AGENCIA TRIBUTARIA / REVENUE SERVICE',
+  'Household Income Certificate (Monthly Assessment)',
   [
-    ['Certified Applicant Name', 'S. Sharma'],
-    ['Assessed Income', '₹15,000 per month'],
-    ['Certificate Issue Date', '12/08/2024'],
-    ['Validity Period', '1 Year (FY 2024-2025)'],
+    ['Certified Student', 'Maria Alvarez'],
+    ['Parent / Sponsor', 'José Alvarez'],
+    ['Assessed Income', '€3,000 per month'],
+    ['Certificate Issue Date', '12 Oct 2024'],
   ],
   'REVENUE DEPT',
   '#d97706'
@@ -143,7 +150,7 @@ fs.writeFileSync(path.join(SAMPLES_DIR, 'messy_form.svg'), messyForm);
 fs.writeFileSync(path.join(SAMPLES_DIR, 'messy_marksheet.svg'), messyMarksheet);
 fs.writeFileSync(path.join(SAMPLES_DIR, 'messy_income_cert.svg'), messyIncome);
 
-// Also copy or symlink/fallback to png naming for compatibility if needed
+// Also copy to png naming for backwards compatibility
 fs.writeFileSync(path.join(SAMPLES_DIR, 'clean_form.png'), cleanForm);
 fs.writeFileSync(path.join(SAMPLES_DIR, 'clean_marksheet.png'), cleanMarksheet);
 fs.writeFileSync(path.join(SAMPLES_DIR, 'clean_income_cert.png'), cleanIncome);

@@ -140,7 +140,7 @@ Activity mode:
   - Update tagline to "Make your documents agree before you submit."
   - Unit tests & commit.
 
-- [ ] **2. International Sample Packets & Synthetic Fixtures**
+- [x] **2. International Sample Packets & Synthetic Fixtures**
   - Regenerate USD scholarship sample packet (form, transcript with 4.0 GPA, tax statement; dates like "12 Aug 2024").
   - Regenerate EUR/GBP messy packet (compound names, accented variants, monthly income).
   - Ensure clean packet produces 3 Conflicts / 2 Consistent and messy packet produces Needs Review via real engine.
