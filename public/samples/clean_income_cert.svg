@@ -11,8 +11,8 @@
     <rect x="8" y="8" width="554" height="474" rx="4" fill="none" stroke="#d97706" stroke-width="1.5" stroke-dasharray="4 2" />
     
     <!-- Header -->
-    <text x="285" y="55" font-family="Georgia, serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#0f172a">INTERNAL REVENUE & TAX ADMINISTRATION</text>
-    <text x="285" y="80" font-family="Inter, sans-serif" font-size="12" text-anchor="middle" fill="#64748b">Official Tax Return Transcript & Income Summary</text>
+    <text x="285" y="55" font-family="Georgia, serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#0f172a">INTERNAL REVENUE &amp; TAX ADMINISTRATION</text>
+    <text x="285" y="80" font-family="Inter, sans-serif" font-size="12" text-anchor="middle" fill="#64748b">Official Tax Return Transcript &amp; Income Summary</text>
     <line x1="40" y1="100" x2="530" y2="100" stroke="#e2e8f0" stroke-width="1.5" />
     
     <text x="40" y="140" font-family="Inter, sans-serif" font-size="12" font-style="italic" fill="#64748b">Verified Official Record Excerpt • Higher Education Application Portal</text>

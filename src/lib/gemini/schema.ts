@@ -47,7 +47,7 @@ export const ExtractedFieldSchema = z.object({
   quote: z.string().nullable(),
   page: z.number().int().default(1),
   confidence: z.number().min(0).max(1),
-  highlight_bbox: BoundingBoxSchema.catch(null).optional().nullable(),
+  highlight_bbox: BoundingBoxSchema.nullable().catch(null).optional(),
 });
 
 export const DocumentExtractionSchema = z.object({

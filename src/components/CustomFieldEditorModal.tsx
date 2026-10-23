@@ -124,7 +124,7 @@ export const CustomFieldEditorModal: React.FC<CustomFieldEditorModalProps> = ({
         <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5">
           {editableFields.length === 0 ? (
             <div className="text-center py-10 text-neutral-400 text-xs">
-              No fields configured. Click "Add Custom Field" to start.
+              No fields configured. Click &quot;Add Custom Field&quot; to start.
             </div>
           ) : (
             editableFields.map((f, idx) => (
