@@ -27,11 +27,11 @@ export function draftIssuingOfficeMessage(params: OfficeMessageParams): DraftedO
   let targetAuthority = issuingAuthority;
   if (!targetAuthority) {
     if (field.field_id === 'marks' || field.field_id === 'academic_year') {
-      targetAuthority = 'The Controller of Examinations / Board of Secondary Education';
+      targetAuthority = 'Office of the Registrar / Academic Examination Board';
     } else if (field.field_id === 'income') {
-      targetAuthority = 'The Tahsildar / Sub-Divisional Magistrate (Revenue Department)';
+      targetAuthority = 'Tax Administration / Government Revenue Office / Financial Aid Department';
     } else if (field.field_id === 'issue_date') {
-      targetAuthority = 'The Certificate Issuing Authority / Revenue Office';
+      targetAuthority = 'Official Certificate Issuing Authority / Records Registrar';
     } else {
       targetAuthority = 'The Competent Issuing Authority / Administrative Registrar';
     }
@@ -39,7 +39,7 @@ export function draftIssuingOfficeMessage(params: OfficeMessageParams): DraftedO
 
   const applicant = studentName || 'Applicant / Student';
   const refText = referenceId ? ` [Ref / Roll No: ${referenceId}]` : '';
-  const dateStr = new Date().toLocaleDateString('en-IN', {
+  const dateStr = new Date().toLocaleDateString('en-US', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',

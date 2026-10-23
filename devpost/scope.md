@@ -81,3 +81,19 @@ In under 60 seconds without needing an API key:
 - **Handwritten Document Support:** Scanned handwriting introduces extreme OCR variance outside the deterministic proof-of-concept scope.
 - **LLM-Based Matching Decisions:** LLMs must never judge equivalence; equivalence is strictly evaluated by deterministic business logic.
 - **Automated Submission:** Parity advises the human applicant; it never submits to third-party portals automatically.
+
+## Revisions
+
+### 2026-10-23 — International Generalization & Multi-Locale Verification
+- **Positioning & Global Terminology:** Generalized the application from an India-specific context to an international audience. Replaced regional terms (e.g. "marksheet") with universal standards ("academic transcript") and adopted the global tagline: *"Make your documents agree before you submit."*
+- **International Sample Packets:** Replaced regional fixtures with:
+  1. A USD scholarship packet (Application Form, Academic Transcript with GPA out of 4.0, Tax Statement proof of income, textual dates like "12 Aug 2024") maintaining the 3 Conflicts / 2 Consistent benchmark.
+  2. A EUR/GBP multi-locale packet featuring compound/accented names ("Maria J. Alvarez" vs "Maria Alvarez", "José" vs "Jose") and per-month income conversions producing `Needs Review`.
+- **Locale-Aware Deterministic Engine:**
+  - Ambiguous numeric dates flag `Needs Review` unless day > 12, month is textual, or date format setting resolves it.
+  - Locale-aware number grouping: US (`1,234.56`), European (`1.234,56`), and space-separated (`1 234,56`).
+  - Multi-currency disparity flags `Needs Review`.
+  - Income frequency scaling (weekly $\times 52$, biweekly $\times 26$, monthly $\times 12$) showing multiplication factors in explanations.
+  - Cultural name variance (accents, hyphenated surnames, particles like `de`/`van`, family-name-first) flags `Needs Review`.
+  - GPA scale awareness (4.0, 5.0, percentage) flagging scale mismatches for human review.
+

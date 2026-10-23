@@ -102,8 +102,8 @@ export function IngestionZone({
 
         <UploadSlot
           id="marksheet"
-          label="2. Academic Marksheet"
-          expectedType="12th / Board Exam Scan (Name, Year, Marks %)"
+          label="2. Academic Transcript"
+          expectedType="Official Transcript Scan (Name, Year, GPA / Grade)"
           description="Max 1.5MB Image / PDF"
           loadedDoc={uploadedDocs.marksheet}
           onFileSelect={(file) => onFileSelect('marksheet', file)}
@@ -112,8 +112,8 @@ export function IngestionZone({
 
         <UploadSlot
           id="income_certificate"
-          label="3. Income Certificate"
-          expectedType="Official Revenue Cert (Name, Income, Date)"
+          label="3. Proof of Income / Tax Statement"
+          expectedType="Official Tax / Income Record (Name, Income, Date)"
           description="Max 1.5MB Image / PDF"
           loadedDoc={uploadedDocs.income_certificate}
           onFileSelect={(file) => onFileSelect('income_certificate', file)}
