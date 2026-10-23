@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter, Newsreader, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
+import '@/styles/fonts.css';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -22,10 +23,10 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://parity.devprashant.com'),
-  title: 'Parity — Evidence-First Application Packet Verification',
-  description:
-    'Catch subtle data mismatches across scholarship and college application documents with deterministic verification and inspectable cited evidence.',
+  metadataBase: new URL('https://convix.software'),
+  title: 'Convix Software — Shaping Agencies of Tomorrow',
+  description: 'The All-In-One Software Powering the Future of PR Agencies',
+
   alternates: {
     canonical: '/',
   },
