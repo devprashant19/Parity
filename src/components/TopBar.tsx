@@ -2,6 +2,8 @@
 
 import React, { useEffect } from 'react';
 
+import { ParityLogo } from './ParityLogo';
+
 export function TopBar() {
   useEffect(() => {
     // Ensure clean light palette as light/dark mode switch is removed
@@ -13,33 +15,13 @@ export function TopBar() {
     }
   }, []);
 
-  // 8 circles around (16,16) with radius 10 + 1 center circle
-  const petalAngles = [0, 45, 90, 135, 180, 225, 270, 315];
-  const radius = 10;
-  const cx = 16;
-  const cy = 16;
-  const rCircle = 3.5;
-
   return (
     <header className="w-full flex justify-center pt-3 sm:pt-4 px-3 sm:px-4 z-30 sticky top-2">
       <div className="bg-white/95 backdrop-blur-md rounded-full shadow-sm border border-neutral-200/90 pl-3 pr-3 py-2 w-full max-w-[1000px] relative flex items-center justify-between transition-colors">
         {/* Left: Brand Identity with 8-Petal Flower */}
         <div className="flex items-center gap-3 shrink-0">
           <a href="#" className="flex items-center gap-2.5 focus:outline-none" aria-label="Parity Home">
-            <svg
-              viewBox="0 0 32 32"
-              className="w-7 h-7 sm:w-8 sm:h-8"
-              fill="#ef4d23"
-              aria-hidden="true"
-            >
-              <circle cx={cx} cy={cy} r={rCircle} />
-              {petalAngles.map((deg) => {
-                const rad = (deg * Math.PI) / 180;
-                const x = cx + radius * Math.cos(rad);
-                const y = cy + radius * Math.sin(rad);
-                return <circle key={deg} cx={x.toFixed(2)} cy={y.toFixed(2)} r={rCircle} />;
-              })}
-            </svg>
+            <ParityLogo className="w-7 h-7 sm:w-8 sm:h-8" />
             <span className="font-semibold text-base sm:text-lg tracking-tight text-neutral-900">
               Parity
             </span>

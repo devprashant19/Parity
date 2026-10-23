@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { X, Plus, Trash2, RotateCcw, Check, Sliders, Info } from 'lucide-react';
 import { CustomFieldDefinition, DocumentType, FieldDataType } from '@/lib/compare/types';
+import { ParityLogo } from './ParityLogo';
 
 interface CustomFieldEditorModalProps {
   isOpen: boolean;
@@ -90,8 +91,8 @@ export const CustomFieldEditorModal: React.FC<CustomFieldEditorModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between p-4 sm:p-5 border-b border-neutral-100 dark:border-neutral-800">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-orange-100 dark:bg-orange-950/60 flex items-center justify-center text-[#ef4d23]">
-              <Sliders className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-lg bg-orange-50 dark:bg-orange-950/60 flex items-center justify-center">
+              <ParityLogo className="w-5 h-5 shrink-0" />
             </div>
             <div>
               <h3 className="text-base font-semibold text-neutral-900 dark:text-white">

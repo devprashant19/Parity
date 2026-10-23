@@ -5,6 +5,7 @@ import { X, AlertTriangle, CheckCircle2, HelpCircle, Eye, Check, Mail, Info } fr
 import { FieldComparison, ResolutionChoice, BoundingBox } from '@/lib/compare/types';
 import { DocumentModal } from './DocumentModal';
 import { ManualEntry } from './ManualEntry';
+import { ParityLogo } from './ParityLogo';
 
 export interface EvidenceDrawerProps {
   field: FieldComparison | null;
@@ -175,7 +176,10 @@ export function EvidenceDrawer({
         <div className="p-4 sm:p-5 bg-[#f5f2ee] dark:bg-[#182030] border-b border-neutral-200/80 dark:border-neutral-700/80 flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[#ef4d23] font-medium text-xs">Inspect Evidence</span>
+              <span className="text-[#ef4d23] font-medium text-xs flex items-center gap-1.5">
+                <ParityLogo className="w-3.5 h-3.5 shrink-0" />
+                Inspect Evidence
+              </span>
               <span className="text-neutral-400">•</span>
               <span className="text-xs text-neutral-500 font-mono">{field.field_id}</span>
             </div>

@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { X, ExternalLink } from 'lucide-react';
 import { BoundingBox } from '@/lib/compare/types';
+import { ParityLogo } from './ParityLogo';
 
 export interface DocumentModalProps {
   isOpen: boolean;
@@ -42,7 +43,10 @@ export function DocumentModal({
         <div className="flex items-center justify-between p-4 sm:p-5 bg-[#f5f2ee] dark:bg-[#182030] border-b border-neutral-200/80 dark:border-neutral-700/80">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[#ef4d23] font-medium text-xs">Scan Inspector</span>
+              <span className="text-[#ef4d23] font-medium text-xs flex items-center gap-1.5">
+                <ParityLogo className="w-3.5 h-3.5 shrink-0" />
+                Scan Inspector
+              </span>
               <span className="text-neutral-400">•</span>
               <span className="text-xs text-neutral-500 font-mono">{fileName}</span>
             </div>
