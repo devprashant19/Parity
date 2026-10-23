@@ -8,6 +8,7 @@ import { normalizeNameTokens } from '../../src/lib/normalize/name';
 import { normalizeIncome, normalizeMarks } from '../../src/lib/normalize/numbers';
 import { normalizeDate } from '../../src/lib/normalize/dates';
 import { cropImageToBoundingBox, compareDoubleReadValues, verifyFieldDoubleRead } from '../../src/lib/gemini/doubleRead';
+import { CLEAN_SAMPLE_PACKET, MESSY_SAMPLE_PACKET } from '../../src/data/samples';
 
 interface GroundTruthItem {
   scan_id: string;
@@ -290,22 +291,51 @@ async function runEvaluation() {
 
   const testPackets = [
     {
-      name: 'Clean Scholarship Packet',
+      name: 'International USD Clean Scholarship Sample Packet',
+      presetDocs: CLEAN_SAMPLE_PACKET,
+      packetType: 'clean_sample' as const,
+      dateFormat: 'Auto' as const,
+      expectedConflicts: 3, // marks (3.92 vs 3.80 GPA), income ($65k vs $48k), issue_date (15 Jul vs 12 Aug)
+      expectedConsistent: 2, // name (Alex Morgan), academic_year (2024-25)
+      expectedNeedsReview: 0,
+    },
+    {
+      name: 'International EUR Messy Scholarship Sample Packet',
+      presetDocs: MESSY_SAMPLE_PACKET,
+      packetType: 'messy_sample' as const,
+      dateFormat: 'Auto' as const,
+      expectedConflicts: 2, // marks (3.85 vs 3.70 GPA), issue_date (15 Jul vs 12 Aug)
+      expectedConsistent: 2, // income (€54k vs €4.5k/mo x12 = €54k), academic_year (2024-25)
+      expectedNeedsReview: 1, // name ("Maria J. Alvarez" vs "Maria Alvarez" middle initial omitted)
+    },
+    {
+      name: 'Regional Scan Packet (DMY Date Setting)',
       scanIds: ['scan_01_clean_form', 'scan_02_clean_marksheet', 'scan_03_clean_income_cert'],
+      dateFormat: 'DMY' as const,
       expectedConflicts: 3, // marks, income, date
       expectedConsistent: 2, // name, year
       expectedNeedsReview: 0,
     },
     {
-      name: 'Messy Scholarship Packet (Initials + Monthly)',
+      name: 'Regional Scan Packet (Auto Date Setting - Ambiguous Numeric Date)',
+      scanIds: ['scan_01_clean_form', 'scan_02_clean_marksheet', 'scan_03_clean_income_cert'],
+      dateFormat: 'Auto' as const,
+      expectedConflicts: 2, // marks, income
+      expectedConsistent: 2, // name, year
+      expectedNeedsReview: 1, // date: "12/08/2024" is ambiguous numeric date in auto mode
+    },
+    {
+      name: 'Messy Scan Packet (Initials + Monthly, DMY Date Setting)',
       scanIds: ['scan_01_clean_form', 'scan_06_messy_initials_marksheet', 'scan_07_monthly_income_cert'],
+      dateFormat: 'DMY' as const,
       expectedConflicts: 3, // marks, income, date
       expectedConsistent: 1, // year
       expectedNeedsReview: 1, // name ("S. Sharma")
     },
     {
-      name: 'Disjoint Name Packet (Conflicting Surname)',
+      name: 'Disjoint Name Scan Packet (Conflicting Surname, DMY Date Setting)',
       scanIds: ['scan_10_conflict_name_form', 'scan_02_clean_marksheet', 'scan_03_clean_income_cert'],
+      dateFormat: 'DMY' as const,
       expectedConflicts: 4, // name (Verma vs Sharma), marks, income, date
       expectedConsistent: 1, // year
       expectedNeedsReview: 0,
@@ -313,6 +343,7 @@ async function runEvaluation() {
     {
       name: 'Double-Read Disagreement Packet (Simulated OCR Crop Mismatch)',
       scanIds: ['scan_01_clean_form', 'scan_02_clean_marksheet', 'scan_03_clean_income_cert'],
+      dateFormat: 'DMY' as const,
       expectedConflicts: 3,
       expectedConsistent: 1,
       expectedNeedsReview: 1,
@@ -324,7 +355,13 @@ async function runEvaluation() {
   let falseConsistentCount = 0;
 
   for (const pkt of testPackets) {
-    let docs = pkt.scanIds.map((id) => extractionsByScanId.get(id)!);
+    let docs: DocumentExtraction[];
+    if ((pkt as any).presetDocs) {
+      docs = (pkt as any).presetDocs;
+    } else {
+      docs = pkt.scanIds!.map((id) => extractionsByScanId.get(id)!);
+    }
+
     if ((pkt as any).injectDisagreement) {
       docs = docs.map((doc) => {
         if (doc.document_type === 'application_form') {
@@ -350,7 +387,9 @@ async function runEvaluation() {
       });
     }
 
-    const result = runVerification(docs, 'live');
+    const pktType = (pkt as any).packetType || 'live';
+    const dateFormat = (pkt as any).dateFormat || 'Auto';
+    const result = runVerification(docs, pktType, undefined, dateFormat);
 
     totalFieldPairsChecked += result.fields.length;
 

@@ -94,7 +94,8 @@ export function normalizeGenericText(val: string | null): string | null {
 export function evaluateCustomField(
   fieldDef: CustomFieldDefinition,
   docMap: Map<string, DocumentExtraction>,
-  sampleUrls?: Record<string, string>
+  sampleUrls?: Record<string, string>,
+  dateFormatSetting: 'Auto' | 'DMY' | 'MDY' = 'Auto'
 ): FieldComparison {
   const comparedDocs: DocumentComparisonEntry[] = [];
 
@@ -107,7 +108,7 @@ export function evaluateCustomField(
       if (fieldDef.type === 'id') {
         normalizedVal = normalizeIdentifier(raw.value);
       } else if (fieldDef.type === 'date') {
-        const d = normalizeDate(raw.value);
+        const d = normalizeDate(raw.value, dateFormatSetting);
         normalizedVal = d.iso;
       } else if (fieldDef.type === 'amount') {
         const inc = normalizeIncome(raw.value);
@@ -250,8 +251,8 @@ export function evaluateCustomField(
     }
 
     if (fieldDef.type === 'date') {
-      const dateA = normalizeDate(firstDoc.raw_value);
-      const dateB = normalizeDate(currentDoc.raw_value);
+      const dateA = normalizeDate(firstDoc.raw_value, dateFormatSetting);
+      const dateB = normalizeDate(currentDoc.raw_value, dateFormatSetting);
 
       if (dateA.isAmbiguous || dateB.isAmbiguous) {
         return {

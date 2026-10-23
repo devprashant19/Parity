@@ -96,10 +96,9 @@ export function parseLocaleNumber(rawNum: string): number | null {
       // Multiple dots: 1.200.000 -> European thousands separators
       cleaned = cleaned.replace(/\./g, '');
     } else if (parts[1] && parts[1].length === 3 && parts[0].length <= 3) {
-      // Single dot with exactly 3 digits after in an integer context (e.g., 36.000 for income)
-      // Check if integer > 100 without decimals
+      // Single dot with exactly 3 digits after in an integer context (e.g., 3.500 or 36.000 for income)
       const candidateInt = parseInt(parts[0], 10);
-      if (candidateInt >= 10) {
+      if (candidateInt >= 1) {
         cleaned = cleaned.replace(/\./g, '');
       }
     }
@@ -150,10 +149,10 @@ export function normalizeIncome(rawInput: string | null): NormalizedIncome {
   let period: 'annual' | 'monthly' | 'biweekly' | 'weekly' | 'unknown' = 'unknown';
   let factor = 1;
 
-  const weeklyMatch = /(\bper\s*week|\s*\/\s*week|\bweekly|\s*\/\s*wk\b)/i.test(lower);
+  const weeklyMatch = /(\bper\s*week|\s*\/\s*week|\bweekly|\s*\/\s*wk\b|\bpor\s*semana\b|\bsemanal\b|\bpar\s*semaine\b|\bpro\s*woche\b)/i.test(lower);
   const biweeklyMatch = /(\bbiweekly|\bbi-weekly|\bfortnightly|\bevery\s*two\s*weeks|\s*\/\s*biweekly\b)/i.test(lower);
-  const monthlyMatch = /(\bper\s*month|\s*\/\s*month|\bp\.?m\.?|\bmonthly|\s*\/\s*mo\b)/i.test(lower);
-  const annualMatch = /(\bper\s*annum|\s*\/\s*year|\bp\.?a\.?|\bannual|\bannually|\bper\s*year|\s*\/\s*yr\b)/i.test(lower);
+  const monthlyMatch = /(\bper\s*month|\s*\/\s*month|\bp\.?m\.?|\bmonthly|\s*\/\s*mo\b|\bal\s*mes\b|\bpor\s*mes\b|\bmensual\b|\bpar\s*mois\b|\bpro\s*monat\b|\bmonatlich\b)/i.test(lower);
+  const annualMatch = /(\bper\s*annum|\s*\/\s*year|\bp\.?a\.?|\bannual|\bannually|\bper\s*year|\s*\/\s*yr\b|\bal\s*a[ñn]o\b|\bpor\s*a[ñn]o\b|\banual\b|\bpar\s*an\b|\bpro\s*jahr\b|\bj[äa]hrlich\b)/i.test(lower);
 
   if (weeklyMatch) {
     period = 'weekly';

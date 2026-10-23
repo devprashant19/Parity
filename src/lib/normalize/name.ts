@@ -238,6 +238,21 @@ export function compareNames(nameA: string | null, nameB: string | null): NameCo
     };
   }
 
+  // 8. Compound / double surnames (e.g., "Gabriel García Márquez" vs "Gabriel García")
+  const [shorter, longer, origShort, origLong] =
+    tokensA.length < tokensB.length
+      ? [tokensA, tokensB, nameA, nameB]
+      : [tokensB, tokensA, nameB, nameA];
+  if (shorter.length >= 2 && longer.length > shorter.length) {
+    const isPrefix = shorter.every((token, idx) => token === longer[idx]);
+    if (isPrefix) {
+      return {
+        status: 'Needs Review',
+        reason: `Compound or maternal surname omitted on one document ("${origShort.trim()}" vs "${origLong.trim()}").`,
+      };
+    }
+  }
+
   // Check surname (last token) vs given name (earlier tokens)
   const surnameA = tokensA[tokensA.length - 1];
   const surnameB = tokensB[tokensB.length - 1];

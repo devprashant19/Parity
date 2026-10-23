@@ -17,7 +17,8 @@ import { evaluateCustomField } from './custom';
 export function runVerification(
   extractions: DocumentExtraction[],
   packetType: 'clean_sample' | 'messy_sample' | 'live' = 'live',
-  customFieldDefs?: CustomFieldDefinition[]
+  customFieldDefs?: CustomFieldDefinition[],
+  dateFormatSetting: 'Auto' | 'DMY' | 'MDY' = 'Auto'
 ): VerificationResult {
   const docMap = new Map<string, DocumentExtraction>();
   for (const doc of extractions) {
@@ -40,7 +41,7 @@ export function runVerification(
   // If custom field definitions are provided, evaluate them with the custom deterministic engine
   if (customFieldDefs && customFieldDefs.length > 0) {
     const fields: FieldComparison[] = customFieldDefs.map((def) =>
-      evaluateCustomField(def, docMap, sampleUrls[packetType])
+      evaluateCustomField(def, docMap, sampleUrls[packetType], dateFormatSetting)
     );
 
     let conflicts_count = 0;
@@ -373,8 +374,8 @@ export function runVerification(
   const formDate = getField(form, 'issue_date');
   const certDate = getField(incomeCert, 'issue_date');
 
-  const normDateForm = normalizeDate(formDate?.value || null);
-  const normDateCert = normalizeDate(certDate?.value || null);
+  const normDateForm = normalizeDate(formDate?.value || null, dateFormatSetting);
+  const normDateCert = normalizeDate(certDate?.value || null, dateFormatSetting);
 
   const dateDocs: DocumentComparisonEntry[] = [
     toDocEntry('application_form', 'Application Form', 'issue_date', normDateForm.iso),
