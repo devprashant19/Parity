@@ -8,7 +8,7 @@ Parity prevents clerical rejections in high-stakes multi-document applicationsâ€
 
 ## Try It
 
-- **Live Web Application:** `https://parity-verify.vercel.app` *(or run locally at `http://localhost:3000`)*
+- **Live Web Application:** [https://parity-devpost.vercel.app](https://parity-devpost.vercel.app) *(or run locally at `http://localhost:3000`)*
 - **Demo Walkthrough Video:** `https://youtu.be/placeholder-demo` *(2:30 runtime walkthrough)*
 - **The 60-Second Instant Test Drive:**
   1. Open the application (no account, login, or API key required).

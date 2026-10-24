@@ -120,7 +120,7 @@ We utilized the **Devpost Learn Skill Pack** throughout the lifecycle of Parity 
 Before finalizing your Devpost submission, verify each item:
 
 - [ ] **Public Repository URL:** GitHub repository is public and accessible (e.g. `https://github.com/devprashant19/Parity`).
-- [ ] **"Try It Out" Link:** Public Vercel URL added to Devpost project header (e.g. `https://parity-verify.vercel.app`).
+- [ ] **"Try It Out" Link:** Public Vercel URL added to Devpost project header ([https://parity-devpost.vercel.app](https://parity-devpost.vercel.app)).
 - [ ] **Open Source License:** MIT License file ([LICENSE](file:///e:/Parity/LICENSE)) is present at the repository root and detected by GitHub.
 - [ ] **Video Link:** Walkthrough video is uploaded, public/unlisted on YouTube or Vimeo, and runtime is strictly under 3:00 minutes (script targeted at 2:15).
 - [ ] **Age of Majority:** Hackathon eligibility age checkbox confirmed.
