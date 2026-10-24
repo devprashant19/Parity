@@ -12,8 +12,8 @@ Parity prevents clerical rejections in high-stakes multi-document applicationsâ€
 - **Demo Walkthrough Video:** `https://youtu.be/placeholder-demo` *(2:30 runtime walkthrough)*
 - **The 60-Second Instant Test Drive:**
   1. Open the application (no account, login, or API key required).
-  2. Click **"Load sample scholarship packet"** to ingest the precomputed USD benchmark documents.
-  3. Click **"Run check"** to execute verification instantly via the deterministic engine ($<2$ seconds).
+  2. Click **"Load sample clean packet"** to ingest the precomputed USD benchmark documents.
+  3. Click **"Run Verification Check"** to execute verification instantly via the deterministic engine ($<2$ seconds).
   4. Inspect the summary counters (**3 Conflicts**, **2 Consistent**).
   5. Click any highlighted conflict row (e.g., **Academic Performance / GPA**) to open the **Evidence Drawer**.
   6. Review side-by-side verbatim quotes (`3.80 GPA` vs `3.50 GPA`), visual coordinate overlays, and select an authoritative document decision to observe the prioritized fix plan update live.
