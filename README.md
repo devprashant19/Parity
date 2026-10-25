@@ -8,12 +8,12 @@ Parity prevents clerical rejections in high-stakes multi-document applications�
 
 ## Try It
 
-- **Live Web Application:** `https://parity-verify.vercel.app` *(or run locally at `http://localhost:3000`)*
-- **Demo Walkthrough Video:** `https://youtu.be/placeholder-demo` *(2:30 runtime walkthrough)*
+- **Live Web Application:** [https://parity-devpost.vercel.app](https://parity-devpost.vercel.app) *(or run locally at `http://localhost:3000`)*
+- **Demo Walkthrough Video:** [https://youtu.be/H-xauc5ope0](https://youtu.be/H-xauc5ope0) *(2:30 runtime walkthrough)*
 - **The 60-Second Instant Test Drive:**
   1. Open the application (no account, login, or API key required).
-  2. Click **"Load sample scholarship packet"** to ingest the precomputed USD benchmark documents.
-  3. Click **"Run check"** to execute verification instantly via the deterministic engine ($<2$ seconds).
+  2. Click **"Load sample clean packet"** to ingest the precomputed USD benchmark documents.
+  3. Click **"Run Verification Check"** to execute verification instantly via the deterministic engine (under 2 seconds).
   4. Inspect the summary counters (**3 Conflicts**, **2 Consistent**).
   5. Click any highlighted conflict row (e.g., **Academic Performance / GPA**) to open the **Evidence Drawer**.
   6. Review side-by-side verbatim quotes (`3.80 GPA` vs `3.50 GPA`), visual coordinate overlays, and select an authoritative document decision to observe the prioritized fix plan update live.
@@ -24,9 +24,9 @@ Parity prevents clerical rejections in high-stakes multi-document applications�
 
 Most AI document tools delegate decisions to an LLM prompt. Parity enforces strict architectural boundaries:
 
-1. **Multimodal Perception Only:** Google Gemini 3.1 Flash Lite is restricted strictly to document reading: extracting values alongside verbatim source text quotes ($\le 200$ characters) and page numbers.
+1. **Multimodal Perception Only:** Google Gemini 3.1 Flash Lite is restricted strictly to document reading: extracting values alongside verbatim source text quotes (at most 200 characters) and page numbers.
 2. **Deterministic Evaluation Core:** An isolated TypeScript engine executes universal normalization (global currencies `$` `€` `£` `¥` `₹`, frequency multipliers, ISO and international dates, GPA and grade scales, and name tokenization), quote containment checks, and tri-state classification:
-   $$\mathbf{Conflict} > \mathbf{Needs\ Review} > \mathbf{Consistent}$$
+   `Conflict > Needs Review > Consistent`
 3. **Human Decision Authority:** The software never auto-edits official credentials or guesses legal authority. The applicant inspects side-by-side evidence quotes and selects which document is authoritative, dynamically generating an ethical fix checklist.
 
 ---
@@ -34,15 +34,15 @@ Most AI document tools delegate decisions to an LLM prompt. Parity enforces stri
 ## What is Verified vs. What Isn't
 
 ### What IS Verified
-- **Deterministic Core Logic:** Full unit test coverage for international currency parsing (`$45,000/yr`, `€3,000/mo`, `£28,000/yr`, `$3,500 per month` $\rightarrow$ `$42,000/year`), GPA and academic marks normalization (`3.8 / 4.0`, `89.4%`), international date matching (ISO, DD/MM/YYYY, MM/DD/YYYY, and textual dates like `12 Aug 2024`), cultural name tokenization, compound surnames, diacritics, quote containment checks, and status precedence.
+- **Deterministic Core Logic:** Full unit test coverage for international currency parsing (`$45,000/yr`, `€3,000/mo`, `£28,000/yr`, `$3,500 per month` → `$42,000/year`), GPA and academic marks normalization (`3.8 / 4.0`, `89.4%`), international date matching (ISO, DD/MM/YYYY, MM/DD/YYYY, and textual dates like `12 Aug 2024`), cultural name tokenization, compound surnames, diacritics, quote containment checks, and status precedence.
 - **Dual Sample Demonstration (Playwright & Vitest Verified):**
-  - **Clean Sample Packet (USD):** Produces exactly **3 Conflicts**, **2 Consistent**, and **0 Needs Review** offline in $<2$ seconds.
+  - **Clean Sample Packet (USD):** Produces exactly **3 Conflicts**, **2 Consistent**, and **0 Needs Review** offline in under 2 seconds.
   - **Messy Sample Packet (EUR/GBP):** Demonstrates **Needs Review** on compound/accented names (`Maria J. Alvarez` vs `Maria Alvarez`, `José` vs `Jose`) and per-month income normalization.
 - **Side-by-Side Evidence Inspection:** Interactive slide-over drawer on desktop (bottom sheet on mobile) displaying side-by-side verbatim quotes, diff callouts, source scan previews, authoritative decision controls, and inline manual overrides.
-- **Serverless & Upload Safety:** Client-side image downscaling (max 1600px JPEG, $\le 1.5$MB/file, $<4.0$MB total request payload), in-memory IP rate limiting, and zero-PII logging.
+- **Serverless & Upload Safety:** Client-side image downscaling (max 1600px JPEG, 1.5 MB/file, under 4.0 MB total request payload), in-memory IP rate limiting, and zero-PII logging.
 
 ### What IS NOT Verified & Known Limitations
-- **Quote Containment vs. Scan Pixel Grounding:** Quote containment verifies that each extracted value is contained verbatim within the model's returned quote excerpt ($\le 200$ chars). However, string containment confirms consistency between the value and the returned text excerpt—it does **not** independently prove the model read the raw pixels with 100% fidelity without human inspection of the source scan in the Evidence Drawer.
+- **Quote Containment vs. Scan Pixel Grounding:** Quote containment verifies that each extracted value is contained verbatim within the model's returned quote excerpt (at most 200 characters). However, string containment confirms consistency between the value and the returned text excerpt—it does **not** independently prove the model read the raw pixels with 100% fidelity without human inspection of the source scan in the Evidence Drawer.
 - **No Legal Genuineness or Fraud Detection:** Parity checks clerical text consistency across submitted pages. It does not authenticate watermarks, verify official seals with issuing authorities, or guarantee scholarship approval.
 - **Benchmark Scope:** The included benchmark reference suite evaluates a 3-document packet (Application Form, Academic Transcript, Proof of Income / Tax Statement) covering cross-referenced fields.
 
@@ -122,7 +122,7 @@ In our ground-truth evaluation, exactly two pairs whose ground truth actually ag
    - **Why Flagged as `Needs Review`:** `scan_06` lists the student's name using an abbreviated first initial (`"S. Sharma"`), while `scan_01` lists the full unabbreviated legal name (`"Suresh Sharma"`). Parity's deterministic name matching rules deliberately withhold an automatic `Consistent` label for abbreviated initials or omitted middle names. In high-stakes scholarship and university admission packets, bureaucratic reviewers frequently reject packets where names do not match official passport/identity spellings character-for-character. Flagging this for human confirmation prevents silent administrative disqualification.
 2. **Pair 2: `scan_01` vs. `scan_03` — Field: `issue_date` (`"12/08/2024"` vs. `"12/08/2024"`) under `Auto` Mode**
    - **Ground Truth:** Both documents were issued on the exact same date (`"12/08/2024"`).
-   - **Why Flagged as `Needs Review`:** In both documents, the numeric day is `12` and the numeric month is `08` (both $\le 12$) with no written month name. Under Parity's `Auto` date ambiguity setting, any date where both day and month are $\le 12$ without an explicit locale format is flagged as `Needs Review` (`"Ambiguous numeric date (could be August 12 or December 8)"`). Parity refuses to guess whether the issuing authority used Day/Month/Year or Month/Day/Year. Once the applicant selects their locale via the Date Format switch (`DMY` or `MDY`), the engine deterministically re-evaluates and marks the pair `Consistent`.
+   - **Why Flagged as `Needs Review`:** In both documents, the numeric day is `12` and the numeric month is `08` (both 12 or less) with no written month name. Under Parity's `Auto` date ambiguity setting, any date where both day and month are 12 or less without an explicit locale format is flagged as `Needs Review` (`"Ambiguous numeric date (could be August 12 or December 8)"`). Parity refuses to guess whether the issuing authority used Day/Month/Year or Month/Day/Year. Once the applicant selects their locale via the Date Format switch (`DMY` or `MDY`), the engine deterministically re-evaluates and marks the pair `Consistent`.
 
 ---
 
@@ -130,7 +130,7 @@ In our ground-truth evaluation, exactly two pairs whose ground truth actually ag
 > **Audit Trail & Observed Live Behavior:**
 > - **Double-Read Verification Evolution (Before vs. After):**
 >   - *The Initial Finding (Tight Bbox Problem):* In the initial live double-read run, Gemini achieved only **28.6% agreement (4 agreed / 14 checks)** with **10 disagreements**. The cause was a bounding-box alignment failure rather than an extraction failure: Gemini's returned vertical bounding-box coordinates on dense tabular scans were shifted 1–2 rows into adjacent lines (e.g., cropping `Taxpayer: Alex Morgan` rather than the `Adjusted Gross Income` row below it). Parity's deterministic comparator caught every single mismatch and flagged them `Needs Review`.
->   - *The Re-Engineered Fix (Batched Full-Width Band):* To eliminate horizontal and row-drift clipping, crops are now padded to the **full horizontal width** of the document with **$\pm 1$ row vertical padding**. Furthermore, all crops for a document are batched into **1 single API call** via multi-image inline data parts, and double-read is executed only for fields that would initially be labelled `Consistent`. Tested live against Gemini 3.1 Flash Lite, this achieved **100.0% agreement (14 of 14 checks)** on scans 11-14 with **0 disagreements** while reducing secondary API calls from 14 down to **4 calls** (a 71% reduction).
+>   - *The Re-Engineered Fix (Batched Full-Width Band):* To eliminate horizontal and row-drift clipping, crops are now padded to the **full horizontal width** of the document with **+/-1 row vertical padding**. Furthermore, all crops for a document are batched into **1 single API call** via multi-image inline data parts, and double-read is executed only for fields that would initially be labelled `Consistent`. Tested live against Gemini 3.1 Flash Lite, this achieved **100.0% agreement (14 of 14 checks)** on scans 11-14 with **0 disagreements** while reducing secondary API calls from 14 down to **4 calls** (a 71% reduction).
 >   - *Conditional Visual Overlays:* Visual bounding-box overlays on document previews are withheld unless the crop read confirms agreement with the full-page read. If unconfirmed or failed, the UI presents the verbatim quote alongside a `"Location not verified"` warning badge to prevent deceptive bounding boxes.
 > - **Dual Symmetrical Metrics (False-Consistent vs. True-Consistent Recall):**
 >   - *False-Consistent Rate (Safety):* *Of the field pairs whose ground truth actually differs across documents, how many were labelled Consistent?* Parity achieved **0 of 31 false-consistent errors (0.0%)** across 9 distinct scan sets.
@@ -142,8 +142,8 @@ In our ground-truth evaluation, exactly two pairs whose ground truth actually ag
 >   - *Strict Verification Mode (`Strict verification` ON - Default):*
 >     - **Default:** **ON** (enabled by default because the post-fix agreement rate is high: 93.6% overall and 100% on clean scans).
 >     - **API Cost:** **4 to 6 API calls total** (3 full-page calls + 1 batched crop call per document containing Consistent fields).
->     - **Behavior:** Runs full-page perception, identifies fields initially labelled `Consistent`, crops full-width horizontal bands ($\pm 1$ row), and batches each document's crops into a single secondary verification call. If the crop read agrees, the field is certified `Consistent` and the visual overlay is displayed; otherwise, the overlay is withheld and marked `"Location not verified"`.
-> - **Observed 503 & Timeout Behavior:** Under high demand, Google Gemini endpoints frequently return HTTP 503 (`UNAVAILABLE / The model is overloaded`) or take $>25$s per multimodal inference. Parity implements:
+>     - **Behavior:** Runs full-page perception, identifies fields initially labelled `Consistent`, crops full-width horizontal bands (+/-1 row), and batches each document's crops into a single secondary verification call. If the crop read agrees, the field is certified `Consistent` and the visual overlay is displayed; otherwise, the overlay is withheld and marked `"Location not verified"`.
+> - **Observed 503 & Timeout Behavior:** Under high demand, Google Gemini endpoints frequently return HTTP 503 (`UNAVAILABLE / The model is overloaded`) or take over 25 seconds per multimodal inference. Parity implements:
 >   1. **Exponential Backoff Retries:** 2 automatic retries with progressive backoff delay for transient 503, 429, and network errors.
 >   2. **Automated Model Fallback:** Seamless fallback from primary model (`gemini-3.1-flash-lite`) to fallback model (`gemini-2.5-flash`).
 >   3. **Graceful HTTP 503 Route Handling:** When all upstream retries and fallbacks are exhausted, `/api/extract` returns clean HTTP 503 (`service_unavailable`) prompting users to test the instant offline sample packets. Unit tests in `tests/unit/gemini-fallback.test.ts` and `tests/unit/extract-route.test.ts` verify the 503 path and fallback execution.

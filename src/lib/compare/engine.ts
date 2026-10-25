@@ -93,7 +93,7 @@ export function runVerification(
       source: raw?.source || 'extracted',
       highlight_bbox: raw?.highlight_bbox,
       double_read: raw?.double_read,
-      preview_url: sampleUrls[packetType]?.[docType],
+      preview_url: docMap.get(docType)?.preview_url || sampleUrls[packetType]?.[docType],
     };
   };
 

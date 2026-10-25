@@ -14,3 +14,12 @@ test-results/
 .DS_Store
 *.log
 *.tsbuildinfo
+
+# Local video tooling and render artifacts (never part of the submission)
+/remotion/
+/video/
+/out/
+*.mp4
+*.mov
+*.webm
+*.wav

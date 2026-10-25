@@ -93,12 +93,12 @@ In under 60 seconds without needing an API key:
   - Ambiguous numeric dates flag `Needs Review` unless day > 12, month is textual, or date format setting resolves it.
   - Locale-aware number grouping: US (`1,234.56`), European (`1.234,56`), and space-separated (`1 234,56`).
   - Multi-currency disparity flags `Needs Review`.
-  - Income frequency scaling (weekly $\times 52$, biweekly $\times 26$, monthly $\times 12$) showing multiplication factors in explanations.
+  - Income frequency scaling (weekly x52, biweekly x26, monthly x12) showing multiplication factors in explanations.
   - Cultural name variance (accents, hyphenated surnames, particles like `de`/`van`, family-name-first) flags `Needs Review`.
   - GPA scale awareness (4.0, 5.0, percentage) flagging scale mismatches for human review.
 
 ### 2026-10-23 — Bounding-Box Double-Read Refinement & Strict Verification Mode
-- **Batched Full-Width Band Cropping:** Double-read cropping expanded from narrow bounding boxes to full-width horizontal bands ($\pm 1$ row padding) to resolve narrow bounding-box vertical offsets into adjacent rows.
+- **Batched Full-Width Band Cropping:** Double-read cropping expanded from narrow bounding boxes to full-width horizontal bands (+/-1 row padding) to resolve narrow bounding-box vertical offsets into adjacent rows.
 - **Document-Level Batching:** Secondary verification calls are batched per document into 1 single API call using multi-image inline data parts, cutting secondary calls from 14 down to 4.
 - **Double-Read Scope:** Secondary verification is restricted strictly to fields initially classified as `Consistent` by the deterministic engine.
 - **Conditional Visual Overlay Policy:** Preview bounding-box overlays are suppressed unless the secondary crop read confirms agreement with the primary full-page read; otherwise the verbatim quote is presented alongside a `"Location not verified"` warning badge.

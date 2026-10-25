@@ -49,7 +49,7 @@ export function SummaryCounters({
         {/* Card 1: Conflicts */}
         <div
           data-testid="counter-conflicts"
-          className="bg-white dark:bg-[#121620] rounded-2xl p-4 sm:p-5 shadow-xs border border-neutral-200/80 dark:border-neutral-800 flex flex-col justify-between"
+          className="bg-white dark:bg-[#121620] rounded-2xl p-4 sm:p-5 shadow-xs border border-neutral-200/80 dark:border-neutral-800 flex flex-col justify-between hover-card-lift transition-all duration-300 hover:border-neutral-300 dark:hover:border-neutral-700 animate-fadeIn"
         >
           <div>
             <div className="flex items-center justify-between text-[13px]">
@@ -57,10 +57,10 @@ export function SummaryCounters({
               <span className="text-neutral-500 dark:text-neutral-400 font-normal">This Packet</span>
             </div>
             <div className="flex items-center gap-2.5 mt-2.5">
-              <span className="text-3xl text-[28px] font-semibold text-neutral-900 dark:text-white leading-none tracking-tight">
+              <span className="text-3xl text-[28px] font-semibold text-neutral-900 dark:text-white leading-none tracking-tight transition-all">
                 {isAnalyzing ? '—' : conflicts}
               </span>
-              <span className="inline-flex items-center gap-1 bg-red-50 text-red-600 dark:bg-red-950/60 dark:text-red-300 rounded-full px-2 py-0.5 text-[11px] font-medium">
+              <span className="inline-flex items-center gap-1 bg-red-50 text-red-600 dark:bg-red-950/60 dark:text-red-300 rounded-full px-2 py-0.5 text-[11px] font-medium animate-badgePop">
                 <AlertTriangle className="w-3 h-3 stroke-[2.5]" />
                 {conflicts > 0 ? `${conflicts} Conflicts` : 'Zero'}
               </span>
@@ -73,7 +73,7 @@ export function SummaryCounters({
         </div>
 
         {/* Card 2: Consistency Match Gauge */}
-        <div className="bg-white dark:bg-[#121620] rounded-2xl p-4 sm:p-5 shadow-xs border border-neutral-200/80 dark:border-neutral-800 flex flex-col justify-between sm:col-span-2 lg:col-span-1">
+        <div className="bg-white dark:bg-[#121620] rounded-2xl p-4 sm:p-5 shadow-xs border border-neutral-200/80 dark:border-neutral-800 flex flex-col justify-between sm:col-span-2 lg:col-span-1 hover-card-lift transition-all duration-300 hover:border-neutral-300 dark:hover:border-neutral-700 animate-fadeIn [animation-delay:60ms]">
           <div>
             <div className="flex items-center justify-between text-[13px]">
               <span className="text-[#ef4d23] font-medium">Match Score</span>
@@ -97,7 +97,7 @@ export function SummaryCounters({
         {/* Card 3: Consistent */}
         <div
           data-testid="counter-consistent"
-          className="bg-white dark:bg-[#121620] rounded-2xl p-4 sm:p-5 shadow-xs border border-neutral-200/80 dark:border-neutral-800 flex flex-col justify-between"
+          className="bg-white dark:bg-[#121620] rounded-2xl p-4 sm:p-5 shadow-xs border border-neutral-200/80 dark:border-neutral-800 flex flex-col justify-between hover-card-lift transition-all duration-300 hover:border-neutral-300 dark:hover:border-neutral-700 animate-fadeIn [animation-delay:120ms]"
         >
           <div>
             <div className="flex items-center justify-between text-[13px]">
@@ -105,10 +105,10 @@ export function SummaryCounters({
               <span className="text-neutral-500 dark:text-neutral-400 font-normal">Consistent</span>
             </div>
             <div className="flex items-center gap-2.5 mt-2.5">
-              <span className="text-3xl text-[28px] font-semibold text-neutral-900 dark:text-white leading-none tracking-tight">
+              <span className="text-3xl text-[28px] font-semibold text-neutral-900 dark:text-white leading-none tracking-tight transition-all">
                 {isAnalyzing ? '—' : consistent}
               </span>
-              <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 rounded-full px-2 py-0.5 text-[11px] font-medium">
+              <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 rounded-full px-2 py-0.5 text-[11px] font-medium animate-badgePop">
                 <CheckCircle2 className="w-3 h-3 stroke-[2.5]" />
                 Values Match
               </span>
@@ -123,7 +123,7 @@ export function SummaryCounters({
         {/* Card 4: Needs Review */}
         <div
           data-testid="counter-needs-review"
-          className="bg-white dark:bg-[#121620] rounded-2xl p-4 sm:p-5 shadow-xs border border-neutral-200/80 dark:border-neutral-800 flex flex-col justify-between"
+          className="bg-white dark:bg-[#121620] rounded-2xl p-4 sm:p-5 shadow-xs border border-neutral-200/80 dark:border-neutral-800 flex flex-col justify-between hover-card-lift transition-all duration-300 hover:border-neutral-300 dark:hover:border-neutral-700 animate-fadeIn [animation-delay:180ms]"
         >
           <div>
             <div className="flex items-center justify-between text-[13px]">
@@ -131,10 +131,10 @@ export function SummaryCounters({
               <span className="text-neutral-500 dark:text-neutral-400 font-normal">Pending</span>
             </div>
             <div className="flex items-center gap-2.5 mt-2.5">
-              <span className="text-3xl text-[28px] font-semibold text-neutral-900 dark:text-white leading-none tracking-tight">
+              <span className="text-3xl text-[28px] font-semibold text-neutral-900 dark:text-white leading-none tracking-tight transition-all">
                 {isAnalyzing ? '—' : needsReview}
               </span>
-              <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 rounded-full px-2 py-0.5 text-[11px] font-medium">
+              <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 rounded-full px-2 py-0.5 text-[11px] font-medium animate-badgePop">
                 <HelpCircle className="w-3 h-3 stroke-[2.5]" />
                 Ambiguous
               </span>

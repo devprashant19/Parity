@@ -45,7 +45,7 @@ export function UploadSlot({
     <div
       onDrop={handleDrop}
       onDragOver={handleDragOver}
-      className="bg-white dark:bg-[#121620] rounded-2xl p-4 sm:p-5 shadow-xs border border-neutral-200/80 dark:border-neutral-800 flex flex-col justify-between transition-all"
+      className="bg-white dark:bg-[#121620] rounded-2xl p-4 sm:p-5 shadow-xs border border-neutral-200/80 dark:border-neutral-800 flex flex-col justify-between hover-card-lift transition-all duration-300"
     >
       <input
         type="file"
@@ -60,7 +60,7 @@ export function UploadSlot({
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2.5">
           <div
-            className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+            className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors duration-200 ${
               loadedDoc
                 ? 'bg-[#ef4d23]/10 text-[#ef4d23] dark:bg-[#ef4d23]/20'
                 : 'bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400'
@@ -83,7 +83,7 @@ export function UploadSlot({
         </div>
 
         {loadedDoc && (
-          <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 rounded-full px-2 py-0.5 text-[11px] font-medium border border-emerald-200/60 dark:border-emerald-800/60">
+          <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 rounded-full px-2.5 py-0.5 text-[11px] font-medium border border-emerald-200/60 dark:border-emerald-800/60 animate-checkmarkPop shadow-2xs">
             <CheckCircle className="w-3 h-3 text-emerald-600" />
             <span>Ready</span>
           </span>
@@ -92,13 +92,13 @@ export function UploadSlot({
 
       {/* Body / Uploaded Preview or Dropzone */}
       {loadedDoc ? (
-        <div className="mt-4 flex items-center justify-between bg-[#f5f2ee] dark:bg-[#182030] p-2.5 rounded-xl border border-neutral-200/60 dark:border-neutral-700/60">
+        <div className="mt-4 flex items-center justify-between bg-[#f5f2ee] dark:bg-[#182030] p-2.5 rounded-xl border border-neutral-200/60 dark:border-neutral-700/60 animate-fadeIn transition-all duration-200">
           <div className="flex items-center gap-2.5 overflow-hidden">
             {loadedDoc.previewUrl ? (
               <img
                 src={loadedDoc.previewUrl}
                 alt={loadedDoc.fileName}
-                className="w-10 h-10 object-cover rounded-lg border border-neutral-200 dark:border-neutral-700 shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
+                className="w-10 h-10 object-cover rounded-lg border border-neutral-200 dark:border-neutral-700 shrink-0 cursor-pointer hover:opacity-90 hover:scale-105 active:scale-95 transition-all duration-200"
                 onClick={onViewDoc}
               />
             ) : (
@@ -114,7 +114,7 @@ export function UploadSlot({
                 {loadedDoc.fileName}
               </p>
               <p className="text-[10px] text-neutral-500 dark:text-neutral-400 font-medium">
-                {loadedDoc.fileSize} {loadedDoc.isSample ? '• Sample' : '• Uploaded'}
+                {loadedDoc.fileSize} • Verified Document
               </p>
             </div>
           </div>

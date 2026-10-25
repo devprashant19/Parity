@@ -12,7 +12,7 @@ The system is split into two strict layers:
 1. **Perception (AI Extraction):** When a student uploads document scans or PDFs, a server-side Gemini multimodal API call reads the text and extracts five key fields (`name`, `academic_year`, `marks`, `income`, `issue_date`). For every field, the model must return the extracted value, a short verbatim quote (under 200 characters) containing that value and surrounding context, the page number, and a self-reported confidence score. If a field cannot be seen clearly, the model returns `null`.
 2. **Judgment (Deterministic Engine):** The AI is never allowed to decide whether two documents match. A pure TypeScript comparison engine takes the extracted data, normalizes values (converting international and regional currency numbers, standardizing dates, and handling per-month vs per-annum conversions), and verifies that each extracted value literally appears within the quoted text. The engine then categorizes each field into one of three strict states using a clear precedence hierarchy: `Conflict` > `Needs Review` > `Consistent`.
 
-The student interacts with an inspection dashboard. For precomputed demos, the system runs with zero network calls in $<2$ seconds using synthetic document assets. For flagged fields, a slide-over drawer shows side-by-side document quotes and previews. When the student indicates which document is correct, a prioritized "Fix before submitting" checklist generates ethical, actionable advice: telling the student to edit their application form if the form was wrong, or to request a re-issued document from the authority if an official certificate was wrong.
+The student interacts with an inspection dashboard. For precomputed demos, the system runs with zero network calls in under 2 seconds using synthetic document assets. For flagged fields, a slide-over drawer shows side-by-side document quotes and previews. When the student indicates which document is correct, a prioritized "Fix before submitting" checklist generates ethical, actionable advice: telling the student to edit their application form if the form was wrong, or to request a re-issued document from the authority if an official certificate was wrong.
 
 ## The Core Journey Through the System
 Implements `prd.md > The Core Journey`.
@@ -21,10 +21,10 @@ Implements `prd.md > The Core Journey`.
 2. **User clicks "Load sample packet" or "Try a messy packet":**
    - The client loads pre-extracted fixture data from `src/data/samples/`.
    - The client passes this data directly to `src/lib/compare/engine.ts`.
-   - In $<2$s, the engine returns the evaluation results. Summary counters animate, and the checklist renders with badges (`Consistent`, `Conflict`, `Needs Review`).
+   - In under 2 seconds, the engine returns the evaluation results. Summary counters animate, and the checklist renders with badges (`Consistent`, `Conflict`, `Needs Review`).
 3. **User runs "Live check" with uploaded files:**
    - Client validates file types (PDF, PNG, JPEG).
-   - Client downscales images in the browser (max 1600px on the longest side, JPEG quality 0.85) to ensure each file is $\le 1.5$MB and total multipart payload is $<4.0$MB (safely beneath Vercel's 4.5MB serverless limit). PDFs $>1.5$MB are rejected before upload.
+   - Client downscales images in the browser (max 1600px on the longest side, JPEG quality 0.85) to ensure each file is 1.5 MB or less and total multipart payload is under 4.0 MB (safely beneath Vercel's 4.5MB serverless limit). PDFs over 1.5 MB are rejected before upload.
    - Client sends payload to `POST /api/extract`.
    - Route handler checks `LIVE_CHECK_ENABLED`, enforces in-memory rate limits, validates magic file signatures, converts files to base64 `inlineData`, and calls Gemini via `@google/genai` with a strict prompt and Zod schema.
    - Route handler runs the deterministic engine on the extracted facts and returns verified field comparisons.
@@ -48,7 +48,7 @@ The deterministic engine evaluates each field strictly across its designated sou
 | `name` | Student Name | **Application Form**, **Marksheet**, **Income Certificate** (Pairwise: Form vs Marksheet, Form vs Income Cert) | Full legal name, tokens, initials |
 | `academic_year` | Academic Year | **Application Form**, **Marksheet** | Enrollment year string (e.g. "2024-25") |
 | `marks` | Marks Percentage | **Application Form**, **Marksheet** | Overall percentage score (e.g. "89.4%") |
-| `income` | Annual Family Income | **Application Form**, **Income Certificate** | Gross annual income in INR (supports monthly $\times 12$) |
+| `income` | Annual Family Income | **Application Form**, **Income Certificate** | Gross annual income in INR (supports monthly x12) |
 | `issue_date` | Certificate Issue Date | **Application Form** (reported date), **Income Certificate** (official issue date) | Certificate issuance date (DD/MM/YYYY) |
 
 ### 2. Preset Packets Matrix
@@ -61,11 +61,11 @@ Parity includes pre-configured packet templates that adapt the comparison matrix
 When defining custom fields in the packet editor, fields map to one of five deterministic comparison engines:
 | Field Type | Canonical Normalization | Matching & Comparison Logic | Classification Rules |
 | :--- | :--- | :--- | :--- |
-| `name` | Unicode normalization, accent folding, title-casing, cultural name parsing (Mr., Ms., Dr., Prof.). | Pairwise token matching: full set equality after accent folding, permutation invariance, single-initial compatibility. | Exact token match or accent-folded match (e.g. "José" / "Jose") $\to$ `Consistent` (with note in explanation); Initial mismatch, compound surname, or particle $\to$ `Needs Review`; Disjoint token sets $\to$ `Conflict`. |
-| `date` | Parse DD/MM/YYYY, YYYY-MM-DD, MM/DD/YYYY, and textual dates (e.g., "12 Aug 2024"). | Calendar date comparison (year, month, day) independent of client timezone or formatting. | Identical date $\to$ `Consistent`; Ambiguous day/month (e.g. 05/06 vs 06/05) $\to$ `Needs Review`; Different calendar dates $\to$ `Conflict`. |
-| `amount` | Strip currency symbols (`$`, `€`, `£`, `₹`), locale grouping; regional numeral conversion; detect per-month vs per-annum. | Exact numerical comparison in base currency units; automatic monthly/weekly/biweekly scaling. | Equal numerical value $\to$ `Consistent`; Currency or scale mismatch $\to$ `Needs Review`; Unequal value $\to$ `Conflict`. |
-| `id` | Uppercase normalization, strip hyphens, spaces, and punctuation (e.g., SSN, National ID, Student ID, Tax ID). | Exact alphanumeric string equality. | Identical sanitized string $\to$ `Consistent`; Missing characters or OCR noise $\to$ `Needs Review`; Mismatched alphanumeric string $\to$ `Conflict`. |
-| `text` | Trim whitespace, lowercase/uppercase canonicalization, punctuation collapsing. | Deterministic normalized string equality and quote containment verification. | Equal text $\to$ `Consistent`; Confidence $<0.7$ or containment failure $\to$ `Needs Review`; Disjoint non-empty values $\to$ `Conflict`. |
+| `name` | Unicode normalization, accent folding, title-casing, cultural name parsing (Mr., Ms., Dr., Prof.). | Pairwise token matching: full set equality after accent folding, permutation invariance, single-initial compatibility. | Exact token match or accent-folded match (e.g. "José" / "Jose") → `Consistent` (with note in explanation); Initial mismatch, compound surname, or particle → `Needs Review`; Disjoint token sets → `Conflict`. |
+| `date` | Parse DD/MM/YYYY, YYYY-MM-DD, MM/DD/YYYY, and textual dates (e.g., "12 Aug 2024"). | Calendar date comparison (year, month, day) independent of client timezone or formatting. | Identical date → `Consistent`; Ambiguous day/month (e.g. 05/06 vs 06/05) → `Needs Review`; Different calendar dates → `Conflict`. |
+| `amount` | Strip currency symbols (`$`, `€`, `£`, `₹`), locale grouping; regional numeral conversion; detect per-month vs per-annum. | Exact numerical comparison in base currency units; automatic monthly/weekly/biweekly scaling. | Equal numerical value → `Consistent`; Currency or scale mismatch → `Needs Review`; Unequal value → `Conflict`. |
+| `id` | Uppercase normalization, strip hyphens, spaces, and punctuation (e.g., SSN, National ID, Student ID, Tax ID). | Exact alphanumeric string equality. | Identical sanitized string → `Consistent`; Missing characters or OCR noise → `Needs Review`; Mismatched alphanumeric string → `Conflict`. |
+| `text` | Trim whitespace, lowercase/uppercase canonicalization, punctuation collapsing. | Deterministic normalized string equality and quote containment verification. | Equal text → `Consistent`; Confidence below 0.7 or containment failure → `Needs Review`; Disjoint non-empty values → `Conflict`. |
 
 ## Stack
 Implements `prd.md > Implementation Priorities`.
@@ -136,7 +136,7 @@ Implements `prd.md > Screens and Layout`, `prd.md > Features and Behavior`.
 ### IngestionZone (`src/components/IngestionZone.tsx`)
 - Houses primary action buttons: `"Load sample scholarship packet"`, `"Try a messy packet"`, and `"Reset"`.
 - Contains three `UploadSlot` components (Application Form, Marksheet, Income Certificate) with dropzone drag-and-drop, file type badges, and preview thumbnails.
-- Client-side downscaling handler: Resizes images to max 1600px JPEG before upload; validates file size $\le 1.5$MB.
+- Client-side downscaling handler: Resizes images to max 1600px JPEG before upload; validates file size 1.5 MB or less.
 - Displays live upload privacy warning notice.
 - PRD ref: `prd.md > Features and Behavior > 1. Ingestion & Dual Sample Presets`.
 
@@ -241,7 +241,7 @@ export function verifyQuoteContainment(value: string | null, quote: string | nul
 
 ### 2. Status Precedence & Tri-State Evaluation
 When evaluating multiple pairwise comparisons or aggregation steps, status precedence is strictly:
-$$\mathbf{Conflict} > \mathbf{Needs\ Review} > \mathbf{Consistent}$$
+`Conflict > Needs Review > Consistent`
 
 - If any pair evaluates to `Conflict`, the aggregated field is `Conflict`.
 - If no pair is `Conflict`, but at least one pair is `Needs Review`, the field is `Needs Review`.
@@ -251,8 +251,8 @@ $$\mathbf{Conflict} > \mathbf{Needs\ Review} > \mathbf{Consistent}$$
 | Case | Document A | Document B | Normalized Comparison | Pair Status | Precedence Reason |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | Exact Match | Suresh Sharma | Suresh Sharma | `["suresh", "sharma"]` == `["suresh", "sharma"]` | `Consistent` | Identical tokens |
-| Accent Folding | José Alvarez | Jose Alvarez | Fold accents $\to$ `["jose", "alvarez"]` == `["jose", "alvarez"]` | `Consistent` | Exact name match after accent folding (note in explanation) |
-| Title/Honorific | Shri Suresh Sharma | Suresh Sharma | Strips "Shri" $\rightarrow$ Identical | `Consistent` | Honorific ignored |
+| Accent Folding | José Alvarez | Jose Alvarez | Fold accents → `["jose", "alvarez"]` == `["jose", "alvarez"]` | `Consistent` | Exact name match after accent folding (note in explanation) |
+| Title/Honorific | Shri Suresh Sharma | Suresh Sharma | Strips "Shri" → Identical | `Consistent` | Honorific ignored |
 | Reordered | Sharma Suresh | Suresh Sharma | Identical set, different order | `Needs Review` | Possible match, reordered |
 | Initials | S. Sharma | Suresh Sharma | Initial token "s" matches prefix "suresh" | `Needs Review` | Possible match, initials |
 | Single Token | Suresh | Suresh Sharma | Single token vs full name | `Needs Review` | Incomplete name token |
@@ -264,15 +264,15 @@ $$\mathbf{Conflict} > \mathbf{Needs\ Review} > \mathbf{Consistent}$$
 - **Number Grouping:** Converts strings with international standard or South Asian grouping (e.g. `"240,000"`, `"2,40,000"`, `"1,80,000"`) to raw integers `240000`, `180000`.
 - **Currency & Frequency:**
   - Strips symbols & currency codes: `$`, `€`, `£`, `¥`, `₹`, `USD`, `EUR`, `GBP`, `CAD`, `AUD`, `INR`, `Rs.`, `/-`.
-  - Detects period tokens: `"per month"`, `"/month"`, `"/mo"`, `"p.m."` $\rightarrow$ multiplies value by 12 to annualize.
-  - Detects `"per annum"`, `"/year"`, `"/yr"`, `"annual"`, `"p.a."` $\rightarrow$ maintains annual value.
-  - If period is ambiguous $\rightarrow$ flags `Needs Review`.
-- **Marks Percentage:** Strips `%`, parses to `float` rounded to 1 decimal place (`92.4%` $\rightarrow$ `92.4`). If scale is detected as CGPA (e.g. `8.9/10`) without explicit conversion formula $\rightarrow$ flags `Needs Review`.
+  - Detects period tokens: `"per month"`, `"/month"`, `"/mo"`, `"p.m."` → multiplies value by 12 to annualize.
+  - Detects `"per annum"`, `"/year"`, `"/yr"`, `"annual"`, `"p.a."` → maintains annual value.
+  - If period is ambiguous → flags `Needs Review`.
+- **Marks Percentage:** Strips `%`, parses to `float` rounded to 1 decimal place (`92.4%` → `92.4`). If scale is detected as CGPA (e.g. `8.9/10`) without explicit conversion formula → flags `Needs Review`.
 
 ### 5. Date Normalization (`src/lib/normalize/dates.ts`)
 - Parses dates using DD/MM/YYYY as primary default.
 - Converts to canonical ISO date string `YYYY-MM-DD` for equality check.
-- If date is ambiguous (e.g., cannot be parsed or invalid calendar date) $\rightarrow$ flags `Needs Review`.
+- If date is ambiguous (e.g., cannot be parsed or invalid calendar date) → flags `Needs Review`.
 
 ## File Structure
 
@@ -360,7 +360,7 @@ e:\Parity/
 
 ## Important Failure Modes & Fallbacks
 1. **Payload Too Large for Vercel Serverless (HTTP 413):**
-   - *Mitigation:* Client automatically downscales document images to max 1600px on the longest dimension (JPEG quality 0.85) before upload. Each file is capped at 1.5MB and total request is capped at $<4.0$MB. PDFs exceeding 1.5MB are rejected immediately on the client with message: *"PDF exceeds 1.5MB limit. Please compress or upload page images."*
+   - *Mitigation:* Client automatically downscales document images to max 1600px on the longest dimension (JPEG quality 0.85) before upload. Each file is capped at 1.5 MB and total request is capped at under 4.0 MB. PDFs exceeding 1.5 MB are rejected immediately on the client with message: *"PDF exceeds 1.5MB limit. Please compress or upload page images."*
 2. **Gemini API Down / Key Expired / Rate Limited:**
    - *Behavior:* Server returns HTTP 503 with `{ error: "live_unavailable" }`. Client renders prominent top banner: *"Live check is unavailable right now. Test the instant sample packet below."* Precomputed sample buttons remain 100% operational.
 3. **Unreadable Scan / Model Returns Null / Containment Fails:**
@@ -371,7 +371,7 @@ e:\Parity/
 ## What Was Simplified and Why
 - **In-Memory Ephemeral Processing** instead of a cloud database (Postgres/Supabase): Eliminates database hosting, migration setup, and user account maintenance while guaranteeing student PII privacy.
 - **Client-Side Image Downscaling** instead of server-side thumbnail generation: Keeps serverless compute lightweight and guarantees request payloads remain within Vercel's 4.5MB ceiling.
-- **Precomputed Synthetic Samples** instead of requiring live API execution for demos: Guarantees a flawless, instant ($<2$s) 60-second video demo that never fails due to network latency, Wi-Fi drops, or API quotas.
+- **Precomputed Synthetic Samples** instead of requiring live API execution for demos: Guarantees a flawless, instant (under 2 seconds) 60-second video demo that never fails due to network latency, Wi-Fi drops, or API quotas.
 - **Single Benchmark Packet Preset** instead of arbitrary schema builder: Focuses 100% of technical effort on the verification kernel, edge cases, and high-trust UI rather than generic form-builder complexity.
 
 ## Decisions and Open Issues
@@ -396,7 +396,7 @@ e:\Parity/
 
 ### 2026-10-23 — Pre-Submission Scope Expansion (Slices A–D)
 - **Slice A (Bounding-Box Evidence Architecture):**
-  - Updated extraction contract to request normalized bounding boxes `[ymin, xmin, ymax, xmax]` (or `{ x, y, width, height }` normalized to $0.0 \dots 1.0$) with each extracted fact.
+  - Updated extraction contract to request normalized bounding boxes `[ymin, xmin, ymax, xmax]` (or `{ x, y, width, height }` normalized to 0.0 to 1.0) with each extracted fact.
   - Implemented visual highlight bounding-box overlays across document previews in `EvidenceDrawer` and `DocumentModal`.
   - Added precomputed normalized bounding boxes for all sample packet fields in `src/data/samples.ts`.
   *Why:* Plain-text verbatim quotes prove the words exist, but students inspecting high-density multi-page forms need immediate visual localization directly overlaid on the scan.
@@ -421,16 +421,16 @@ e:\Parity/
   - USD Scholarship Packet: Application form, academic transcript (GPA out of 4.0), and tax statement (dates formatted as "12 Aug 2024"). Maintains 3 Conflicts / 2 Consistent benchmark.
   - EUR/GBP Multi-Locale Packet: Compound surnames ("Maria J. Alvarez" vs "Maria Alvarez"), diacritics/accents ("José" vs "Jose"), and monthly income annualization producing `Needs Review`.
 - **Locale-Aware Deterministic Rules Specification:**
-  - `evaluateDate`: Ambiguous numeric dates (e.g. `03/04/2024` where both day and month $\le 12$) flag `Needs Review` unless disambiguated by textual month or an explicit setting (`Auto`, `DMY`, `MDY`).
+  - `evaluateDate`: Ambiguous numeric dates (e.g. `03/04/2024` where both day and month are 12 or less) flag `Needs Review` unless disambiguated by textual month or an explicit setting (`Auto`, `DMY`, `MDY`).
   - `normalizeNumeric`: Support US/UK grouping (`1,234.56`), European dot/comma grouping (`1.234,56`), space-separated (`1 234,56`), and South Asian grouping (`1,20,000`).
   - `evaluateCurrency`: Different currency tokens (e.g. `$` vs `€` vs `£`) trigger `Needs Review` without unverified foreign exchange assumptions.
-  - `evaluateIncome`: Weekly ($\times 52$), biweekly ($\times 26$), and monthly ($\times 12$) conversions with explicit multiplication factor shown in `diff_explanation`.
+  - `evaluateIncome`: Weekly (x52), biweekly (x26), and monthly (x12) conversions with explicit multiplication factor shown in `diff_explanation`.
   - `evaluateName`: Accent folding (NFD normalization), double/hyphenated surnames, cultural particles (`de`, `van`, `von`), and family-name-first order detection flagging `Needs Review`.
   - `evaluateGPA`: GPA scale differentiation (4.0, 5.0, percentage), flagging scale mismatches for human review.
   - `evaluateAcademicYear`: Support diverse international academic terms (`2024/2025`, `2024-2025`, `2024-25`, `AY 24/25`, `Fall 2024 - Spring 2025`).
 
 ### 2026-10-23 — Bounding-Box Double-Read Refinement & Strict Verification Mode
-- **Batched Full-Width Band Cropping:** Shifted double-read cropping from narrow bounding boxes to full-width horizontal bands ($\pm 1$ row padding) to resolve narrow bounding-box vertical offsets into adjacent rows.
+- **Batched Full-Width Band Cropping:** Shifted double-read cropping from narrow bounding boxes to full-width horizontal bands (+/-1 row padding) to resolve narrow bounding-box vertical offsets into adjacent rows.
 - **Document-Level Verification Batching:** Secondary verification calls are batched per document into 1 single API call using multi-image inline data parts, reducing secondary API calls from 14 down to 4.
 - **Double-Read Scope Constraint:** Secondary verification is restricted strictly to fields initially classified as `Consistent` by the deterministic engine.
 - **Conditional Visual Overlay Policy:** Document preview bounding-box overlays are suppressed unless the secondary crop read confirms agreement with the primary full-page read; otherwise the verbatim quote is presented alongside a `"Location not verified"` warning badge.

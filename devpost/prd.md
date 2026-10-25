@@ -95,21 +95,21 @@ Source: `scope.md > Inspiration & Identity`.
 Source: `scope.md > The Core Loop`, `scope.md > What "Working" Looks Like`.
 
 - **Sample 1: Clean Benchmark ("Load sample scholarship packet"):**
-  - Executes in $<2$ seconds using pre-extracted data with the real deterministic engine.
+  - Executes in under 2 seconds using pre-extracted data with the real deterministic engine.
   - Produces exactly: `3 Conflicts`, `2 Consistent`, `0 Needs Review`.
   - Planted values:
-    1. Marks Percentage: Application Form `92.4%` vs Marksheet `89.4%` $\rightarrow$ **`Conflict`**
-    2. Annual Income: Application Form `₹2,40,000/year` vs Income Certificate `₹1,80,000/year` $\rightarrow$ **`Conflict`**
-    3. Issue Date: Application Form `15/07/2024` vs Income Certificate `12/08/2024` $\rightarrow$ **`Conflict`**
-    4. Student Name: "Suresh Sharma" identical in all 3 documents $\rightarrow$ **`Consistent`**
-    5. Academic Year: "2024-25" on Form and Marksheet $\rightarrow$ **`Consistent`**
+    1. Marks Percentage: Application Form `92.4%` vs Marksheet `89.4%` → **`Conflict`**
+    2. Annual Income: Application Form `₹2,40,000/year` vs Income Certificate `₹1,80,000/year` → **`Conflict`**
+    3. Issue Date: Application Form `15/07/2024` vs Income Certificate `12/08/2024` → **`Conflict`**
+    4. Student Name: "Suresh Sharma" identical in all 3 documents → **`Consistent`**
+    5. Academic Year: "2024-25" on Form and Marksheet → **`Consistent`**
 - **Sample 2: Messy Preset ("Try a messy packet"):**
   - Demonstrates ambiguity and format normalization via the real comparison engine.
   - Includes:
-    - Name on Income Certificate written as "S. Sharma" while Form has "Suresh Sharma" $\rightarrow$ **`Needs Review`** ("Possible match, needs review").
-    - Income on Income Certificate stated as "₹15,000 per month" while Form has "₹1,80,000 per annum" $\rightarrow$ normalizes monthly to annual ($\times 12 = ₹1,80,000$) $\rightarrow$ **`Consistent`**.
+    - Name on Income Certificate written as "S. Sharma" while Form has "Suresh Sharma" → **`Needs Review`** ("Possible match, needs review").
+    - Income on Income Certificate stated as "₹15,000 per month" while Form has "₹1,80,000 per annum" → normalizes monthly to annual (x12 = ₹1,80,000) → **`Consistent`**.
 - **Live Upload Mode:**
-  - Rejects files $>10$MB or unsupported formats before upload.
+  - Rejects files over 10 MB or unsupported formats before upload.
   - Displays privacy notice clearly.
   - Uses server-side `GEMINI_API_KEY` with rate-limit and error fallback banner: *"Live check is unavailable right now. Try again shortly or test the instant sample packet."*
 
@@ -122,8 +122,8 @@ Source: `scope.md > The Unique Kernel`, `scope.md > The POC Boundary`.
   1. **Quote Containment:** The extracted value must literally appear inside the returned `quote`. If not, field transitions to `Needs Review` with message: *"Extracted value could not be confirmed in document text."*
   2. **Confidence Threshold:** High confidence requires meeting a numeric threshold (defined in `4-spec`). Below threshold transitions to `Needs Review`.
   3. **Normalization:**
-     - Number formatting (handles both standard international grouping `240,000` and South Asian grouping `2,40,000` $\rightarrow$ `240000`).
-     - Currency and unit normalization (`$3,000/mo` $\rightarrow$ `$36,000/yr`, `₹15,000/month` $\rightarrow$ `₹1,80,000/year`).
+     - Number formatting (handles both standard international grouping `240,000` and South Asian grouping `2,40,000` → `240000`).
+     - Currency and unit normalization (`$3,000/mo` → `$36,000/yr`, `₹15,000/month` → `₹1,80,000/year`).
      - Date parsing supporting ISO (`YYYY-MM-DD`), DD/MM/YYYY, and DD-Month-YYYY.
      - Name cleaning (trim whitespace, lowercase, remove honorifics like "Shri", "Mr.", "Ms.", punctuation).
   4. **Pairwise 3-Document Matching (Name):**
@@ -169,7 +169,7 @@ Source: `scope.md > What "Working" Looks Like`.
 
 - **Empty / Initial State:** Dropzones ready, sample buttons highlighted.
 - **Sample Loaded State:** 3 synthetic document cards visible. Run check button active.
-- **Analyzing State:** Progress spinner, completes in $<2$s for sample.
+- **Analyzing State:** Progress spinner, completes in under 2 seconds for sample.
 - **Results State:** Counters show breakdown. 5-field checklist populated. Results disclaimer footer visible.
 - **Evidence Drawer Open:** Drawer visible on right side; checklist active on left. Active field highlighted. Close button or Esc dismisses.
 - **Manual Entry State:** Inline input on evidence card with "Save & Re-evaluate" button. Result tagged "Entered by you".
@@ -236,20 +236,20 @@ Source: `learner-profile.md > Collaboration and Communication Preferences`, `sco
   *Why:* Students need authoritative, offline-shareable documentation to present to college administrative desks and issuing authorities to dispute errors before deadlines.
 
 ### 2026-10-23 — International Generalization & Multi-Locale Verification
-- **Global Positioning & Tagline:** Replaced regional assumptions and terminology (e.g., "marksheet" $\rightarrow$ "academic transcript") across UI copy, documentation, and metadata. Standardized on the universal tagline: *"Make your documents agree before you submit."*
+- **Global Positioning & Tagline:** Replaced regional assumptions and terminology (e.g., "marksheet" → "academic transcript") across UI copy, documentation, and metadata. Standardized on the universal tagline: *"Make your documents agree before you submit."*
 - **International Benchmark Fixtures:**
   1. USD Scholarship Packet: Application form, academic transcript with GPA (e.g., 3.8 vs 3.5 out of 4.0), tax statement proof of income, and standard international dates ("12 Aug 2024"). Preserves the 3 Conflicts / 2 Consistent benchmark.
   2. Multi-Locale Packet (EUR/GBP): Features compound names ("Maria J. Alvarez" vs "Maria Alvarez"), accented names ("José" vs "Jose"), and monthly income frequency conversions producing `Needs Review`.
 - **Locale-Aware Deterministic Engine Features:**
-  - Date format ambiguity: Pure numeric dates (e.g., `03/04/2024`) flag `Needs Review` when day $\le 12$, unless disambiguated by textual months or an explicit date format setting (Auto/DMY/MDY).
+  - Date format ambiguity: Pure numeric dates (e.g., `03/04/2024`) flag `Needs Review` when day is 12 or less, unless disambiguated by textual months or an explicit date format setting (Auto/DMY/MDY).
   - Multi-locale numeric grouping: US standard (`1,234.56`), European dot/comma (`1.234,56`), space-separated (`1 234,56`), and South Asian grouping.
   - Multi-currency disparity: Cross-currency comparisons flag `Needs Review` without speculative currency conversions.
-  - Income frequency scaling: Weekly ($\times 52$), biweekly ($\times 26$), and monthly ($\times 12$) annualized conversions explicitly displaying the multiplication factor in the explanation.
+  - Income frequency scaling: Weekly (x52), biweekly (x26), and monthly (x12) annualized conversions explicitly displaying the multiplication factor in the explanation.
   - Cultural name normalization: Accent folding, double/hyphenated surnames, particles (`de`, `van`, `von`), and family-name-first orders flag `Needs Review`.
   - GPA scale awareness: Handles 4.0, 5.0, and percentage grading scales, flagging scale mismatches as `Needs Review`.
 
 ### 2026-10-23 — Bounding-Box Double-Read Refinement & Strict Verification Mode
-- **Batched Full-Width Band Cropping:** Rather than tight bounding box crops that drift vertically across rows in tabular layouts, crops are expanded to full document width with $\pm 1$ row padding. Crops for each document are batched into 1 secondary API call.
+- **Batched Full-Width Band Cropping:** Rather than tight bounding box crops that drift vertically across rows in tabular layouts, crops are expanded to full document width with +/-1 row padding. Crops for each document are batched into 1 secondary API call.
 - **Double-Read Scope:** Double-read is executed only for fields that would be labelled `Consistent` by the deterministic engine.
 - **Conditional Visual Overlays:** Visual highlight overlays are withheld unless the crop read confirms agreement with the full-page read; otherwise the quote is shown with a `"Location not verified"` warning badge.
 - **Strict Verification Toggle:** Added user toggle for "Strict verification" (default ON, measured agreement rate 100.0%) with clear API call cost and behavior documentation.

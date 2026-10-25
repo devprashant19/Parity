@@ -13,13 +13,16 @@
 ### Tagline
 *Make your documents agree before you submit.*
 
+- **Live Web Application:** [https://parity-devpost.vercel.app](https://parity-devpost.vercel.app)
+- **Demo Walkthrough Video:** [https://youtu.be/H-xauc5ope0](https://youtu.be/H-xauc5ope0)
+
 ### Elevator Pitch / What It Does
 Parity is an evidence-first, pre-submission packet verification tool that catches subtle data discrepancies across application forms and supporting certificates before submission. 
 
 Instead of asking an AI to decide whether documents match, Parity splits verification into two strict layers:
-1. **Multimodal Perception Only:** Google Gemini 3.1 Flash Lite reads document scans (PDF/PNG/JPEG) and extracts structured values alongside verbatim quoted text excerpts (&le; 200 characters), page citations, and normalized coordinate bounding boxes.
+1. **Multimodal Perception Only:** Google Gemini 3.1 Flash Lite reads document scans (PDF/PNG/JPEG) and extracts structured values alongside verbatim quoted text excerpts (at most 200 characters), page citations, and normalized coordinate bounding boxes.
 2. **Deterministic Mathematical Judgment:** Pure TypeScript rules perform international data normalization (currencies, dates, income frequencies, name tokens, GPA scales), verify literal quote containment, and evaluate document consistency into a tri-state classification:
-   $$\mathbf{Conflict} > \mathbf{Needs\ Review} > \mathbf{Consistent}$$
+   `Conflict > Needs Review > Consistent`
 
 The human applicant—never the AI—retains sole decision authority. An interactive side-by-side Evidence Drawer presents highlighted quotes and verified bounding-box scan overlays, empowering the student to select the authoritative document. Parity then generates an ethical, prioritized "Fix Before Submitting" remediation checklist, a downloadable PDF audit report, and a formal draft letter addressed to the issuing authority.
 
@@ -45,8 +48,8 @@ Parity solves this by enforcing that **the model never decides whether values ma
 ---
 
 ### What I Learned
-1. **The Bounding-Box Alignment Trap:** In our initial live multimodal runs, tight bounding-box crops suffered from vertical row-drift on dense tabular scans (e.g. capturing an adjacent taxpayer row rather than the income figure). Re-engineering the cropping pipeline to a full-width horizontal band (&plusmn;1 row padding) and batching document crops into single API calls raised double-read crop agreement from **28.6%** to **100.0%** on clean international scans.
-2. **Cultural & Global Data Realities:** Real applications cross national borders. What looks like a mismatch is often a cultural formatting standard: compound Hispanic surnames (`García Márquez`), accented spellings (`José` vs `Jose`), British hyphenated names, European dot-decimal grouping (`1.234,56 €`), and ambiguous numeric dates (`12/08/2024` where day and month are both &le; 12). Designing deterministic rules to gracefully elevate ambiguous forms to `Needs Review` rather than false errors is essential for student trust.
+1. **The Bounding-Box Alignment Trap:** In our initial live multimodal runs, tight bounding-box crops suffered from vertical row-drift on dense tabular scans (e.g. capturing an adjacent taxpayer row rather than the income figure). Re-engineering the cropping pipeline to a full-width horizontal band (+/-1 row padding) and batching document crops into single API calls raised double-read crop agreement from **28.6%** to **100.0%** on clean international scans.
+2. **Cultural & Global Data Realities:** Real applications cross national borders. What looks like a mismatch is often a cultural formatting standard: compound Hispanic surnames (`García Márquez`), accented spellings (`José` vs `Jose`), British hyphenated names, European dot-decimal grouping (`1.234,56 €`), and ambiguous numeric dates (`12/08/2024` where day and month are both 12 or less). Designing deterministic rules to gracefully elevate ambiguous forms to `Needs Review` rather than false errors is essential for student trust.
 3. **The Power of Spec-Driven Agentic Engineering:** Starting with approved specification documents (`scope.md`, `prd.md`, `spec.md`) and tracking slices in a disciplined checklist prevented feature creep and kept the architecture grounded in zero-hallucination verification.
 
 ---
@@ -70,7 +73,7 @@ Parity solves this by enforcing that **the model never decides whether values ma
   - **Batched Double-Read Agreement:** **93.6% (44 agreed / 47 checks)** across all scans; **100.0% (14 / 14 checks)** on international scans.
 - **The Two True-Consistent Pairs Flagged as "Needs Review":**
   1. `scan_01` vs `scan_06` on `name`: Initial abbreviation (`"S. Sharma"` vs `"Suresh Sharma"`). Parity refuses to auto-match initials to protect applicants from bureaucratic name-spelling disqualifications.
-  2. `scan_01` vs `scan_03` on `issue_date`: Ambiguous numeric date (`"12/08/2024"` vs `"12/08/2024"`) under `Auto` mode where day and month are both &le; 12.
+  2. `scan_01` vs `scan_03` on `issue_date`: Ambiguous numeric date (`"12/08/2024"` vs `"12/08/2024"`) under `Auto` mode where day and month are both 12 or less.
 - **Important Limitations & Caveats:**
   - *Synthetic Data Boundary:* All 14 benchmark scans are synthetic documents generated by automated scripts. High performance on these synthetic scans is **not a claim of universal OCR accuracy** across arbitrary unconstrained real-world paperwork.
   - *Clerical Parity vs. Fraud Authentication:* Parity checks clerical consistency across submitted pages; it does not authenticate government watermarks or detect fraudulent documents.
@@ -90,13 +93,13 @@ We utilized the **Devpost Learn Skill Pack** throughout the lifecycle of Parity 
    We documented user personas, core interaction loops, and specific UI states:
    - Primary instant path: Clean scholarship packet producing exactly 3 Conflicts and 2 Consistent.
    - Ambiguity test path: Messy packet testing `Needs Review` and income annualization.
-   - Tri-state precedence: $\mathbf{Conflict} > \mathbf{Needs\ Review} > \mathbf{Consistent}$.
+   - Tri-state precedence: `Conflict > Needs Review > Consistent`.
 3. **Phase 3: Technical Specification (`devpost/spec.md`):**  
-   We established explicit schemas for Gemini extraction, quote containment boundaries (&le; 200 characters), normalization tables for 5 countries/locales, and serverless constraint handling (client-side downscaling to &le; 1600px JPEG, `<4.0`MB total payload).
+   We established explicit schemas for Gemini extraction, quote containment boundaries (at most 200 characters), normalization tables for 5 countries/locales, and serverless constraint handling (client-side downscaling to 1600px JPEG or less, under 4.0 MB total payload).
 4. **Phase 4: Sliced Execution & Verifiable Checkpoints (`devpost/checklist.md`):**  
    We structured the project into atomic slices. Each slice was verified with mechanical commands (`npm test`, `npm run build`, `npm run test:e2e`) and learner checks before proceeding.
 5. **Phase 5: Real-World Iteration & Dated Revisions:**  
-   When early evaluation revealed bounding-box row-drift on dense tables, we didn't quietly tweak numbers. We logged the finding in dated revision entries across `scope.md`, `prd.md`, and `spec.md`, re-engineered the cropping pipeline into a batched full-width band (&plusmn;1 row), added a Strict verification toggle, and documented the before-and-after results honestly in `README.md`.
+   When early evaluation revealed bounding-box row-drift on dense tables, we didn't quietly tweak numbers. We logged the finding in dated revision entries across `scope.md`, `prd.md`, and `spec.md`, re-engineered the cropping pipeline into a batched full-width band (+/-1 row), added a Strict verification toggle, and documented the before-and-after results honestly in `README.md`.
 
 ---
 
@@ -120,9 +123,9 @@ We utilized the **Devpost Learn Skill Pack** throughout the lifecycle of Parity 
 Before finalizing your Devpost submission, verify each item:
 
 - [ ] **Public Repository URL:** GitHub repository is public and accessible (e.g. `https://github.com/devprashant19/Parity`).
-- [ ] **"Try It Out" Link:** Public Vercel URL added to Devpost project header (e.g. `https://parity-verify.vercel.app`).
+- [ ] **"Try It Out" Link:** Public Vercel URL added to Devpost project header ([https://parity-devpost.vercel.app](https://parity-devpost.vercel.app)).
 - [ ] **Open Source License:** MIT License file ([LICENSE](file:///e:/Parity/LICENSE)) is present at the repository root and detected by GitHub.
-- [ ] **Video Link:** Walkthrough video is uploaded, public/unlisted on YouTube or Vimeo, and runtime is strictly under 3:00 minutes (script targeted at 2:15).
+- [x] **Video Link:** [https://youtu.be/H-xauc5ope0](https://youtu.be/H-xauc5ope0) — Walkthrough video is uploaded, public/unlisted on YouTube (2:48 runtime, strictly under the 3:00 minute limit).
 - [ ] **Age of Majority:** Hackathon eligibility age checkbox confirmed.
 - [ ] **Project Description:** Devpost markdown description copied from Section 1 above with accurate headings, honest limitations, and measured benchmark results.
 - [ ] **Project Tags / Keywords:** `gemini-api`, `multimodal-vision`, `document-verification`, `nextjs`, `typescript`, `scholarships`, `admissions`, `zero-hallucination`.

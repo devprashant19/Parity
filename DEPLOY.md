@@ -54,7 +54,7 @@ Configure these in the Vercel Dashboard under **Project Settings → Environment
 ## 4. Serverless Timeout & Payload Boundaries
 
 - **Route Timeout (`maxDuration = 60`)**: The live extraction endpoint (`/api/extract`) explicitly exports `maxDuration = 60` to configure Vercel's Serverless Function execution ceiling to 60 seconds (Hobby max: 60s, Pro: up to 300s).
-- **Client-Side Image Downscaling**: All uploaded scan images are resized client-side in the browser to max 1600px JPEG ($\le 1.5$MB per file), ensuring total multipart payload stays $<4.0$MB, well within Vercel's 4.5MB request limit.
+- **Client-Side Image Downscaling**: All uploaded scan images are resized client-side in the browser to max 1600px JPEG (1.5 MB per file), ensuring total multipart payload stays under 4.0 MB, well within Vercel's 4.5MB request limit.
 - **Zero-PII Policy**: No file contents, applicant names, or extracted values are ever written to server logs.
 
 ---
@@ -65,7 +65,7 @@ Once deployed to your production URL (`https://<your-project>.vercel.app`):
 
 1. **Test Instant Offline Sample Path (Zero Network Calls):**
    - Click **"Load sample clean packet"** and **"Run Verification Check"**.
-   - Verify summary counters show **3 Conflicts, 2 Consistent, 0 Needs Review** in $<2$ seconds.
+   - Verify summary counters show **3 Conflicts, 2 Consistent, 0 Needs Review** in under 2 seconds.
    - Click the **Marks Percentage** row to verify the Evidence Drawer opens with side-by-side verbatim quotes (`92.4%` vs `89.4%`).
 2. **Test Messy Sample Path:**
    - Click **"Try messy packet"** and run check.
